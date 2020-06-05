@@ -143,28 +143,31 @@
 \mainmatter % Denotes the start of the main document content, resets page numbering and uses arabic numbers
 \setchapterstyle{kao} % Choose the default chapter heading style
 
-\input{chapters/introduction.tex}
+\input{chapters/Introduction.tex}
 
 \pagelayout{wide} % No margins
-\addpart{Theoretical Background and Methods}
+\addpart{Theoretical Background \& Related Work}
 \pagelayout{margin} % Restore margins
 
-%\input{chapters/options.tex}
-%\input{chapters/textnotes.tex}
-%\input{chapters/figsntabs.tex}
-%\input{chapters/references.tex}
+\input{chapters/MLandCV.tex}
+\input{chapters/GenModels.tex}
+\input{chapters/StyleTransfer.tex}
+\input{chapters/Optim.tex}
 
 \pagelayout{wide} % No margins
-\addpart{Contribution}
+\addpart{Contribution and Experiments}
 \pagelayout{margin} % Restore margins
 
-%\input{chapters/layout.tex}
-%\input{chapters/mathematics.tex}
+\input{chapters/NeuralRenderer.tex}
+\input{chapters/StrokeApprox.tex}
+\input{chapters/Ablations.tex}
 
 \pagelayout{wide} % No margins
 \addpart{Conclusion}
 \pagelayout{margin} % Restore margins
 
+\input{chapters/Discussion.tex}
+\input{chapters/Outlook.tex}
 
 \appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
 
@@ -172,7 +175,7 @@
 \addpart{Appendix}
 \pagelayout{margin} % Restore margins
 
-\input{chapters/appendix.tex}
+\input{chapters/Appendix.tex}
 
 %----------------------------------------------------------------------------------------
 
