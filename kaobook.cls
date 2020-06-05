@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % kaobook
 % LaTeX Class
-% Version 1.2 (4/1/2020)
+% Version 1.0 (5/6/19)
 %
 % This template originates from:
 % https://www.LaTeXTemplates.com
@@ -25,7 +25,7 @@
 %----------------------------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{kaobook}[2020/01/04 kaobook class v1.2]
+\ProvidesClass{kaobook}[2020/03/12 v1.1 kaobook]
 
 \newcommand{\@classname}{kaobook} % Class name
 \newcommand{\@baseclass}{scrbook} % Base class name
@@ -40,7 +40,7 @@
 \ProcessOptions\relax % Process the options
 
 \LoadClass{\@baseclass} % Load the base class
-\input{styles/kao.sty} % Load the code common to all classes
+\RequirePackage{styles/kao} % Load the code common to all classes
 
 %----------------------------------------------------------------------------------------
 %	FRONT-, MAIN-, BACK- MATTERS BEHAVIOUR
@@ -54,14 +54,14 @@
 \renewcommand{\frontmatter}{
 	\oldfrontmatter % First of all, call the old command
 
-	% Set some lengths used for the page headers
+	% Set some Lengths used for the page headers
 	\setlength{\overflowingheadlen}{\linewidth}
 	\addtolength{\overflowingheadlen}{\marginparsep}
 	\addtolength{\overflowingheadlen}{\marginparwidth}
 
 	\pagestyle{plain.scrheadings} % Use a plain style for the header and the footer
 	\pagelayout{wide} % Use a wide page layout
-	% \sloppy % Uncomment to better break long lines
+	% \sloppy % Required to better break long lines
 }
 
 %------------------------------------------------
@@ -73,12 +73,12 @@
 	% Add a blank page before the main matter if the front matter has an
 	% odd number of pages
 	\ifthispageodd{
-		\afterpage{\blankpage}
+	  \afterpage{\blankpage}
 	}{}
 
 	\oldmainmatter % Call the old command
 
-	% Set some lengths used for the page headers
+	% Set some Lengths used for the page headers
 	\setlength{\overflowingheadlen}{\linewidth}
 	\addtolength{\overflowingheadlen}{\marginparsep}
 	\addtolength{\overflowingheadlen}{\marginparwidth}
@@ -103,7 +103,7 @@
 \renewcommand{\backmatter}{
 	\oldbackmatter % Call the old command
 
-	% Set some lengths used for the page headers
+	% Set some Lengths used for the page headers
 	\setlength{\overflowingheadlen}{\linewidth}
 	\addtolength{\overflowingheadlen}{\marginparsep}
 	\addtolength{\overflowingheadlen}{\marginparwidth}
@@ -153,7 +153,7 @@
 	\setlength{\mtocshift}{0mm}
 }
 
-% Rules
+% Lines
 \renewcommand{\hrulefill}[1][0.4pt]{%
 	\leavevmode\leaders\hrule height #1\hfill\kern\z@%
 }
