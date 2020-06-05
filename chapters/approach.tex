@@ -55,7 +55,6 @@ using brush strokes.
     \labfig{genetic}
 \end{marginfigure}
 
-
 This is a similar task to what genetic algorithms already can do and have done in
 order to approximate images by other geometric shapes or even smaller photos (also 
 known as the popular photo mosaic effect).
@@ -65,19 +64,18 @@ radius and color; it then chooses the most successful samples and resamples agai
 in a region around these.
 This process is repeated again and again, until a certain level of convergence is reached.
 
-\begin{figure}
-    \includegraphics{photomosaic_starry_night}
-    \caption[]{Photo mosaic of Starry Night using only images by the Hubble Space Telescope. \url{http://www.astro.uvic.ca/~alexhp/new/figures/starrynight_HST.001.jpg}}
-    \labfig{photomosaic}
-\end{figure}
-
-
 As well as this does work, it is very much computationally expensive as most samples
 will not fit the image, thus searching for the tiny set fitting shapes requires
 to evaluate all the bad shapes as well.
 Since brush strokes have many more degrees of freedom and artworks usually consist
 of upwards of a few thousand brush strokes this will not be applicable to this problem
 until computational resources have become a few magnitudes more powerful.
+
+\begin{figure}
+    \includegraphics{photomosaic_starry_night}
+    \caption[]{Photo mosaic of Starry Night using only images by the Hubble Space Telescope. \url{http://www.astro.uvic.ca/~alexhp/new/figures/starrynight_HST.001.jpg}}
+    \labfig{photomosaic}
+\end{figure}
 
 This premise can be overcome, though, by using something that is known as as a differentiable
 renderer.
@@ -131,7 +129,7 @@ must be specifically created for this approach.
 There are several sources for brush strokes that are evaluated in the following part.
 
 
-\subsubbsection{Brush Stroke Images}
+\subsubsection{Brush Stroke Images}
 \labsubsubsec{bsimages}
 
 There are multiple sets of handrawn brush strokes available online.
@@ -156,7 +154,7 @@ It seems that this data set would be nice to replicate real world brush strokes
 as images but limitations to the data make it unlikely that a generator could learn
 a coherent representation from this.
 
-\subsubbsection{Painting Libraries}
+\subsubsection{Painting Libraries}
 \labsubsubsec{libmypaint}
 
 The mentioned work of SPIRAL \todo{cite this} relies on opposite data to real world
@@ -177,7 +175,7 @@ This data set is better suited for our task than the given images are but will t
 to make all rendering look a bit 'cartoonish' or flat, which could in turn limit
 convergence during the latter optimization process.
 
-\subsubbsection{Fluid Simulation}
+\subsubsection{Fluid Simulation}
 \labsubsubsec{fluidpaint}
 
 Fluid Paint \todo{cite website} is a project by \todo{name this guy} that uses simple
@@ -206,15 +204,98 @@ to allow for the creation of large data sets in a reasonable time frame.
 Even though this data set still has some weaknesses, it comes in as the probably best
 choice for training a differentiable renderer because of the noted reasons.
 
+\todo{add similar samples for all brush stroke methods.}
+
 Other notable mentions are the painting programs \todo{these two weird software stuff things}
 which allow for even more authentic brush strokes but lack a well documented interface
 in order to generate a vast number of brush strokes.
 
 
-\subsubbsection{Brush Stroke Formalism}
+\subsubsection{Brush Stroke Formalism}
 \labsubsubsec{formalism}
 With the means of data set production seized \todo{cut this joke}, what is left
-is to formulate the parameter that define the brush strokes.
+is to formulate the parameters that define the brush strokes.
+These parameters must quantify the following three properties of brush strokes:
+\begin{itemize}
+    \item color
+    \item thickness
+    \item path
+\end{itemize}
+
+The easiest of these three properties is quantifying the color.
+Naturally, computer vision relies on the RGB format the defines color as a set of
+three 8-Bit integer values between 0 and 255. 
+As for path and thickness these two properties depend on the given coordinate system.
+FluidPaint represents the canvas as a 2D plane in the $[0, 1]$ range, thus it makes
+sense to follow the same representation.
+
+Thickness thus becomes a value in $[0, 1]$  for each brush stroke, where 0 is and
+infinitely small brush stroke and 1 is a brush stroke with the width of the canvas.
+As both the edge cases do not make sense, the range is constrained to $[.03, .2]$
+which includes only brush strokes that are visible and also do not cover the whole canvas.
+
+Quantifying the path now is a little more tricky.
+The fluid dynamics simulation that FluidPaint uses relies on internal time steps
+at which the equations are evaluated and subsequently rendered.
+At the same time each step allows only a linear motion of the brush handle between
+positions $a$ and $b$.
+This means that any curved paths must be split into linear/straight segments, that
+should resemble a curved line.
+As more steps mean longer simulation times and fewer steps mean edgy movement, a
+value of 20 time steps per stroke is picked \todo{this is actually differernt as the steps depend on the lenght of the path. Look this up}.
+This is equivalent to the number of steps that SPIRAL used in their implementation.
+
+Another problem becomes how to express a curved path in numbers.
+The easiest representation would be a sequence of points which make up the path of
+interest.
+This would give the highest versatility but at the same time introduce a noticeable
+amount of parameters as each point consists of 2 coordinates rendering 40 values.
+These values are also not independent but should follow are reasonable path as otherwise
+the resulting brush stroke would look rather like a random walk than a believable
+brush stroke.
+Since works such as SPIRAL or Learning to Paint face a quite similar obstacle, their
+solution should be applicable in this case as well.
+Both works use so called 'Bezier curves' which parametrize curved paths by a limited
+set of numbers.
+\todo{image of bezier curve}
+
+Bezier curves were invented in order to parametrize curved paths not through checkpoints
+but analytical parametrizations for computer models.
+They can be of different orders which allows them to follow more complicated paths
+but in this case the simples form -- the first order -- is sufficient.
+It defines a curve through its start and and point as well as a control point.
+The curve is then defined as the path of a point over the time interval $[0, T]$.
+First one connect the start and end points with the control point to get two lines
+in return.
+Along the lines on defines two points that move in a linear fashion along their lines
+within the time interval $[0, T]$.
+Then these two points are connected in the same way by a third line, which again
+has a point moving along its direction over the span of $[0, T]$.
+As the first two points that define the third line will move, the lines orientation
+will change as well, thus translating the linear movement of the point into a complex
+curved path.
+The path that this point then takes in $[0, T]$ then defines the Bezier curve.
+A first order Bezier curve will only bend into one direction or follow a straight path.
+For higher orders the displayed process can be applied iteratively and allow for
+more complex curves but as brush strokes usually follow a quite simple path and 
+fewer parameters are preferred, Bezier curves of first order are chosen as parametrization.
+
+Ultimately this gives 10 values that are sufficient to parametrize brush strokes
+with certain constraints:
+\begin{itemize}
+    \item 3 two dimensional coordinates that define the Bezier curves (6 values).
+    \item 1 thickness paramter.
+    \item 3 values in RGB space.
+\end{itemize}
+
+%is this number of paramters enough, too much?
+
+\subsubsection{Data Preparation}
+\labsubsubsec{preparation}
+%Limit to [-1, 1]
+%constraints for neding
+%constraints for thickness
+%constraints for distance to edge
 
 
 \subsection{Architecture}
