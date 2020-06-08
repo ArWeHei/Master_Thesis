@@ -2123,6 +2123,12 @@
     <bcf:citekey order="1">adobe stroke paper</bcf:citekey>
     <bcf:citekey order="2">japanese neural renderer</bcf:citekey>
     <bcf:citekey order="3">libmypaint</bcf:citekey>
+    <bcf:citekey order="4">coordconv</bcf:citekey>
+    <bcf:citekey order="5">textons</bcf:citekey>
+    <bcf:citekey order="6">filters</bcf:citekey>
+    <bcf:citekey order="7">brushstrokecharacteristics</bcf:citekey>
+    <bcf:citekey order="8">brushstrokeextraction</bcf:citekey>
+    <bcf:citekey order="9">gatys</bcf:citekey>
   </bcf:section>
   <bcf:sortlist section="0" name="none/global/" type="entry" sortscheme="none" sortnamekeyscheme="global" labelprefix="">
   <bcf:sorting>

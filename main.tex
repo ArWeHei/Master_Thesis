@@ -59,6 +59,9 @@
 % Reset sidenote counter at chapters
 %\counterwithin*{sidenote}{chapter}
 
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\vec[1]{\underline#1}
+
 %----------------------------------------------------------------------------------------
 
 \begin{document}
@@ -215,6 +218,7 @@
 
 \renewcommand{\nomname}{Notation} % Rename the default 'Nomenclature'
 \renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document.} % Prepend this text to the nomenclature
+
 
 \printnomenclature % Output the nomenclature
 
