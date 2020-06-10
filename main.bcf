@@ -2129,6 +2129,9 @@
     <bcf:citekey order="7">brushstrokecharacteristics</bcf:citekey>
     <bcf:citekey order="8">brushstrokeextraction</bcf:citekey>
     <bcf:citekey order="9">gatys</bcf:citekey>
+    <bcf:citekey order="10">superpixels</bcf:citekey>
+    <bcf:citekey order="11">img segmentation with SP</bcf:citekey>
+    <bcf:citekey order="12">brushs stroke extraction</bcf:citekey>
   </bcf:section>
   <bcf:sortlist section="0" name="none/global/" type="entry" sortscheme="none" sortnamekeyscheme="global" labelprefix="">
   <bcf:sorting>

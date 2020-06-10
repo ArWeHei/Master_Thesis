@@ -403,6 +403,7 @@ with the hand picked factor of $0.7$ to ensure the brush strokes are rendered co
 and not cut by the edge of the render window size.
 At last the brush strokes are rendered according to the data set and added as well.
 The render canvas size is 64x64 pixels.
+\todo{why 64x64, explain this due to computational overhead, date requirements and training convergence}
 
 As a last step, the data set is renormalized to the range $[-1, 1]$ for convenience
 and to facilitate training as well.
@@ -614,6 +615,55 @@ All in all such an approach fits best to the goal of this thesis as it will gene
 an approximation of a target image that ideally resembles the target as closely as
 possible while being limited to the use of brush strokes.
 
+
+
+The decision of whether to use an optimization based approach is also linked to
+another question: Whether to use a sequential or parallel placement of brush strokes.
+
+As an example most drawing networks rely on a sequential approach as do some stroke
+based renderers.
+Intuitively it also makes sense to use a sequential approach as artists also place
+their brush strokes sequentially on the canvas.
+Yet there is a major difference in how existing computer vision based approaches
+place their strokes compared to artists.
+Due to the loss functions that are used when training drawing networks or stroke based
+renderers the resulting images tend to be made up entirely of large canvas-filling
+brush strokes which reduces the L2 loss very fast.
+
+This is contrary to an artist which would maybe start with some sketches first but
+then fills the canvas not with a brush that is roughly the size of the canvas -- as these
+algorithms do -- but with a significantly smaller brush that requires many individual
+strokes (often with some pattern) to fill large areas.
+Thus, sequential approaches do actually differ significantly from how an artist would
+paint.
+
+In contrast to this parallel approaches which predict the whole painting in one step
+are not wide spread due to the computational pitfalls that come with predicting
+brush strokes for a whole painting at once compared to predicting only a few at a time.
+Also, parallel approaches require to deal explicitly with the order in which brush
+strokes should be placed on the canvas, as it will be explained in section \ref{sssec:order}.
+Still, if one considers the optimization procedure instead of a policy network,
+it becomes clear that the there are interactions between strokes that are locally
+close.
+An example would be one stroke in the foreground changing its path and revealing
+the canvas beneath, then another stroke in the background should cover this up if
+the color matches.
+
+As usually artists plan their future brush strokes when painting the background
+it would require a drawing network to plan far head which is impossible to do with
+an optimization based approach.
+
+Another argument for parallel optimization is the actual reliance on actual visual
+proof for approximating brush strokes.
+Sequential approaches will again an again cover up previous brush strokes until maybe
+only a few pixels of the background brush stroke are visible.
+Even if these few pixels match the target image well it will be a shot in the dark
+whether this is really how the artist has drawn the background, which in return
+introduces a great deal of noise to the result.
+A parallel approach on the other hand should only place brush strokes where there
+is visual evidence that there is a brush stroke and concentrate less on possible
+background arrangements.
+
 \subsubsection{Pitfalls of Feed-Forward Approaches}
 \labsubsubsec{ffapproaches}
 
@@ -651,10 +701,133 @@ Since the previous section \ref{ssec:ffapproaches} already specified why an opti
 based approach has been chosen over a feed forward or recurrent approach, this section
 is meant to explain a little more about the optimization procedure itself.
 
-Fundamentally, it can be either compared to a stroke based rendering procedure or
-it could be compared to the style transfer approach by Gatys \etal \cite{gatys}.
 
-Starting with an initialization of brush strokes all brush strokes are optimized in
+\subsubsection{Rendering Layout}
+\labsubsubsec{layout}
+Fundamentally, the optimization procedure is inspired by stroke based rendering procedures.
+Also, it could be compared to the style transfer approach by Gatys \etal \cite{gatys}, where, 
+instead of pixels there a parameters optimized.
+The difference to normal stroke based renderers, though, is the limited size of a
+rendered brush stroke in this work's renderer.
+
+This poses a significant challenge that might not be obvious at first.
+
+Ideally the optimization procedure should be able to place strokes freely on canvas,
+as this allows for an unbiased approximation.
+Furthermore, this allows to allocate many small strokes in areas where the artist
+placed many strokes as well and use fewer and wider strokes in other area during
+the optimization procedure.
+But due to various limitations which were explained in \ref{sec:NR}, the renderer
+is not able to render single brush strokes in a 1MP frame.
+Similar approaches only perform on relatively small canvas sizes, likely due to this
+issue \todo{add ref}.
+
+One work-around for this would be to dissect the target image into many smaller
+patches and then run the optimization procedure on these individual patches.
+This could be compared to a grid of renders where each grid cell is the center of
+many renderings at the same time \todo{add figure to this}.
+Right away, a major issue with this becomes obvious, which are the edges where the
+grid cells are joined.
+
+As a grid structure will almost always always differ from the inherent distribution
+of brush strokes in an image, grid edges will more often than not, separate brush
+strokes between two grid cells.
+A simple solution to this problem is going from a stacked grid structure to an overlapping
+grid. \todo{graphics!!!!!}
+
+This hides obvious edges between render windows as every edge coincides with the center
+of a different render window.
+It is easily realized by choosing a lattice vector size smaller than the render window's
+dimensions.
+
+Still, this kind of initialization requires a very even distribution of brush strokes
+with only small dislocations at each point in the lattice.
+As this is not the case and stroke densities will vary locally, the grid layout is prone
+to lead to enforcing a grid-like layout of strokes were there isn't any.
+Mainly due to the inability of the grid to account for local changes in density and
+the following propagation of error.
+This would start with a single region of high density strokes in the vicinity of one
+grid cell which would ideally result in a narrow stroke to achieve high accuracy.
+Neighboring cells then have to shift their strokes towards the center of that grid cell
+to account for the free space that is not covered by the narrow brush strokes.
+This shift must then be accounted for by the next neighboring cells and so on, which
+will cause all strokes in a raw or column to shift towards this one spot with a high
+stroke density.
+
+Now, a painting usually has many such high density areas which would require the
+optimization procedure to balance the shift that is caused by these areas.
+As a result the strokes are likely to not shift at all as shifting will equal out
+for many such areas of high density.
+Subsequently, an area of high stroke density will be not have enough strokes available
+in its local region and thus will be covered up by a single broad stroke as this minimizes
+the L2 loss.
+
+The core of the problem is the previously imposed lattice structure that propagates
+local density shifts along its principle axis.
+
+One possible solution to this is getting rid of the lattice structure and replacing
+it with a more random structure that also covers the image sufficiently.
+This can be accomplished by using \textbf{super-pixels} \cite{superpixels}.
+Super pixels come from an earlier era of computer vision and are often used in image
+segmentation tasks (\cite{img segmentation with SP}) but super-pixels are also
+a popular starting point for brush stroke extraction algorithms \cite{brushs stroke extraction}.
+
+Basically, super-pixels are disjoint groups of pixels in an image that would usually
+combine pixels with similar colors in a local region.
+Straight away, it is obvious why this is interesting for brush stroke extraction.
+In theory the distribution of super-pixels will not follow a grid-layout as the previous
+approach and the location of super-pixels should relate to the given color distribution
+in the image.
+It is easy to imagine that the location of the super-pixel centers would be a good prior
+of locations of render windows as well.
+Also, as the colors of pixels inside a super-pixel should be similar, one can use
+the mean color of a super-pixel as an initialization for the color of the brush stroke.
+
+Ultimately, a super-pixel segmentation will be used to infer positions for render
+windows as well as the color initialization of each strokes.
+
+\subsubsection{Rendering Order}
+\labsubsubsec{order}
+Another problem that will come up during the optimization procedure is the order
+in which strokes are rendered.
+Real world brush strokes are also subject to the same issue as later brush strokes
+will always be placed on top of earlier brush strokes, with no way of changing this
+(see section \ref{sssec:combinedapproach}).
+
+As the optimization based approach relies on parallel optimization of brush strokes,
+it must be decided which strokes are in the foreground and which are in the background.
+Otherwise, as this would randomly change, edges in the image might be obstructed
+and optimization could oscillate between solutions where different strokes lie in the
+foreground.
+This would
+
+When brush strokes are rendered 
+
+
+
+\subsubsection{Initilization}
+\labsubsubsec{init}
+
+The following section will focus on initialization details for all parameters of a
+brush stroke, their position and the confidence value.
+
+Ideally the initialization should not place any bias in the optimization process.
+At the same time an initialization should facilitate training and accelerate convergence
+in early stages of optimization.
+Unfortunately, the placement of the render window will already enforce a strong bias
+on the optimization procedure through the very limited size of the render window and
+the bias of the brush stroke training data towards the center of said window.
+Implicitly, the renderer thus expects a brush stroke to lie at the center of the render
+window for an optimal performance.
+
+There are two easily realizable forms of initialization of
+
+Considering the other parameters
+
+\subsubsection{Partial Updates}
+\labsubsubsec{partupdate}
+
+Starting with an initialization of brush strokes, all brush strokes are optimized in
 parallel to avoid any bias towards earlier brush strokes.
 Each brush stroke is rendered as it is initialized using the differentiable renderer
 introduced in section \ref{sec:NR}.
@@ -665,7 +838,7 @@ all rendering to the provided brush stroke parameters.
 Together the parameter catalogue and the render catalogue are used to stitch the
 individual renderings to a full image.
 This requires to know the position of each brush stroke which is stored in the parameter
-catalogue as well
+catalogue as well.
  
 \todo{introduce certainty}
 \todo{introduce the principle of catalogues}
@@ -675,7 +848,6 @@ catalogue as well
 \labsubsubsec{losses}
 \todo
 
-\todo{sequential vs. parallel when explaining the optimization procedure}
 
 \subsection{Image Composition}
 \labsubsec{composition}
