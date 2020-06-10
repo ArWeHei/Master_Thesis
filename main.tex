@@ -38,6 +38,7 @@
 % Choose the language
 \usepackage[english]{babel} % Load characters and hyphenation
 \usepackage[english=british]{csquotes}	% English quotes
+\usepackage{dsfont}
 
 % Load packages for testing
 \usepackage{blindtext}
@@ -61,7 +62,12 @@
 
 \newcommand\norm[1]{\left\lVert#1\right\rVert}
 \renewcommand\vec[1]{\underline#1}
+\newcommand\tensor[1]{\mathbf{#1}}
+\newcommand\R{\mathbb{R}}
 
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 %----------------------------------------------------------------------------------------
 
 \begin{document}

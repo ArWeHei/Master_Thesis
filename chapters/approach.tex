@@ -446,9 +446,11 @@ as the stochastic nature of the brush strokes puts a threshold on how short the 
 distance can become.
 
 To stabilize training further a two-time-step update rule was implemented.
+\todo{write this down and look at the tricks that were used}
 
 \subsection{Results}
 \labsubsec{results}
+\todo{pick some results and present whether they are any good}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%% Stroke Approximation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -797,12 +799,39 @@ will always be placed on top of earlier brush strokes, with no way of changing t
 As the optimization based approach relies on parallel optimization of brush strokes,
 it must be decided which strokes are in the foreground and which are in the background.
 Otherwise, as this would randomly change, edges in the image might be obstructed
-and optimization could oscillate between solutions where different strokes lie in the
-foreground.
-This would
+and optimization could oscillate between solutions where different strokes lie in
+the foreground.
+It could also lead to brush strokes not overlapping but covering disjoint areas.
+All of these outcomes would be unfavorable as it tends to produce worse results
+in the end.
 
-When brush strokes are rendered 
+The solution which is presented in this thesis is an additional parameter that describes
+a brush stroke's accuracy.
+The accuracy is defined as the L2 distance of each stroke's pixel to the corresponding
+pixel in the target image multiplied by this each pixel's alpha value.
+This removes any pixels which are of no interest from the loss and focusses only
+on the rendered pixels.
+\begin{align}
+    \text{accuracy} = 1 - \frac{1}{N} \sum_{p \in \text{pixels}} \norm{p - p'}_2^2 \text{ with } \vec{p} = \vec{p'} 
+\end{align}
+    \todo{improve this}
 
+The resulting value describes how well the pixels of the rendered stroke match their
+respective pixels in the target image.
+Consequently, any brush stroke with a higher accuracy will be more faithful to the
+target image than strokes with a lower accuracy.
+Placing these brush strokes in the foreground should thus result in a smaller L2 loss
+than the other way around.
+Vice versa, brush strokes which connect two same colored areas will aggregate a lower
+accuracy as the brush stroke is compared at the intersection as well.
+A rendered brush stroke which fits to the foreground brush stroke will not be affected by
+such a penalty thus getting a higher accuracy and laying on top of the other brush
+stroke.
+
+Notably, the accuracy should not be included in the brush stroke's loss, as this
+would prohibit background strokes from covering larger areas and result in behaviour
+that is similar to non-overlapping issue previously described.
+Thus, the accuracy of each stroke will be calculated as it is rendered.
 
 
 \subsubsection{Initilization}
@@ -811,48 +840,247 @@ When brush strokes are rendered
 The following section will focus on initialization details for all parameters of a
 brush stroke, their position and the confidence value.
 
-Ideally the initialization should not place any bias in the optimization process.
+Besides the original 10 parameters of each brush stroke, which were explained in
+section \ref{sssec:formalism}, the previous two section introduced an accuracy
+parameter for ordering and two translation parameters which define the position
+of the render window along each axis.
+All of these parameters must be initialized before the optimization procedure starts.
+Ideally, the initialization should not introduce any bias to the optimization process.
 At the same time an initialization should facilitate training and accelerate convergence
 in early stages of optimization.
-Unfortunately, the placement of the render window will already enforce a strong bias
-on the optimization procedure through the very limited size of the render window and
-the bias of the brush stroke training data towards the center of said window.
-Implicitly, the renderer thus expects a brush stroke to lie at the center of the render
-window for an optimal performance.
 
-There are two easily realizable forms of initialization of
+Unfortunately, the placement of the render window will surely enforce a bias on the
+optimization as hinted in section \ref{sssec:layout}.
+There a super-pixel initialization was motivated and for the translation parameters
+as well as the color of the brush strokes.
+Subsequently, the translation parameter for each render window will be equal to the
+position of the weighted mass center of its respective super-pixel.
 
-Considering the other parameters
+The initial color will be taken from the mean color value over the super pixel.
+
+The brush size will be initialized with the minimum possible value.
+This will let brush strokes not overlap at the beginning of optimization.
+Only when the brush strokes already roughly fit their local region they shall intersect
+and be ordered by their accuracy.
+Therefore, the initial accuracy will be 0 everywhere, as the accuracy is recalculated
+after every optimization step.
+
+Other patch parameter, notably $\vec{s}$, $\vec{e}$ and $\vec{c}$, will be initialised
+using a narrow normal distribution with $\sigma = .1$ and values clipped to $[-1, 1]$.
+This is done, as there is no prior information available on how the brush strokes
+are oriented.
+Instead, this approach relies on the optimization procedure to be minimally biased
+by this initialization of the path variables.
 
 \subsubsection{Partial Updates}
 \labsubsubsec{partupdate}
 
-Starting with an initialization of brush strokes, all brush strokes are optimized in
-parallel to avoid any bias towards earlier brush strokes.
-Each brush stroke is rendered as it is initialized using the differentiable renderer
-introduced in section \ref{sec:NR}.
+One major problem that emerges when building an optimizer based on the information
+provided up until now, is the limitations of GPU memory.
+Even as it might not be obvious at first, the optimization procedure imposes a huge
+requirement for memory on the graphics card.
+This is mainly due to two parts of the training:
 
-The outputs are then collected and build a so called render catalogue which holds
-all rendering to the provided brush stroke parameters.
+First, the number of brush strokes can easily become very large, if large enough
+images are used as input.
+As the render window size of 64x64 already suggests the brush strokes are relatively
+small and mentioned in section \ref{sec:motivation}, a painting can consist of a
+few thousand brush strokes.
+This would equate to a batch size of a few thousand for the brush stroke renderer.
+Tests have shown that on an NVIDIA GTX 2080 Ti with 12GB GDDR5 VRAM the maximum number
+of brush strokes rendered in parallel is $\approx 256$.
+Obviously this is one to two orders of magnitude smaller than what would be needed
+to optimize all stroke in the painting in parallel.
+Still, there is a way around this bottleneck, by optimizing the image not as a whole
+but as smaller patches consisting of 256 brush strokes at a time, giving a partial
+update routine.
 
-Together the parameter catalogue and the render catalogue are used to stitch the
-individual renderings to a full image.
-This requires to know the position of each brush stroke which is stored in the parameter
-catalogue as well.
- 
-\todo{introduce certainty}
-\todo{introduce the principle of catalogues}
-\todo{explain the limit due to computatioanl costs}
+Each patch comprises the 256 nearest render windows to a randomly sampled location
+on the canvas.
+These 256 brush strokes are then rendered from their parameters in order to obtain
+a gradient later on.
+Then the strokes are placed on the canvas or 'padded' and than blended or 'stitched'
+after they were ordered according to their accuracy.
+At last, the loss is calculated and backpropagated to update the parameters of the patch.
+
+As this will not make a difference for any brush strokes at the center of the patch,
+border brush strokes (those which do not solely neighbor brush strokes that are also
+optimized) will be affected by this.
+This is the reason why it makes sense to safe the rendered brush strokes for all
+parameters at any time forming a \textbf{render image catalogue}.
+Equally the collection of brush strokes that shall later compose the image shall
+be called a \textbf{parameter catalogue}.
+With the render image catalogue at hand, it is possible to use the previously rendered
+brush strokes to render the image as whole with the newly rendered brush strokes
+of the image patch embedded.
+
+As this will cause the border strokes to be surrounded by other brush strokes to all
+sides (even if not all of them are freshly rendered) the effect of the partial update
+routine vanishes.
+
+The other problem that will occur for very large input images, is that the stitching
+of brush strokes itself takes up a huge mount of RAM.
+Going into detail, each brush stroke must be placed on the virtual canvas individually, 
+where the canvas' size is that of the input image.
+This would equate to a couple thousand 1MP images being stored in RAM before they
+are stitched to a single 1MP images.
+As a single 1MP image carries roughly $1000 \times 1000 \times 4 \text{channels}
+\times 8 Bit = 32 \times 10^{6} Bit = 4 \times 10^{6} Byte = 4 MB$ of information,
+a few thousand of these will easily eat up the RAM of most graphics cards.
+
+Luckily, the previous work-around for optimizing only 256 brush strokes will work
+as well without rendering the full image at every step.
+Since most brush strokes are not re-rendered anyway and thus will not be supplied with
+a gradient, their main task is to regulate losses for edge strokes of the image patch.
+As this does not need far away strokes but only those close the strokes that are
+optimized, a ring of pre-rendered strokes around the re-rendered patch will suffice.
+
+\todo{approximate the amount of brush strokes needed to surround the patch}
+This allows to reduce the amount of involved brush strokes per optimization step
+from a few thousand down to a couple hundred.
+Besides allowing for the partial update routine to be performed at all, it also
+should increase performance significantly compared to an approach that involves
+all brush strokes at any time.
+
+\subsection{Image Placing and Blending}
+\labsubsec{composition}
+As the update and optimization procedure has now been explained thoroughly, it is
+now time to explain the process of placing and blending a rendered brush stroke a
+bit further.
+
+After each stroke has been rendered it needs to be placed according to the translation
+parameters that were introduced in section \ref{sssec:layout}.
+This requires dynamically placing each brush stroke inside zero-filled tensor.
+
+By calculating the global position of each pixel in the rendered image individually,
+it is possible to scatter the pixels of the original rendered image into the larger
+zero-filled tensor and obtain a globally placed brush stroke.
+
+What is more complicated though is the task of blending the resulting canvas-sized
+renders together or stitching them.
+Due to the canvas' alpha channel it is possible to blend only relevant information
+while the rest of the image will be ignored.
+
+As far as conventional alpha blending goes, two images are blended by multiplying
+each pixel value with the alpha value of the top-layer image while the background
+image is multiplied with the complement to the alpha value:
+\begin{align}
+    p_{x,y} = p^{\text{top}}_{x, y} \times \alpha^{top}_{x, y}
+    + p^{\text{bottom}}_{x, y} \times (1 - \alpha^{top}_{x, y})
+    \forall (x, y) \in \mathcal{D}(\text{image})
+\end{align}
+\todo{correct this equation and make it nicer}
+
+For multiple layers this process can be repeated in various fashions, after the strokes
+are ordered according to their accuracy.
+Either one could start from the bottom and blend the two back-most strokes, followed
+by the next third last strokes and so one, or one could start this process from
+the front with the two strokes in the very front being blended at first, then the
+stroke with the third highest accuracy \etc.
+
+Both of the approaches would yield the same result but differ only in the order in
+which they were blended.
+Subsequently, both methods will have $(n-1)$ blending operations to compute per pixel.
+
+By moving from the linear approaches to a tree-based approach this number will not
+decrease any further.
+
+What makes it possible to reduce this number, though, is blending the strokes in 
+a content aware fashion.
+As looking at figure \ref{fig:stroke_on_canvas} shows, the majority of pixels for
+each padded brush stroke is non-informative, as the alpha value is zero.
+This hints at possibility to turn the process of blending around and instead of merging
+layers subsequently as a whole, merging all layers at the same time by picking relevant
+layers for each pixel.
+Then all non-zero layers are merged in the same way as ordinary alpha blending works
+but with the number of layers being reduced and information inside a layer not being
+coherent anymore.
+
+
+The easiest way to accomplish this is to first find the maximum depth over all pixels,
+where the depth $k$ is the number of layers where the alpha value is not zero.
+\begin{align}
+    k = \argmax_{p \in \text{pixels}} \sum_{i \in \# \text{layers}} \mathds{1}(\alpha_i > 0)
+\end{align}
+
+Then the top $k$ layer indices for each pixel are picked, which reduces the number
+of blending operations from $(n-1)$ to $(k-1)$.
+Importantly, the top $k$ indices should not be ordered by their alpha values but
+remain in the order that was imposed by sorting according to the accuracy value.
+Otherwise, the order will most certainly be mixed up and the pixel with the highest
+alpha value will always lie on top instead of the pixel that belongs to the most
+accurate brush stroke.
+Especially as brush stroke renderings fade out towards their edges, this makes a
+significant difference.
+
+
+Another way of accelerating the process of alpha-blending is vectorizing the process
+instead of iteratively applying the computations.
+To achieve this it is necessary to construct a tensor with the following properties:
+
+For $\tensor{I} \in [0, 1]^{H \times W \times 4} $ the image target, the shape will be defined
+as $\mathcal{S}(\tensor{I}) = (H, W, 4)$.
+Each alpha channel will have the values $\alpha^{hw} \in [0, 1]$ for $h = 0, ..., H$ and $w = 0, ..., W$.
+
+The set of rendered and padded brush strokes $\tensor{J}$ will have the shape $(N, H, W, 4)$
+with $N$ depicting the number of brush strokes that ought to be stitched simultaneously.
+
+Now, looking at each individual pixel in $\tensor{J}$, which is described by $(z^{hw}_n, \alpha^{hw}_n)$
+for $n = 1, ..., N$ and $z^{hw}_n \in [0, 1]^{3}$, $z^{hw}$ describes the RGB values
+and $\alpha^{hw}$ the alpha-channel for a pixel at $(h, w)$.
+
+A blending operation can then be defined by
+\begin{align}
+    z'^{hw} & = \tilde{\alpha}^{hw} \cdot z^{hw} \\
+    \text{or} \\
+    z'^{hw} & = \sum_{n=1}^N \tilde{\alpha}^{hw}_n  z^{hw}_n \\
+\end{align}
+
+with $z'^{hw}$ the resulting RGB values of the blended pixel and $\tilde{\alpha}^{hw}$
+a vector that holds the merged alpha values for each pixel:
+\begin{align}
+    \tilde{\alpha}^{hw} & =
+    \begin{pmatrix}
+        \alpha^{hw}_1 & &\\
+        \alpha^{hw}_2 & (1 - \alpha^{hw}_1) &\\
+        \alpha^{hw}_3 & (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        \vdots & &\\
+    \end{pmatrix}
+    = \alpha^{hw} \odot 
+    \begin{pmatrix}
+        1  &\\
+        (1 - \alpha^{hw}_1) &\\
+        (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        \vdots &\\
+    \end{pmatrix}
+    \\
+    \rightarrow  \tilde{\alpha}^{hw}_n & = \alpha^{hw}_n \prod^{n-1}_{i=1} (1 - \alpha^{hw}_i)
+\end{align}
+
+Where $\odot$ describes the element-wise product.
+
+What is left, is to find a way to construct $\tilde{\alpha}^{hw}$. from $\alpha^{hw}$.
+
+blablabbla
+
+
+
+
+
+
+%TODO explain the notation for alpha values with indices and what they mean
+
+\todo{explain the alpha blending matrix}
+
+
+
+
 
 \subsubsection{Losses}
 \labsubsubsec{losses}
-\todo
 
+\todo{explain different loss combinations for different tasks}
 
-\subsection{Image Composition}
-\labsubsec{composition}
-
-\todo{explain alpha blending}
 
 \subsection{Results}
 \labsubsec{results}
