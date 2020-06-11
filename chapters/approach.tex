@@ -21,9 +21,17 @@ The two step approach can be motivated by comparing the optimization procedure t
 actual process of painting an image.
 An artist will most likely not pick single color particles to then place them on
 the canvas.
-Instead, the artist uses a brush or other utilities (see Pollock or others) to place
+Instead, an artist uses a brush or other utilities (see Pollock or others) to place
 more paint with a single action.
-\todo{image that shows different types of paint and tools etc.}
+
+\begin{marginfigure}
+    \includegraphics{oil_painting_tools}
+    \caption[]{A typical set of brushes and spatulas used for oil paintings.
+    %Source:Kuznetcov_Konstantin/Shutterstock}
+    }
+    \labfig{painting_tools}
+\end{marginfigure}
+
 This of course limits the control over each individual drop of paint but maintains
 enough control to still create very delicate details in paintings.
 This trade-off varies for different brush sizes and for this reason an artist must
@@ -55,11 +63,6 @@ The shapes may not overlay or be cut or anything.
 Quite similarly, the objective for an optimizer is to replicate an image by only
 using brush strokes.
 
-\begin{marginfigure}
-    \includegraphics{genetic_starry_night}
-    \caption[]{Starry Night approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
-    \labfig{genetic}
-\end{marginfigure}
 
 This is a similar task to what genetic algorithms already can do and have done in
 order to approximate images by other geometric shapes or even smaller photos (also 
@@ -69,6 +72,12 @@ Basically starting with a random set of circles that are parameterized by their 
 radius and color; it then chooses the most successful samples and resamples again
 in a region around these.
 This process is repeated again and again, until a certain level of convergence is reached.
+
+\begin{marginfigure}
+    \includegraphics{genetic_starry_night}
+    \caption[]{Starry Night approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
+    \labfig{genetic}
+\end{marginfigure}
 
 As well as this does work, it is very much computationally expensive as most samples
 will not fit the image, thus searching for the tiny set fitting shapes requires
@@ -125,8 +134,10 @@ are outlined in the following two sections.
 \section{Neural Renderer}
 \labsec{NeuralRend}
 
-The neural renderer is inspired by previous works (\todo{cite these works}) and 
-is required to be differentiable and should be based on a rather simple architecture.
+The neural renderer is inspired by \citeauthor{NeuralPainters} usage of a neural renderer
+to improve SPIRAL \cite{NeuralPainters} as well as \citeauthor*{Learning2Paint}'s efforts
+on using deep reinforcement learning for drawing images with a differentiable renderer \cite{Learning2Paint}.
+The renderer is required to be differentiable and should be based on a rather simple architecture.
 Especially since complicated architectures impose computational burdens and could
 possibly distort the gradients for optimization.
 
@@ -136,8 +147,19 @@ possibly distort the gradients for optimization.
 Unfortunately there is no data set available for this task which means that the data set
 must be specifically created for this approach.
 
-There are several sources for brush strokes that are evaluated in the following part.
-
+There are several sources for brush strokes that will be evaluated in the following
+part.
+The main focus will lie on three qualities for each data source:
+\begin{enumerate}
+    \item Suitable data format. As brush strokes are meant to overlap later on, it
+        data should already provide information about opacity ore transparency, favorably
+        in the common RGBA format, which has a fourth alpha channel to hold opacity
+        information.
+    \item Size and versatility. Only with enough data available it will be possible
+        to train a renderer reliably.
+    \item Image quality. Brush strokes should be as close to real world brush strokes
+        as possible to ensure high quality renderings later on.
+\end{enumerate}
 
 \subsubsection{Brush Stroke Images}
 \labsubsubsec{bsimages}
@@ -167,7 +189,7 @@ a coherent representation from this.
 \subsubsection{Painting Libraries}
 \labsubsubsec{libmypaint}
 
-The mentioned work of SPIRAL \todo{cite this} relies on opposite data to real world
+The mentioned work of SPIRAL \cite{SPIRAL} relies on opposite data to real world
 images.
 They used the painting library 'libmypaint' \cite{libmypaint} to generate brush strokes
 from parameters in real time during training.
@@ -188,12 +210,12 @@ convergence during the latter optimization process.
 \subsubsection{Fluid Simulation}
 \labsubsubsec{fluidpaint}
 
-Fluid Paint \todo{cite website} is a project by \todo{name this guy} that uses simple
+Fluid Paint is a project by David Li \cite{fluidpaint} that uses simple
 fluid dynamics to give artificial brush strokes a more plastic look.
-It is implemented in JavaScript and OpenGL \todo{reference both}.
+It is implemented in JavaScript and OpenGL.
 
-There is a C++ based version in the repository of SPIRAL which is also fitted with
-python bindings by \todo{name that guy}.
+There is a C++ based version in the git-repository of SPIRAL which is also fitted with
+python bindings by Yaroslav Ganin.
 
 Using these python bindings, it possible to generate brush strokes locally outside
 of a web browser.
@@ -216,7 +238,7 @@ choice for training a differentiable renderer because of the noted reasons.
 
 \todo{add similar samples for all brush stroke methods.}
 
-Other notable mentions are the painting programs \todo{these two weird software stuff things}
+Other honorable mentions are painting programs such as \todo{these two weird software stuff things}
 which allow for even more authentic brush strokes but lack a well documented interface
 in order to generate a vast number of brush strokes.
 
@@ -254,7 +276,7 @@ positions $a$ and $b$.
 This means that any curved paths must be split into linear/straight segments, that
 should resemble a curved line.
 As more steps mean longer simulation times and fewer steps mean edgy movement, a
-value of 20 time steps per stroke is picked \todo{this is actually differernt as the steps depend on the lenght of the path. Look this up}.
+value of 20 time steps per stroke is picked \todo{this is actually different as the steps depend on the lenght of the path. Look this up}.
 This is equivalent to the number of steps that SPIRAL used in their implementation.
 
 Another problem becomes how to express a curved path in numbers.
@@ -269,7 +291,12 @@ Since works such as SPIRAL or Learning to Paint face a quite similar obstacle, t
 solution should be applicable in this case as well.
 Both works use so called 'Bezier curves' which parametrize curved paths by a limited
 set of numbers.
-\todo{image of bezier curve}
+\begin{marginfigure}
+    \includegraphics{bezier_sample}
+    \caption[]{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm,
+    \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
+    \labfig{genetic}
+\end{marginfigure}
 
 Bezier curves were invented in order to parametrize curved paths not through checkpoints
 but analytical parametrizations for computer models.
@@ -402,8 +429,19 @@ Before rendering starts the values of $\vec{s}$, $\vec{e}$ and $\vec{c}$ are sca
 with the hand picked factor of $0.7$ to ensure the brush strokes are rendered completely
 and not cut by the edge of the render window size.
 At last the brush strokes are rendered according to the data set and added as well.
-The render canvas size is 64x64 pixels.
-\todo{why 64x64, explain this due to computational overhead, date requirements and training convergence}
+
+The render canvas size was chosen to be 64x64 pixels for several reasons:
+First, even with such a small canvas size, training for the renderer takes about
+one day.
+Secondly, the larger the render canvas size becomes, the deeper the renderer needs
+to be which results in more computational overhead in the optimization routine as
+well as more layer through which the gradient has to be propagated.
+And lastly, as there will be upwards of a thousand brush strokes in a single image,
+increasing the canvas size to 128x128 would require four times as much memory per
+rendered image. As 1000 brush strokes would already account for
+$1000 x 64 x 64 x 4 \si{\byte} \approx 16.4 \si{\gibi \byte}$ a fourfold increase
+would be significant.
+
 
 As a last step, the data set is renormalized to the range $[-1, 1]$ for convenience
 and to facilitate training as well.
@@ -429,7 +467,16 @@ tested:
     \item Various combinations of activation and normalization functions.
 \end{itemize}
 
-\todo{network architectures as image}
+\begin{figure*}
+    \resizebox{1.5\textwidth}{!}{
+        \input{images/vgg16.tex}
+    }
+    \resizebox{1.5\textwidth}{!}{
+        \input{images/vgg16.tex}
+    }
+        \caption{Visualization of the generator and discriminator architectures}\labfig{genarch}
+\end{figure*}
+
 The discriminator is designed after the same principles and resembles a VGG encoder
 network
 First three convolutional layers are applied, followed by a downsampling or pooling layer.
@@ -1163,7 +1210,7 @@ be discussed.
 
 First off, the L2 loss or \textbf{mean squared error} is an obvious choice for this task.
 \begin{align}
-    L_MSE = \frac{1}{HW} \sum_{p \in \text{pixels}} \norm{z(p) - z'(p)}_2^2
+    L_{\text{MSE}} = \frac{1}{HW} \sum_{p \in \text{pixels}} \norm{z(p) - z'(p)}_2^2
 \end{align}
 
 Since the MSE loss focuses on minimizing the pixel-wise error between the
@@ -1180,7 +1227,8 @@ Perceptual loss is based on a VGG Network \cite{VGG} that is pre-trained on Imag
 To compute the loss, the activations of deep layers (usually the fourth convolutional
 block) of the pre-trained VGG network are inferred and then compared using MSE loss.
 \begin{align}
-    L_perceptual = \frac{1}{H_f, W_f} \sum_{p \in \text{pixels}} \norm{f(p) - f'(p)}_2^2
+    L_{\text{perceptual}} = \frac{1}{H_f, W_f} \sum_{p \in \text{pixels}} \norm{f(p) - f'(p)}_2^2
+    \labeq{percep}
 \end{align}
 The resulting distance is meant to capture how well edges between the two input images
 are preserved which should be equal to whether the content in both images is the same.
@@ -1264,8 +1312,9 @@ vector $\vec{s}(x) - \vec{e}(x)$:
 Then $\vec{c}(x)$ can be projected into the coordinate system spanned by  $\vec{n}_{se}^\parallel(x)$
 and $\vec{n}_{se}^\bot(x)$:
 \begin{align}
-    c^\parallel(x) & = \vec{c}(x) \cdot \vec{n}_{se}^\parallel(x)  \\
-    c^\bot(x) & = \vec{c}(x) \cdot \vec{n}_{se}^\bot(x)  \\
+    c^\parallel(x) & = (\vec{c}(x) - \vec{a}(x)) \cdot \vec{n}_{se}^\parallel(x)  \\
+    c^\bot(x) & = (\vec{c}(x) - \vec{a}(x)) \cdot \vec{n}_{se}^\bot(x)  \\
+    \vec{a}(x) & = \frac{\vec{s}(x) + \vec{e}(x)}/2
 \end{align}
 
 Now, the axes of the original multivariate distribution co-align with $\vec{c}^\parallel(x)$
@@ -1284,20 +1333,99 @@ Using the Kullback-Leibler divergence for multivariate normal distributions,
 the compliance with the data sets distribution can be checked:
 
 \begin{align}
-    L_{KL} = \frac{1}{2}\left[\log\frac{|\Sigma|}{|\tilde{\Sigma}|} - d + \text{tr} ( \Sigma^{-1}\tilde{\Sigma} ) + (\mu - \tilde{\mu})^T \Sigma^{-1}(\mu - \tilde{\mu})\right]
+    \L_{\text{KL}} = \frac{1}{2}\left[\log\frac{|\Sigma|}{|\tilde{\Sigma}|} - d + \text{tr} ( \Sigma^{-1}\tilde{\Sigma} ) + (\mu - \tilde{\mu})^T \Sigma^{-1}(\mu - \tilde{\mu})\right]
 \end{align}
 
 with 
 \begin{align}
-    \tilde{\mu} & = \begin{pmatrix} 0.5 // 0.5 \end{pmatrix} \\
+    \tilde{\mu} & = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \\
     \tilde{\Sigma} & = \begin{pmatrix} \frac{1}{200} & 0 \\ 0 & \frac{1}{25} \end{pmatrix} \text{ see \eqref{eq:Sigma}}
 \end{align}
 
+since the origin of the projection is at $\vec{a}(x)$, thus in the middle between
+$\vec{s}(x)$ and $\vec{e}(x)$ and coincides with the center of the data distribution.
+
+In theory, $L_{\text{KL}}$ and $L_{\text{bs}}$ should be able to capture any deviation
+from the source data and ensure that parameters stay withing the training space of
+the renderer.
+One problem that obviously could arise with this formulation is for patches with
+very similar brush strokes that show a mean other than $\tilde{\mu}$ as well as 
+a very low values inside the covariance matrix and non-zero off-diagonal values.
+Thus is will be favorable to include as many strokes as possible when calculating
+this loss, ideally all strokes in the global parameter catalogue.
 
 \subsection{Style Transfer}
 \labsubsec{opt:styletransfer}
 
+One question that that arises when talking about the optimization procedure, is whether
+there could be style transfer performed with this approach as well.
+Especially, since the optimization procedure has explicitly been compared to the
+approach by \citeauthor*{Gatys}~\cite{Gatys}, it is just a short way of thought to
+assume that such an approach could also be applicable in this case.
+
+This mainly requires to introduce a style loss as it has been done by \citeauthor*{Gatys}~\cite{Gatys},
+since a content loss is already in place (see~\eqref{eq:percep}).
+A style loss can then be implemented similarly by aggregating the activations of
+more layers and then calculating the gram matrices:
+\begin{align}
+    \L_{\text{style}} & = \sum_{l=0}^L \frac{w_l}{4 N^2_l M^2_l} \sum_{ij} (G_{ij}^l - A_{ij}^l)^2
+    G_{ij}^l & = \sum_k F_{ik}^l F_{jk}^l
+\end{align}
+
+\subsection{Optimization Details}
+\labsubsec{opt:details}
+
+As it has been explained in \refsec{opt:partialupdates}, it is not possible to optimize
+brush strokes for the whole image in parallel.
+This is partly due to the memory requirements of the neural renderer which scales
+with the number of rendered patches.
+And partly due to the memory requirements of the placing and blending method, which
+scales with the number of rendered brush strokes as well as the number of surrounding
+fixed brush strokes and the patch window size.
+Experiments have shown that a combination of 256 rendered brush strokes with 128
+surrounding brush strokes paired with a patch window size of 320x320 pixels occupies
+around $9.5 \si{\gibi \byte}$ of memory which leaves enough space for more advanced
+losses and tweaks to the network architecture.
+
+The learning rate for the optimization procedure can be significantly larger than for
+training the neural renderer.
+With a learning rate of $0.01$ the optimization procedure will converge significantly
+faster to a solution without any instability issues.
+
+One choice, which has to be made individually per target image is how many brush strokes
+will cover the image.
+As larger images obviously require more brush strokes than smaller images, what should
+remain the same is the \textbf{brush strokes density}.
+The brush stroke density will decide how many pixel on average should be covered by
+each brush stroke and thus be used during initialization.
+A number of $100 \frac{\text{pixels}}{\text{brush stroke}}$ has produced the best
+results during the experiments.
+
+Another important choice that goes along the choice of how dense the brush strokes
+should be distributed, is that of how many optimization steps each brush stroke will
+be object to.
+As for too few steps the training will not have converged and for too many optimization
+will take an unnecessary amount of time.
+As this can vary between images, since some images require more time to converge,
+about $1500 \frac{\text{steps}}{\text{brush stroke}}$ give constantly good results.
+There is no direct enforcement that each brush strokes is updated exactly this often
+but it can be expected that due to the uniform sampling of render patches, there
+will be no major deviation for some brush strokes.
+Since 256 brush strokes will be optimized in every step, the total number of
+optimization steps can be calculated together with the brush stroke density and the
+image's size.
+
+Another minor detail is the fact that for each render patch five consecutive optimization
+steps are performed as this safes memory bandwidth, since data must be written and read
+from memory each time a different render patch is optimized.
 
 \subsection{Results}
 \labsubsec{results}
 
+Results can be seen in \reffig{opt:results:starry_night} for Starry Night as the standard reference
+image of this thesis.
+It took approximately 15,000 optimization steps which corresponds to about $2\si{\hour}$.
+The rendering consists of roughly 10,000 brush strokes.
+
+\reffig{opt:results:photo} shows the result for natural photo as target image which took
+also $~2\si{\hour}$ to compute with 8.000 brush strokes and 12.000 optimization steps.

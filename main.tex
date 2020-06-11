@@ -47,7 +47,10 @@
 
 % Load the bibliography package
 \usepackage{styles/kaobiblio}
-\addbibresource{main.bib} % Bibliography file
+%\addbibresource{main.bib} % Bibliography file
+\addbibresource{bibliographies/styletransfer.bib} % Bibliography file
+\addbibresource{bibliographies/brushstrokes.bib} % Bibliography file
+\addbibresource{bibliographies/painters.bib} % Bibliography file
 
 % Load mathematical packages for theorems and related environments. NOTE: choose only one between 'mdftheorems' and 'plaintheorems'.
 \usepackage{styles/mdftheorems}
@@ -59,12 +62,14 @@
 
 % Reset sidenote counter at chapters
 %\counterwithin*{sidenote}{chapter}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
 \newcommand\norm[1]{\left\lVert#1\right\rVert}
 \renewcommand\vec[1]{\underline#1}
 \newcommand\mat[1]{\underline{\underline{#1}}}
 \newcommand\tensor[1]{\mathbf{#1}}
 \newcommand\R{\mathbb{R}}
+\renewcommand\L{\mathcal{L}}
 
 \usepackage{amsmath}
 \usepackage[binary-units=true]{siunitx}
@@ -72,6 +77,16 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 %----------------------------------------------------------------------------------------
 
+\usepackage{import}
+\subimport{./images/PlotNeuralNet/layers/}{init}
+\usetikzlibrary{positioning}
+
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\PoolColor{rgb:red,1;black,0.3}
+\def\FcColor{rgb:blue,5;red,2.5;white,5}
+\def\FcReluColor{rgb:blue,5;red,5;white,4}
+\def\SoftmaxColor{rgb:magenta,5;black,7}
 
 \begin{document}
 
