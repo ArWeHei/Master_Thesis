@@ -1,3 +1,31 @@
 \setchapterpreamble[u]{\margintoc}
 \chapter{Ablation Experiments}
 \labch{Ablations}
+
+In this chapter, the ablation experiments for to the approaches presented in \refch{approach}
+shall be presented.
+This is meant to show some weaknesses of each method as well as give a visual understanding
+of the effects of some losses and parameters.
+Together with an interpretation it should help to get a better understanding of previous
+motivations.
+
+
+\section{Neural Renderer}
+\labsec{abl:NR}
+
+The neural renderer will be evaluated with respect to a few aspects.
+First, the performance for larger resolution images will be evaluated.
+Then, the effect of the discriminator will shown by training the renderer without
+the discriminator loss.
+At last, the weakness of the renderer, which is data points outside the training space,
+will be analyzed.
+
+\section{Optimization Procedure}
+\labsec{abl:Opt}
+
+The optimization procedure gives many starting points for ablation experiments.
+At first, the effects of each loss will be visually compared.
+Then, different initializations will be shown as well as various choices for training
+parameters.
+
+
