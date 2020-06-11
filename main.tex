@@ -62,13 +62,16 @@
 
 \newcommand\norm[1]{\left\lVert#1\right\rVert}
 \renewcommand\vec[1]{\underline#1}
+\newcommand\mat[1]{\underline{\underline{#1}}}
 \newcommand\tensor[1]{\mathbf{#1}}
 \newcommand\R{\mathbb{R}}
 
 \usepackage{amsmath}
+\usepackage[binary-units=true]{siunitx}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 %----------------------------------------------------------------------------------------
+
 
 \begin{document}
 
@@ -152,32 +155,67 @@
 \mainmatter % Denotes the start of the main document content, resets page numbering and uses arabic numbers
 \setchapterstyle{kao} % Choose the default chapter heading style
 
-\input{chapters/Introduction.tex}
+%\input{chapters/Introduction.tex}
+%
+%\pagelayout{wide} % No margins
+%\addpart{Theoretical Background \& Related Work}
+%\pagelayout{margin} % Restore margins
+%
+%\input{chapters/MLandCV.tex}
+%\input{chapters/GenModels.tex}
+%\input{chapters/StyleTransfer.tex}
+%\input{chapters/Optim.tex}
+%
+%\pagelayout{wide} % No margins
+%\addpart{Contribution and Experiments}
+%\pagelayout{margin} % Restore margins
+%
+%%\input{chapters/NeuralRenderer.tex}
+%%\input{chapters/StrokeApprox.tex}
+%\input{chapters/Approach.tex}
+%\input{chapters/Ablations.tex}
+%
+%\pagelayout{wide} % No margins
+%\addpart{Conclusion}
+%\pagelayout{margin} % Restore margins
+%
+%\input{chapters/Discussion.tex}
+%\input{chapters/Outlook.tex}
+%
+%\appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
+%
+%\pagelayout{wide} % No margins
+%\addpart{Appendix}
+%\pagelayout{margin} % Restore margins
+%
+%\input{chapters/Appendix.tex}
+
+\include{chapters/Introduction}
 
 \pagelayout{wide} % No margins
 \addpart{Theoretical Background \& Related Work}
 \pagelayout{margin} % Restore margins
 
-\input{chapters/MLandCV.tex}
-\input{chapters/GenModels.tex}
-\input{chapters/StyleTransfer.tex}
-\input{chapters/Optim.tex}
+\include{chapters/MLandCV}
+\include{chapters/Optim}
+\include{chapters/GenModels}
+\include{chapters/StyleTransfer}
 
 \pagelayout{wide} % No margins
 \addpart{Contribution and Experiments}
 \pagelayout{margin} % Restore margins
 
-%\input{chapters/NeuralRenderer.tex}
-%\input{chapters/StrokeApprox.tex}
-\input{chapters/Approach.tex}
-\input{chapters/Ablations.tex}
+%\include{chapters/NeuralRenderer}
+%\include{chapters/StrokeApprox}
+\include{chapters/Approach}
+\include{chapters/Ablations}
 
 \pagelayout{wide} % No margins
 \addpart{Conclusion}
 \pagelayout{margin} % Restore margins
 
-\input{chapters/Discussion.tex}
-\input{chapters/Outlook.tex}
+\include{chapters/Discussion}
+\include{chapters/Outlook}
 
 \appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
 
@@ -185,8 +223,7 @@
 \addpart{Appendix}
 \pagelayout{margin} % Restore margins
 
-\input{chapters/Appendix.tex}
-
+\include{chapters/Appendix}
 %----------------------------------------------------------------------------------------
 
 \backmatter % Denotes the end of the main document content

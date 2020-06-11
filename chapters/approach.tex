@@ -369,9 +369,9 @@ The area of interest, though, will be densely populated as intended.
     \mu & = \frac{\vec{s} - \vec{e}}{2} + \vec{e} \\
     \Sigma & =
         \begin{pmatrix}
-            \vec{a}_x & 0 \\
-            0 & \vec{a}_y
-        \end{pmatrix} \\
+            a_x & 0 \\
+            0 & a_y
+        \end{pmatrix} \labeq{Sigma}\\
     \vec{a} & = \vec{s} - \vec{e}
 \end{align}
 
@@ -459,7 +459,7 @@ To stabilize training further a two-time-step update rule was implemented.
 \section{Stroke Approximation}
 \labsec{strokeapprox}
 
-\subsection{Dataset}
+\subsection{Data Set}
 \labsubsec{dataset}
 First off, for this section the data set will be presented.
 This is due to the data defining some demands for the networks later on.
@@ -1046,7 +1046,8 @@ a vector that holds the merged alpha values for each pixel:
         \alpha^{hw}_3 & (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
         \vdots & &\\
     \end{pmatrix}
-    = \alpha^{hw} \odot 
+    \\
+    & = \alpha^{hw} \odot 
     \begin{pmatrix}
         1  &\\
         (1 - \alpha^{hw}_1) &\\
@@ -1059,27 +1060,242 @@ a vector that holds the merged alpha values for each pixel:
 
 Where $\odot$ describes the element-wise product.
 
-What is left, is to find a way to construct $\tilde{\alpha}^{hw}$. from $\alpha^{hw}$.
+What is left, is to find a way to construct $\tilde{\alpha}^{hw}$ from $\alpha^{hw}$.
 
-blablabbla
+For this an auxiliary matrix $\beta^{hw}$ is constructed:
+\begin{align}
+    \beta^{hw} = \alpha^{hw} \times \mathbb{1}_{1 \times N} = 
+    \begin{pmatrix}
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+        \vdots & \vdots & \ddots & \vdots \\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+    \end{pmatrix}
+\end{align}
+with
+$$
+\mathbb{1}_{1 \times N} = \begin{pmatrix}
+        1 \\
+        1 \\
+        \vdots\\
+        1 \\
+    \end{pmatrix}^T
+$$
 
+Then $\beta^{hw}$ is strictly triangulated such that:
+\begin{align}
+    \gamma^{hw} & = \beta^{hw} \odot
+    \begin{pmatrix}
+        0 & 0 & 0 &\hdots & 0\\
+        1 & 0 & 0 &\hdots & 0\\
+        1 & 1 & 0 &\hdots & 0\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        1 & 1 & \hdots & 1 & 0\\
+    \end{pmatrix}
+    \\ & = 
+    \begin{pmatrix}
+        0 & 0 & 0 & \hdots & 0\\
+        \alpha^{hw}_1 & 0 & 0 & \hdots & 0\\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & 0 & \hdots & 0\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_{n-1} & 0\\
+    \end{pmatrix}
+    \\
+    \rightarrow \delta^{hw} = 1 - \gamma^{hw} & = 
+    \begin{pmatrix}
+        1 & 1 & 1 & \hdots & 1\\
+        (1 - \alpha^{hw}_1) & 1 & 1 & \hdots & 1\\
+        (1 - \alpha^{hw}_1) & (1 - \alpha^{hw}_2) & 1 & \hdots & 1\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        (1 - \alpha^{hw}_1) & (1 - \alpha^{hw}_2) & \hdots & (1 - \alpha^{hw}_{n-1}) & 1\\
+    \end{pmatrix}
+\end{align}
 
+By multiplying the elements along each row in $\delta^{hw}$ one gets:
 
+\begin{align}
+    \epsilon^{hw}_i = \prod^N_{j=1} \delta^{hw}_{ij} & =
+    \begin{pmatrix}
+        1  &\\
+        (1 - \alpha^{hw}_1) &\\
+        \vdots &\\
+        \prod^{N-1}_{j=1} (1 - \alpha^{hw}_j)
+    \end{pmatrix}
+    \\ \rightarrow \tilde{\alpha}^{hw} = \epsilon^{hw} \odot \alpha^{hw} & =
+    \begin{pmatrix}
+        \alpha^{hw}_1 & &\\
+        \alpha^{hw}_2 & (1 - \alpha^{hw}_1) &\\
+        \alpha^{hw}_3 & (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        & \vdots &\\
+        \alpha^{hw}_N & \prod^{N-1}_{j=1} (1 - \alpha^{hw}_j)
+    \end{pmatrix}
+\end{align}
 
+This vectorized version of alpha blending will introduce a new possible bottleneck
+as it is, since $\beta^{hw}$ will be a tensor of shape $(N, N, H, W)$, which will
+equate to
+$$
+256 \times 256 \times 256 \times 256 \times 4 \si{\byte} = 2^{36}\si{\byte} = 64\si{\gibi\byte}
+$$
+alone.
 
+This is where the previous content aware alpha blending tricks becomes useful.
+By computing $\beta^{hw}$ only through the top $k$ values of $\alpha^{hw}$ instead
+of the full tensor $\alpha^{hw}$, the size will be reduced to
+$$
+k \times k \times 256 \times 256 \times 4 \si{\byte} = k^2 2^{22}\si{\byte} = k^2 \times 4\si{\mebi\byte}
+$$
+As the shape is reduced to $(k, k, H, W)$.
 
-%TODO explain the notation for alpha values with indices and what they mean
+Ultimately, this accelerates optimization by a factor of $2-3$ as it will be shown
+in \ref{sec:exp:vectorization}.
 
-\todo{explain the alpha blending matrix}
-
-
-
-
+It must be mentioned that the upper boundary for computational complexity in using
+this kind of alpha-blending is $\mathcal{O}(N \log k)$ as the top $k$ search is
+bound by this complexity.
+\todo{calcualte this}
 
 \subsubsection{Losses}
 \labsubsubsec{losses}
 
-\todo{explain different loss combinations for different tasks}
+In this section the different kinds of losses for the optimization procedure will
+be discussed.
+
+First off, the L2 loss or \textbf{mean squared error} is an obvious choice for this task.
+\begin{align}
+    L_MSE = \frac{1}{HW} \sum_{p \in \text{pixels}} \norm{z(p) - z'(p)}_2^2
+\end{align}
+
+Since the MSE loss focuses on minimizing the pixel-wise error between the
+target image and the fully rendered approximation by brush strokes, it will cause the
+rendered image to match the target image mainly in color.
+At the same time MSE loss is prone to blurring which results in washed out edges
+in the rendered image.
+Thus, this loss is must be accompanied by additional losses to make up for the shortcoming
+of MSE loss.
+
+A popular choice for preserving content in an image which, which is associated with
+preserving edges, is \textbf{perceptual loss}.
+Perceptual loss is based on a VGG Network \cite{VGG} that is pre-trained on ImageNet \cite{ImageNet}.
+To compute the loss, the activations of deep layers (usually the fourth convolutional
+block) of the pre-trained VGG network are inferred and then compared using MSE loss.
+\begin{align}
+    L_perceptual = \frac{1}{H_f, W_f} \sum_{p \in \text{pixels}} \norm{f(p) - f'(p)}_2^2
+\end{align}
+The resulting distance is meant to capture how well edges between the two input images
+are preserved which should be equal to whether the content in both images is the same.
+Together with MSE loss perceptual loss is often used to get better reconstructions
+than with MSE loss alone, as edges of object in the image are better preserved, prohibiting
+blurriness that would occur otherwise.
+
+As an evolutionary step to perceptual loss, Zhang \etal \cite{lpips} introduced 
+perceptual similarity or \textbf{LPIPS loss} which weighs the different layers of
+the pre-trained VGG-network differently in order to increase the effectiveness of
+perceptual distance between two images.
+LPIPS loss is meant to preserve edges even better than perceptual loss does with
+a similar computational overhead.
+
+Besides losses that operate in pixel space, it is also necessary to restrict the
+action space for each brush stroke.
+As it has been explained in section \ref{ssec:render:dataset} the renderer has been
+trained on a limited data set which put constraints on how curved brush strokes may
+be and how the ration between length and width ought to look like.
+These constraints must be enforced in the optimizing process as well.
+Because the renderer has nit been trained on data that lies outside of the generated
+data set, it is very likely that that the renderer will break if the input parameters
+lie to far apart from the space it has been trained in.
+The results would then be renderings with no output, distorted brush strokes or just
+noisy output, as it can be seen in \ref{ssec:ablation:renderer}.
+
+Thus, one must think of an additional loss to confine the parameter space to the same
+space as the generated brush stroke data during optimization.
+There are two ways of achieving this:
+\begin{itemize}
+    \item Discriminators
+    \item Explicitly coded losses
+\end{itemize}
+
+\paragraph{Discriminators} are a popular choice in this context because even if the
+data distribution is not known beforehand, a discriminator is still able to learn
+the distribution from data and thus point out wrong parameter combinations in this
+case.
+Still, a discriminator comes with a few compromises, as the target distribution will
+never be perfectly learned rather than well approximated by a discriminator.
+This leaves room for weaknesses as well as local minima in the discriminator's prediction
+which would result in worse quality for this task.
+Usually, these weaknesses are made up for during adversarial training as if the generator
+over fits to such weaknesses the discriminator will quickly penalize such a solution.
+In the case of the optimization routine which is employed for this problem, it is
+not possible to train the discriminator online as the limit amount of brush strokes
+will allow the discriminator to over-fit the problem easily.
+Thus only a pre-trained discriminator with its said weaknesses can be used in this
+case.
+
+\paragraph{Handpicked losses} As the data distribution for the generated data set
+is actually known in this case (see \ref{sssec:creation}), it is also possible to
+manually define losses that confine the brush strokes.
+The width constraint -- as a first example -- can easily be enforced by penalizing
+whenever the brush stroke's width $w(x)$ is more than half the length $l(x)$ between the
+start point $\vec{s}(x)$ and the end point $\vec{e}(x)$ of the brush stroke $x$:
+\begin{align}
+    L_{\text{bs}} & = \frac{1}{\vert X \vert}\sum_{x \in X} \max(0, 2w(x) - l(x)) \\
+    & = \frac{1}{\vert X \vert}\sum_{x \in X} \max(0, 2w(x) - \norm{\vec{s(x)} - \vec{e(x)}}_2)
+\end{align}
+
+This is a bit more complicated regarding the limitation that is introduced to the
+control point $\vec{c}(x)$.
+As $\vec{c}(x)$ was sampled from a multivariate gaussian with fixed parameters in
+the data set, it should now follow a similar distribution in relation to the direction
+$\vec{s}(x) - \vec{e}(x)$ of each stroke.
+
+This can be achieved by first defining two orthonormal basis vectors which are either
+parallel $\vec{n}_{se}^\parallel(x)$ or orthogonal $\vec{n}_{se}^\bot(x)$ to the directional
+vector $\vec{s}(x) - \vec{e}(x)$:
+\begin{align}
+    \vec{n}_{se}^\parallel(x) & = \frac{\vec{s}(x) - \vec{e}(x)}{\norm{\vec{s}(x) - \vec{e}(x)}_2} \\
+    \vec{n}_{se}^\bot(x) & = R_{\pi/2} \frac{\vec{s}(x) - \vec{e}(x)}{\norm{\vec{s}(x) - \vec{e}(x)}_2} \\
+    \text{with } R_{\pi/2} & =
+    \begin{pmatrix}
+        \cos \pi/2 & -\sin \pi/2 \\
+        \sin \pi/2 & \cos \pi/2
+    \end{pmatrix}
+\end{align}
+
+Then $\vec{c}(x)$ can be projected into the coordinate system spanned by  $\vec{n}_{se}^\parallel(x)$
+and $\vec{n}_{se}^\bot(x)$:
+\begin{align}
+    c^\parallel(x) & = \vec{c}(x) \cdot \vec{n}_{se}^\parallel(x)  \\
+    c^\bot(x) & = \vec{c}(x) \cdot \vec{n}_{se}^\bot(x)  \\
+\end{align}
+
+Now, the axes of the original multivariate distribution co-align with $\vec{c}^\parallel(x)$
+and $\vec{c}^\bot(x)$.
+By calculating the mean and standard deviation along these projections, they can
+be compared to the parameters of the original data distribution.
+\begin{align}
+    \vec{\mu} & = \frac{1}{\vert X \vert}\sum_{x \in X} \begin{pmatrix} c^\parallel(x) \\ c^\bot(x) \end{pmatrix} \\
+    \mat{\Sigma} & = (\frac{1}{\vert X \vert} \sum_{x \in X}
+        (\begin{pmatrix} c^\parallel(x) \\ c^\bot(x) \end{pmatrix} - \vec{\mu})
+        (\begin{pmatrix} c^\parallel(x) \\ c^\bot(x) \end{pmatrix} - \vec{\mu})^T
+        )^{\frac{1}{2}} \\
+\end{align}
+
+Using the Kullback-Leibler divergence for multivariate normal distributions,
+the compliance with the data sets distribution can be checked:
+
+\begin{align}
+    L_{KL} = \frac{1}{2}\left[\log\frac{|\Sigma|}{|\tilde{\Sigma}|} - d + \text{tr} ( \Sigma^{-1}\tilde{\Sigma} ) + (\mu - \tilde{\mu})^T \Sigma^{-1}(\mu - \tilde{\mu})\right]
+\end{align}
+
+with 
+\begin{align}
+    \tilde{\mu} & = \begin{pmatrix} 0.5 // 0.5 \end{pmatrix} \\
+    \tilde{\Sigma} & = \begin{pmatrix} \frac{1}{200} & 0 \\ 0 & \frac{1}{25} \end{pmatrix} \text{ see \eqref{eq:Sigma}}
+\end{align}
+
+
+\subsection{Style Transfer}
+\labsubsec{opt:styletransfer}
 
 
 \subsection{Results}
