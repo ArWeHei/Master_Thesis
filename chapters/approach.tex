@@ -381,7 +381,14 @@ Then both axes are scaled with $\norm{a}_2$ and also the handpicked values $\fra
 and $\frac{1}{25}$ for along $a$ and orthogonal to it, respectively.
 Figure \ref{fig:datageneration} shows samples from this distribution for an exemplary
 brush stroke.
-\todo{draw figure in matplotlib or plotly or something}
+\begin{marginfigure}
+    \resizebox{\textwidth}{!}{
+        \input{images/scatter.pgf}
+    }
+    \caption[]{Exemplary scatter plot for given start and end point to visualize the
+    covariance matrix}
+    \labfig{scatter}
+\end{marginfigure}
 This distribution is intended to follow that of brush strokes as they would appear
 in the real world.
 The majority of brush strokes will be straight or just slightly bent due to the maximum
@@ -744,7 +751,7 @@ to scale badly when implemented in fully convolutional manner.
 Thus an optimization based approximation was chosen as it offers good approximations
 at high resolutions with manageable computational overhead.
 
-\subsection{Optimization Based Approach}
+\subsection{Optimization Procedure}
 \labsubsec{opt}
 Since the previous section \ref{ssec:ffapproaches} already specified why an optimization
 based approach has been chosen over a feed forward or recurrent approach, this section
@@ -989,8 +996,8 @@ Besides allowing for the partial update routine to be performed at all, it also
 should increase performance significantly compared to an approach that involves
 all brush strokes at any time.
 
-\subsection{Image Placing and Blending}
-\labsubsec{composition}
+\subsection{Image Placing \& Blending}
+\labsubsec{placing_blending}
 As the update and optimization procedure has now been explained thoroughly, it is
 now time to explain the process of placing and blending a rendered brush stroke a
 bit further.

@@ -89,7 +89,9 @@
 % Settings for a normal paragraph
 \newcommand{\@body@par}{%
 	\justifying% Justify text
-	\singlespacing% Set the interline space to a single line
+	%\singlespacing% Set the interline space to a single line
+        %\onehalfspacing
+        \spacing{1.5}
 	\frenchspacing% No additional space after periods
 	\normalfont% Use the default font
 	\normalsize% Use the default size
@@ -100,6 +102,8 @@
 % Settings for a paragraph in the margins
 \newcommand{\@margin@par}{%
 	\justifying% justify text
+        %\onehalfspacing
+        %\spacing{1.5}
 	\setlength{\RaggedRightParindent}{0em}% Suppress indentation
 	\setlength{\parindent}{0em}% Suppress indentation
 	\setlength{\parskip}{0.5pc}% Set the space between paragraphs
