@@ -406,217 +406,221 @@ A two-time-step update rule was implemented to stabilize training further.
 
 \subsection{Data Set}
 \labsubsec{dataset}
-First off, for this section the data set will be presented.
-This is due to the data defining some demands for the networks later on.
-The data set for the optimization task should also meet a few requirements.
+The data set will be presented in this section due to the data defining demands for later networks.
+Also, the data set for the optimization task should meet a few requirements.
 
-In order to be able to focus on the brushstrokes in an image the data set should consist of relatively high resolution images.
-This becomes necessary as most brushstrokes should fit into a 64x64 window any larger strokes could not be approximated with a single renderer and thus would falsely be constructed of multiple brushstrokes.
+In order to focus on the brushstrokes in an image, the data set should consist of relatively high-resolution images.
+At the same time, most brushstrokes should fit into a 64x64 window.
+Any larger strokes can not be approximated with a single rendering window and thus would falsely be approximated by multiple brushstrokes.
 
-This requires more information per image than simply the resolution as the scale of the image plays into this requirement as well.
-Ideally each image should be accompanied by its size as this allows to rescale all images accordingly, given that one knows how large a typical brushstroke is.
+Thus, more information per image is required, than merely the resolution.
+The scale of the image, therefore, becomes inquired information in this task.
+Ideally, each image should be accompanied by its measurement as this allows for rescaling the image accordingly, given that one knows how large a typical brushstroke is.
 
-At last the painting's technique must be oil on canvas or similar techniques as this is what the renderer has been trained for.
+At last, the painting's technique must be oil on canvas or similar techniques as this is what the renderer has been trained for.
 
-All these requirements on the data can be met by using data directly from the Van Gogh Museum in Amsterdam that is freely available online.
-Each high resolution image is categorized by its technique as well as the period in which it was painted accompanied by information on the measurements of the image.
+All these requirements on the data are met by data directly available from the Van Gogh Museum in Amsterdam.
+Each high-resolution image is categorized by its technique as well as the period in which it was painted.
+This is Taccompanied by information on the dimensions of the image.
 
-\subsection{Weapon of Choice}
-The next stage of training takes the now pre-trained neural renderer and combines it with the task of approximating brushstrokes in images.
-In theory the neural renderer should allow to gather gradients in parameter space even though meaningful losses are calculated in image space, as explained in section
+\subsection{Optimization Algorithm}
+The next stage of the approach takes the pre-trained neural renderer and uses it to approximate brushstrokes in images.
+In theory, the neural renderer should allow gathering meaningful gradients in parameter space even though the losses are calculated in image space, as explained in section
 \ref{sec:motivation}.
-There, it was outlined already that the weapon of choice will be an optimization procedure that relies on the capabilities of the neural renderer.
+There, it was outlined already that the weapon of choice will be an optimization procedure that relies on the differentiability of the neural renderer.
 
-But this is not the only possible approach to dissecting images into sets op parameters.
-As explained in \ref{sec:PR} there exist a variety of approaches for this kind of task.
-Some of these promise fast generation of parameters from images which makes the optimization approach in this work seem like a step back at first.
-The following section is dedicated to justifying the chosen approach by comparing state of the art implementations of existing approaches.
+Nevertheless, this is not the only possible approach to dissect images into sets of parameters.
+As explained in \ref{sec:PR}, there exist a variety of approaches for this kind of task.
+Some of these promise a fast inference of parameters from images, which makes the optimization approach in this work seem like a step back at first.
+The following section is dedicated to justifying the chosen approach by comparing the existing state-of-the-art approaches.
 
-The targeted task is to approximate the representation of an image with roughly 1MP by the means of $\approx 10.000$ brushstrokes (see section \ref{ssec:motivation}).
+The targeted task is to approximate the representation of an image with roughly 1,000,000 pixels =  1MP by means of $\approx 10.000$ brushstrokes (see section \ref{ssec:motivation}).
 
 \subsubsection{Genetic Algorithms}
 \labsubsubsec{genalg}
-Genetic algorithms are possibly the simplest approaches.
-As it was laid out in sections \ref{sec:motivation} and \ref{sec:genetic}, genetic algorithms use random sampling and previous best results to approximate fitting solutions to the rendering problem which was described in section \ref{sec:renderproblem}.
+Genetic algorithms are possibly the simplest approach.
+As it was laid out in sections \ref{sec:motivation} and \ref{sec:genetic}, genetic algorithms use random sampling and previous best results to approximate fitting solutions to the rendering problem, which was described in section \ref{sec:renderproblem}.
 
-Current state of the art solutions are capable of finding a solution in $\approx 1h$, when searching for an approximation of a 1MP image with simple geometric shapes like circles or triangles.
-This accounts for roughly $1 \times 10^{9}$ sampling steps.
-This time frame varies depending on target shape density, target accuracy, sampling runs per shape and degrees of freedom (with the latter requiring more sampling runs).
+The current state-of-the-art solutions are capable of finding a solution in $\approx 1h$ when searching for an approximation of a 1MP image with simple geometric shapes like circles or triangles.
+This corresponds to roughly $1 \times 10^{9}$ sampling steps.
+The time frame and the number of sampling steps depend on target shape density, target accuracy, sampling rate per shape, and degrees of freedom (with the latter requiring more sampling).
 
-Looking back at seciton \ref{sec:renderer} each brushstrokes has 10 degrees of freedom with some inter-dependencies between them.
+Looking back at section \ref{sec:renderer}, each brushstroke has 10 degrees of freedom with some inter-dependencies between them.
 Also it is known that the obtained neural renderer is capable of generating $\approx 300 \frac{\text{images}}{s}$.
-This means that rendering the same amount of sampled images will take:
+This means that rendering $10^{9}$ sampled brushstrokes will take:
 $$
 \frac{10^{9} \text{samples}}{300 \frac{\text{images}}{s}} \approx 3.33 \times 10^{6} s
 \approx 926 h \approx 38.6 d
 $$
-Which is an impossible amount of time to spend \textbf{per image}.
+Clearly, this is an absurd amount of time to spend \textbf{per image}.
+At the same time, the sampling magnitude has not even been corrected for by the additional degrees of freedom that brushstrokes provide.
 
-At this point the number of samples has not been corrected for by the higher number of degrees of freedom of this problem.
+Ultimately, this means that genetic algorithms are not an option for this task, as they are too inefficient.
 
-Ultimately this means that genetic algorithms are not an option for this task.
-
-\subsubsection{Brush Stroke Extraction}
+\subsubsection{Brushstroke Extraction}
 \labsubsubsec{bse}
-Next in the line of approaches are algorithm based approaches that use standard computer vision techniques to extract brushstrokes from an image and parametrize them.
+Next in the line are algorithm-based approaches that extract brushstrokes from an image using standard computer vision techniques.
 
 Besides texton based image characterization \cite{textons} and pure filter based approaches \cite{filters} there have been approaches to extract brushstrokes or some of their characteristics \cite{brushstrokecharacteristics} \cite{brushstrokeextraction}.
 
-The latter would pose a valid option for the main goal of this thesis if it were to characterize brushstrokes reliably.
-Unfortunately the best existing techniques fail to detect brushstrokes equally  over the whole image but only identify the most significant ones (see figure \ref{fig brushstrokeextracted}).
-Other approaches are only able to extract only few characteristics like the orientation of a brushstroke, which proves insufficient as well.
+The latter would pose a valid option for the task at hand.
+Unfortunately, the best existing techniques fail to detect brushstrokes reliably over the whole image but only identify the most significant ones (see figure \ref{fig brushstrokeextracted}) /todo{add example image}.
+Other approaches are only able to extract a few characteristics, like the orientation of a brushstroke, which proves insufficient as well.
 \todo{show some of the extracted brushstrokes}
 
 \subsubsection{Stroke Based Rendering}
 \labsubsubsec{sbr}
-A different field that also uses algorithm to approximate an image through brushstrokes and also wants to achieve some stylization along the way is Stroke Based Rendering or Painterly Rendering.
-While early works relied on interactive approaches, later publications then were able to fully automate this process.
-Judging from tests by the authors themselves such an approach would take between \todo{this number} and \todo{this number} hours per image to fully render it this way.
-As figures \ref{fig:sbr1} and \ref{fig:sbr2} show, these approaches obtain similar results to genetic algorithms and tend to draw and image from a coarse scale to a finer scale instead of locally coherent.
+Stroke Based Rendering or Painterly Rendering also uses algorithms to approximate an image through brushstrokes with the original goal to achieve some stylization along the way.
+While early works relied on interactive approaches, later publications were then able to automate this process entirely.
+Judging from tests by the authors, such an approach would take between \todo{this number} and \todo{this number} hours per image.
+As figures \ref{fig:sbr1} and \ref{fig:sbr2} show, these approaches obtain similar results to genetic algorithms and tend to draw an image from a coarse scale to a more delicate scale over time instead of a locally coherent manner.
 
-At last these approaches were not intended to be used to obtain brushstrokes from a painting but rather focus on stylizing images.
+These approaches were not intended to be used to obtain brushstrokes from a painting but focus on stylizing images.
 This renders such an approach unfit for the goal of this thesis as well.
 
 \subsubsection{Drawing Networks}
 \labsubsubsec{drawingnetworks}
 Lastly, drawing networks are the newest iteration of approaches in this field.
-Beginning with \todo{which one was first?} there have been approaches the make use
-of feed-forward or recurrent neural networks combined with either supervised training
-or deep reinforcement learning.
-The best results by these approaches are shown in figure \ref{fig:drawingnets}.
+Beginning with \todo{which one was first?}, there have been approaches that make use of feed-forward or recurrent neural networks combined with either supervised training or deep reinforcement learning.
+The best results of these approaches are shown in figure \ref{fig:drawingnets}.
 
-Noticeably, all of these images have a maximum resolution of 256 pixels along the
-longer edge.
-There have not been any approaches yet, which are able to go significantly beyond
-this limitation.
-Especially, the high computational costs of training recurrent neural networks seems
-to be an obstacle when shooting for higher resolutions.
-As it will be outlined in more detail in \ref{ssec:dataset} such resolutions can not
-be deemed sufficient when looking at individual brushstrokes.
+Noticeably, all of these images have a maximum resolution of 256 pixels along their longest edge.
+There have not been any approaches yet, which can go significantly beyond this limitation.
+Notably, the high computational costs of training recurrent neural networks seem to be an obstacle when shooting for higher resolutions.
+Such resolutions can not be deemed sufficient when looking at individual brushstrokes, as outlined in \ref{ssec:dataset}.
 
-This, also rules out drawing networks.
+Consequently, drawing networks must also be ruled out.
 
 \subsubsection{Combined Approach}
 \labsubsubsec{combinedapproach}
 
-Even though there have been plenty of previous approaches to the task of extracting brushstrokes from images or to similar task like rendering images through brushstrokes; none of these quite meet all the requirements that have been posed for this task.
-Namely, high resolution input images, brushstroke focussed rendering and/or retrieval, limited resources and realistic depiction of brushstrokes.
+Even though there have been plenty of previous approaches to the task of extracting brushstrokes from images or similar tasks like rendering images through brushstrokes, none of these quite meet all the requirements of this task.
+Namely, high-resolution input images, brushstroke focussed rendering or retrieval, limited resources, and realistic depiction of brushstrokes.
 
-Even though brushstroke extraction seems to be most fit for the main asset of this thesis, stroke based rendering and drawing networks both bring features into the mix, that seem capable of making the task at hand more feasible.
-Drawing networks for once introduced differentiable renderers as a tool to facilitate training.
-Stroke based renderers achieve a parametrization implicitly by focussing on replicating the entire image instead of extracting brushstroke by brushstroke.
+Although brushstroke extraction is the asset of this chapter, stroke based rendering and drawing networks both seem capable of making brushstroke extraction more feasible with their inverse approach.
+Drawing networks introduced differentiable renderers as a tool to facilitate training.
+Stroke based renderers achieve a parametrization implicitly by focussing on replicating the entire image instead of extracting individual brushstrokes.
 
-This can be combined into a unified approach that uses the differentiable renderer and the objective of recreating an entire image.
-The resulting approach does not use re-sampling like genetic algorithms do, but can rely on gradient descent to converge to a solution significantly faster.
+They can be combined into a unified approach that uses the differentiable renderer and the objective of recreating an entire image.
+The resulting approach does not use re-sampling like genetic algorithms but relies on gradient descent to converge to a solution significantly faster.
 
-The limited capabilities of such a renderer would also guarantee that any approximation is composed of only valid brushstrokes instead of single pixels it would be the case with normal generative models.
+The limited capabilities of such a renderer would also guarantee that any approximation is composed of only valid brushstrokes instead of single pixels as it would be the case with normal generative models.
 
-All in all such an approach fits best to the goal of this thesis as it will generate an approximation of a target image that ideally resembles the target as closely as possible while being limited to the use of brushstrokes.
+All in all, this approach is probably the best suited for approximating a target image only through brushstrokes as closely as possible.
 
 
+The decision of whether to use an optimization-based approach is also linked to another question: Whether to sequentially or parallelly place brushstrokes.
 
-The decision of whether to use an optimization based approach is also linked to another question: Whether to use a sequential or parallel placement of brushstrokes.
+As an example, most drawing networks and stroke-based renderers rely on a sequential approach.
+Intuitively, it makes sense to use a sequential approach as artists also place their brushstrokes sequentially on the canvas.
+However, there is a significant difference in how existing computer vision approaches place strokes compared to artists.
+As neural networks search for ways to reduce the loss function as much as possible and as fast as possible, images tend to be made up of large canvas-filling brushstrokes at early stages, which in turn reduce the L2 loss.
 
-As an example most drawing networks rely on a sequential approach as do some stroke based renderers.
-Intuitively it also makes sense to use a sequential approach as artists also place their brushstrokes sequentially on the canvas.
-Yet there is a major difference in how existing computer vision based approaches place their strokes compared to artists.
-Due to the loss functions that are used when training drawing networks or stroke based renderers the resulting images tend to be made up entirely of large canvas-filling brushstrokes which reduces the L2 loss very fast.
+This is contrary to how an artist usually works.
+Artists tend to fill the background based on content (\eg sea or sky is often painted first) and will often leave some blank canvas to paint foreground objects later on.
+They also do not use giant brushes for this but normal-sized brushes with which they place many strokes.
+Thus, sequential approaches differ significantly from real-world paint processes.
 
-This is contrary to an artist which would maybe start with some sketches first but then fills the canvas not with a brush that is roughly the size of the canvas -- as these algorithms do -- but with a significantly smaller brush that requires many individual strokes (often with some pattern) to fill large areas.
-Thus, sequential approaches do actually differ significantly from how an artist would paint.
+In contrast, parallel approaches predict the whole painting as one set of parameters.
+They are not as widespread due to the computational pitfalls that come with predicting brushstrokes for a whole painting at once compared to predicting only a few at a time.
+Also, parallel approaches still need to predict in which order brushstrokes should be placed on the canvas (this will be explained in section \ref{sssec:order}) such that brush strokes can overlap.
+Nonetheless, the advantage to sequential approaches is the fact, that foreground an background strokes can influence one another.
 
-In contrast to this parallel approaches which predict the whole painting in one step are not wide spread due to the computational pitfalls that come with predicting brushstrokes for a whole painting at once compared to predicting only a few at a time.
-Also, parallel approaches require to deal explicitly with the order in which brushstrokes should be placed on the canvas, as it will be explained in section \ref{sssec:order}.
-Still, if one considers the optimization procedure instead of a policy network, it becomes clear that the there are interactions between strokes that are locally close.
-An example would be one stroke in the foreground changing its path and revealing the canvas beneath, then another stroke in the background should cover this up if the color matches.
+An example would be a stroke in the foreground, changing its path and revealing the canvas beneath.
+Then another stroke in the background should cover this up if the color matches.
+For sequential approaches, the background stroke can not be changed afterward, and it is very complicated to formulate a loss that propagates this information.
+As artists already plan their future brushstrokes when painting the background, it would require a drawing network to plan far ahead.
+At the same time, an optimization-based approach will not need to do that.
 
-As usually artists plan their future brushstrokes when painting the background it would require a drawing network to plan far head which is impossible to do with an optimization based approach.
-
-Another argument for parallel optimization is the actual reliance on actual visual proof for approximating brushstrokes.
-Sequential approaches will again an again cover up previous brushstrokes until maybe only a few pixels of the background brushstroke are visible.
-Even if these few pixels match the target image well it will be a shot in the dark whether this is really how the artist has drawn the background, which in return introduces a great deal of noise to the result.
-A parallel approach on the other hand should only place brushstrokes where there is visual evidence that there is a brushstroke and concentrate less on possible background arrangements.
+Another argument for parallel optimization is the focus on actually visible brushstrokes.
+As artists cover up previous strokes, again and again, it becomes a shot in the dark to guess what these first brush strokes might have looked like.
+Subsequently, any such guess is ill-posed and only introduces noise to the problem.
+A parallel approach does not care for how the background could have been drawn but only focus on what is visible in the given image.
 
 \subsubsection{Pitfalls of Feed-Forward Approaches}
 \labsubsubsec{ffapproaches}
 
-In the course of this thesis there were experiments targeting a feed forward approach before ultimately tending toward the optimization based approach that is presented.
+In the development of this thesis, there were experiments targeting a feed-forward approach before ultimately deciding on an optimization-based approach that is now presented.
+As it would exceed the scope of this thesis, the arising problems and cause for discarding this approach shall be discussed.
 
-The main reason for this change in direction can be pinpointed to two problems that emerged.
-The computational burden that of a feed-forward approach can be approximated when looking at existing feed-forward approaches of drawing networks.
-Without compromising resolution and this images quality significantly, training a network can hardly be realized.
-Still it was possible to show a basic implementation of this for very simple data like the cMNIST data set. \todo{margin explain cmnist} \todo{add image that were drawn by ff network}
+First, the computational burden of a feed-forward approach is very high.
+Existing feed-forward drawing networks compromise image resolution to realize their implementation.
+As it was possible to implement this for small scale data like the cMNIST data set, such an approach seems feasible at first. \todo{margin explain cmnist} \todo{add image that were drawn by ff network}
+However, since compromising image resolution is not a viable option (see \refssec{dataset}, one must find ways around this problem.
+Fully convolutional architectures are a popular solution, which allows training on small scale data and inference on large scale images.
+Unfortunately, the problem of predicting many spatially brushstrokes with complex parameters has proven too difficult for fully convolutional approaches.
 
-Another problem that occurred was the placement of brushstrokes on the canvas.
-As artists are not bound to the same pixel grid as images are, they can place brushstrokes freely on the canvas.
+This goes hand in hand with another problem that occurred: the placement of brushstrokes on the canvas.
+As artists are not bound to the same pixel grid as computers typically are, they can place brushstrokes freely on the canvas.
 More so, they can pack brushstrokes densely in one area while distributing them broadly in another.
+Classic CNNs are not able to allow for similar behavior as they always require a grid layout.
+Experiments with either displaceable grid cells or stacked grids have proven did work on a small scale.
+However, together with a fully convolutional architecture, the approach did not seem to scale to larger images.
 
-As most neural networks in computer vision are CNNs, they are not able to allow for a similar behaviour as they will always follow a grid layout of various resolutions.
-
-Repeated experiments with either displaceable grid cells or stacked signals have proven too complicated to manage for a convolutional network architecture and also seemed to scale badly when implemented in fully convolutional manner.
-
-Thus an optimization based approximation was chosen as it offers good approximations at high resolutions with manageable computational overhead.
+Thus, an optimization-based approach became favorable as it offers good approximations at high resolutions with manageable computational overhead.
 
 \subsection{Optimization Procedure}
 \labsubsec{opt}
-Since the previous section \ref{ssec:ffapproaches} already specified why an optimization based approach has been chosen over a feed forward or recurrent approach, this section is meant to explain a little more about the optimization procedure itself.
+Since the previous section \ref{ssec:ffapproaches} already specified why an optimization-based approach is preferable over a feed-forward or recurrent approach, this section is meant to explain a little more about the details of the optimization procedure.
 
 
 \subsubsection{Rendering Layout}
 \labsubsubsec{layout}
-Fundamentally, the optimization procedure is inspired by stroke based rendering procedures.
-Also, it could be compared to the style transfer approach by Gatys \etal \cite{gatys}, where,  instead of pixels there a parameters optimized.
-The difference to normal stroke based renderers, though, is the limited size of a rendered brushstroke in this work's renderer.
+Fundamentally, the optimization procedure is inspired by stroke-based rendering procedures.
+It could also be compared to the style transfer approach by \citeauthor*~{gatys} \cite{gatys}, with parameters optimized instead of pixels.
+The difference to normal stroke-based renderers, though, is the limited size of a rendered brushstroke in this work's renderer.
 
 This poses a significant challenge that might not be obvious at first.
 
-Ideally the optimization procedure should be able to place strokes freely on canvas, as this allows for an unbiased approximation.
-Furthermore, this allows to allocate many small strokes in areas where the artist placed many strokes as well and use fewer and wider strokes in other area during the optimization procedure.
-But due to various limitations which were explained in \ref{sec:NR}, the renderer is not able to render single brushstrokes in a 1MP frame. Similar approaches only perform on relatively small canvas sizes, likely due to this issue \todo{add ref}.
+Ideally, the optimization procedure should be able to place strokes freely on the canvas, as this allows for an unbiased approximation.
+Furthermore, it would allow allocating many small strokes in areas where the artist placed many strokes and use fewer and wider strokes in other areas.
+However, due to various limitations, which were explained in \ref{sec:NR}, the renderer is not able to render single brushstrokes in a 1MP frame. Similar approaches only perform on relatively small canvas sizes, likely due to this issue \todo{add ref}.
 
-One work-around for this would be to dissect the target image into many smaller patches and then run the optimization procedure on these individual patches.
-This could be compared to a grid of renders where each grid cell is the center of many renderings at the same time \todo{add figure to this}.
-Right away, a major issue with this becomes obvious, which are the edges where the grid cells are joined.
+Dissecting the target image into many small patches and then running the optimization procedure on these individual patches is a workaround for this.
+After the patches are rendered, they are then fused along their edges to give the full image.
+A good comparison is a grid of renders where each grid cell is the center of many renderings at the same time \todo{add figure to this}.
+The major issue of such an approach is the adjacent edges where the grid cells are joined.
+Also, a grid structure will almost always differ from the inherent distribution of brushstrokes in an image;
+grid edges will, more often than not, separate brushstrokes between two grid cells.
+A simple solution to this problem is transitioning from a stacked grid structure to an overlapping grid. \todo{graphics!!!!!}
 
-As a grid structure will almost always always differ from the inherent distribution of brushstrokes in an image, grid edges will more often than not, separate brushstrokes between two grid cells.
-A simple solution to this problem is going from a stacked grid structure to an overlapping grid. \todo{graphics!!!!!}
+By overlapping the grid cell, obvious edges between render windows are hidden as every edge lies within the frame of a different render window.
+Choosing a lattice vector size smaller than the render window's dimensions such a grid can easily be realized.
 
-This hides obvious edges between render windows as every edge coincides with the center of a different render window.
-It is easily realized by choosing a lattice vector size smaller than the render window's dimensions.
-
-Still, this kind of initialization requires a very even distribution of brushstrokes with only small dislocations at each point in the lattice.
-As this is not the case and stroke densities will vary locally, the grid layout is prone to lead to enforcing a grid-like layout of strokes were there isn't any.
-Mainly due to the inability of the grid to account for local changes in density and the following propagation of error.
-This would start with a single region of high density strokes in the vicinity of one grid cell which would ideally result in a narrow stroke to achieve high accuracy.
+Still, this kind of initialization requires a very even distribution of brushstrokes, ideally with a brushstroke at the center of each cell.
+As this is not the case, and stroke densities will vary locally, the grid layout is prone to erroneously enforcing a grid-like layout of strokes where there is none.
+This is due to the inability of the grid to account for local changes in density and the following propagation of error.
+Starting with a single region of high-density strokes in the vicinity of one grid cell, this cell would ideally render a narrow stroke to achieve high accuracy.
 Neighboring cells then have to shift their strokes towards the center of that grid cell to account for the free space that is not covered by the narrow brushstrokes.
-This shift must then be accounted for by the next neighboring cells and so on, which will cause all strokes in a raw or column to shift towards this one spot with a high stroke density.
+This shift must then be accounted for by the next neighboring cells and so on, which will cause all strokes in a row or column to shift towards this one spot with a high stroke density.
 
-Now, a painting usually has many such high density areas which would require the optimization procedure to balance the shift that is caused by these areas.
-As a result the strokes are likely to not shift at all as shifting will equal out for many such areas of high density.
-Subsequently, an area of high stroke density will be not have enough strokes available in its local region and thus will be covered up by a single broad stroke as this minimizes the L2 loss.
+Now, a painting usually has many such high-density regions, which possibly cancel the shift that is caused by other areas.
+As a result, the renderings are likely to not shift at all, as shifting mostly cancels out over the whole image.
+Subsequently, an area of high stroke density will not have enough strokes available in its local region and thus will be covered up by a single broad stroke as this minimizes the L2 loss.
 
-The core of the problem is the previously imposed lattice structure that propagates local density shifts along its principle axis.
+The core of the problem is the previously imposed lattice structure that propagates local density shifts along its principal axes.
 
-One possible solution to this is getting rid of the lattice structure and replacing it with a more random structure that also covers the image sufficiently.
+One possible solution is getting rid of the lattice structure and replacing it with a more random structure that also covers the image sufficiently.
 This can be accomplished by using \textbf{super-pixels} \cite{superpixels}.
-Super pixels come from an earlier era of computer vision and are often used in image segmentation tasks (\cite{img segmentation with SP}) but super-pixels are also a popular starting point for brushstroke extraction algorithms \cite{brushs stroke extraction}.
+Superpixels were popular in the pre-neural network era of computer vision and were often used in image segmentation tasks (\cite{img segmentation with SP}).
+Nevertheless, superpixels are also a popular starting point for brushstroke extraction algorithms \cite{brushs stroke extraction}.
 
-Basically, super-pixels are disjoint groups of pixels in an image that would usually combine pixels with similar colors in a local region.
+Basically, superpixels are pairwise disjoint groups of pixels in an image that would usually join pixels with similar colors in a local region.
 Straight away, it is obvious why this is interesting for brushstroke extraction.
-In theory the distribution of super-pixels will not follow a grid-layout as the previous approach and the location of super-pixels should relate to the given color distribution in the image.
-It is easy to imagine that the location of the super-pixel centers would be a good prior of locations of render windows as well.
-Also, as the colors of pixels inside a super-pixel should be similar, one can use the mean color of a super-pixel as an initialization for the color of the brushstroke.
+The distribution of superpixels will not follow a grid-layout as the previous approach, and the location of superpixels should relate to the given color distribution in the image.
+It is easy to imagine that the location of the superpixel centers would be a good prior for locations of render windows as well.
+Also, as the colors of pixels inside a superpixel should be similar, one can use the mean color of a superpixel as an initialization for the color of the brushstroke.
 
-Ultimately, a super-pixel segmentation will be used to infer positions for render windows as well as the color initialization of each strokes.
+Ultimately, a superpixel segmentation will be used to infer positions for render windows as well as the color initialization of each stroke.
 
 \subsubsection{Rendering Order}
 \labsubsubsec{order}
-Another problem that will come up during the optimization procedure is the order in which strokes are rendered.
-Real world brushstrokes are also subject to the same issue as later brushstrokes will always be placed on top of earlier brushstrokes, with no way of changing this (see section \ref{sssec:combinedapproach}).
+Another problem that will come up during the optimization procedure is the order in which strokes are rendered (already mentioned in \refsec{opt}).
+Real-world brushstrokes are also subject to the same issue as the current brushstroke will always be placed on top of brushstrokes painted earlier, (see section \ref{sssec:combinedapproach}).
 
-As the optimization based approach relies on parallel optimization of brushstrokes, it must be decided which strokes are in the foreground and which are in the background.
-Otherwise, as this would randomly change, edges in the image might be obstructed and optimization could oscillate between solutions where different strokes lie in the foreground.
-It could also lead to brushstrokes not overlapping but covering disjoint areas.
+As the optimization-based approach relies on parallel optimization of brushstrokes, it must decide which strokes are in the foreground and which are in the background.
+Otherwise, as this would randomly change, edges in the image might be obstructed, and optimization could oscillate between solutions where different strokes lie in the foreground.
+It could also prevent brushstrokes from overlapping such that they cover disjoint areas.
 All of these outcomes would be unfavorable as it tends to produce worse results in the end.
 
 The solution which is presented in this thesis is an additional parameter that describes a brushstroke's accuracy.
@@ -628,90 +632,88 @@ This removes any pixels which are of no interest from the loss and focusses only
     \todo{improve this}
 
 The resulting value describes how well the pixels of the rendered stroke match their respective pixels in the target image.
-Consequently, any brushstroke with a higher accuracy will be more faithful to the target image than strokes with a lower accuracy.
+Consequently, any brushstroke with higher accuracy will be more faithful to the target image than strokes with lower accuracy.
 Placing these brushstrokes in the foreground should thus result in a smaller L2 loss than the other way around.
-Vice versa, brushstrokes which connect two same colored areas will aggregate a lower accuracy as the brushstroke is compared at the intersection as well.
-A rendered brushstroke which fits to the foreground brushstroke will not be affected by such a penalty thus getting a higher accuracy and laying on top of the other brushstroke.
+Vice versa, brushstrokes that connect two same colored areas will aggregate a lower accuracy as the brushstroke is compared at the intersection as well.
+A rendered brushstroke that fits the foreground brushstroke will not be affected by this, thus keeping its high accuracy and laying on top of the other brush stroke.
 
-Notably, the accuracy should not be included in the brushstroke's loss, as this would prohibit background strokes from covering larger areas and result in behaviour that is similar to non-overlapping issue previously described.
+Notably, the accuracy should not be included in the brushstroke's loss, as this would prohibit background strokes from covering larger areas and result in behavior that is similar to the non-overlapping issue previously described.
 Thus, the accuracy of each stroke will be calculated as it is rendered.
 
 
 \subsubsection{Initilization}
 \labsubsubsec{init}
 
-The following section will focus on initialization details for all parameters of a brushstroke, their position and the confidence value.
+The following section will focus on initialization details for all parameters of a brushstroke, their position, and the confidence value.
 
-Besides the original 10 parameters of each brushstroke, which were explained in section \ref{sssec:formalism}, the previous two section introduced an accuracy parameter for ordering and two translation parameters which define the position of the render window along each axis.
+Besides the original ten parameters of each brushstroke, which were explained in section \ref{sssec:formalism}, the previous two sections introduced an accuracy parameter for ordering and two translation parameters that define the position of the render window along each axis.
 All of these parameters must be initialized before the optimization procedure starts.
 Ideally, the initialization should not introduce any bias to the optimization process.
-At the same time an initialization should facilitate training and accelerate convergence in early stages of optimization.
+At the same time, an initialization should facilitate training and accelerate convergence in the early stages of optimization.
 
-Unfortunately, the placement of the render window will surely enforce a bias on the optimization as hinted in section \ref{sssec:layout}.
-There a super-pixel initialization was motivated and for the translation parameters as well as the color of the brushstrokes.
-Subsequently, the translation parameter for each render window will be equal to the position of the weighted mass center of its respective super-pixel.
+Unfortunately, the placement of the render window will surely enforce a bias on the optimization (see section \ref{sssec:layout}).
+Thus, a superpixel initialization was motivated for the translation parameters as well as the color of the brushstrokes.
+Subsequently, the translation parameter for each render window will be equal to the position of the weighted mass center of its respective superpixel.
 
-The initial color will be taken from the mean color value over the super pixel.
+The initial color will be taken from the mean color value of the superpixel.
 
 The brush size will be initialized with the minimum possible value.
 This will let brushstrokes not overlap at the beginning of optimization.
-Only when the brushstrokes already roughly fit their local region they shall intersect and be ordered by their accuracy.
+Only when the brushstrokes already roughly fit their local region, they shall intersect and be ordered by their accuracy.
 Therefore, the initial accuracy will be 0 everywhere, as the accuracy is recalculated after every optimization step.
 
-Other patch parameter, notably $\vec{s}$, $\vec{e}$ and $\vec{c}$, will be initialised using a narrow normal distribution with $\sigma = .1$ and values clipped to $[-1, 1]$.
-This is done, as there is no prior information available on how the brushstrokes are oriented.
+Other patch parameters, notably $\vec{s}$, $\vec{e}$ and $\vec{c}$, will be initialised using a narrow normal distribution with $\sigma = .1$ and values clipped to $[-1, 1]$ because there is no prior information available on how the brushstrokes are oriented.
 Instead, this approach relies on the optimization procedure to be minimally biased by this initialization of the path variables.
 
 \subsubsection{Partial Updates}
 \labsubsubsec{partupdate}
 
-One major problem that emerges when building an optimizer based on the information provided up until now, is the limitations of GPU memory.
-Even as it might not be obvious at first, the optimization procedure imposes a huge requirement for memory on the graphics card.
-This is mainly due to two parts of the training:
+One problem that emerges when building an optimizer based on the information provided until now is GPU memory limitations.
+Even as it might not be evident at first, the optimization procedure imposes a considerable requirement for memory on the graphics card, due to two parts of the training:
 
-First, the number of brushstrokes can easily become very large, if large enough images are used as input.
-As the render window size of 64x64 already suggests the brushstrokes are relatively small and mentioned in section \ref{sec:motivation}, a painting can consist of a few thousand brushstrokes.
+First, the number of brushstrokes can easily become very high with large images as input.
+With a render window size of 64x64, the brushstrokes are relatively small, and paintings can consist of a few thousand brushstrokes.
 This would equate to a batch size of a few thousand for the brushstroke renderer.
-Tests have shown that on an NVIDIA GTX 2080 Ti with 12GB GDDR5 VRAM the maximum number of brushstrokes rendered in parallel is $\approx 256$.
-Obviously this is one to two orders of magnitude smaller than what would be needed to optimize all stroke in the painting in parallel.
+Tests have shown that on the latest hardware with 12GB memory, the maximum number of brushstrokes rendered in parallel is $\approx 256$.
+Obviously, this is one to two orders of magnitude smaller than what would be needed to optimize all strokes in the painting in parallel.
 Still, there is a way around this bottleneck, by optimizing the image not as a whole but as smaller patches consisting of 256 brushstrokes at a time, giving a partial update routine.
 
 Each patch comprises the 256 nearest render windows to a randomly sampled location on the canvas.
 These 256 brushstrokes are then rendered from their parameters in order to obtain a gradient later on.
-Then the strokes are placed on the canvas or 'padded' and than blended or 'stitched' after they were ordered according to their accuracy.
+Then strokes are ordered according to their accuracy, placed on canvas ('padded') and blended ('stitched').
 At last, the loss is calculated and backpropagated to update the parameters of the patch.
 
 As this will not make a difference for any brushstrokes at the center of the patch, border brushstrokes (those which do not solely neighbor brushstrokes that are also optimized) will be affected by this.
-This is the reason why it makes sense to safe the rendered brushstrokes for all parameters at any time forming a \textbf{render image catalogue}.
-Equally the collection of brushstrokes that shall later compose the image shall be called a \textbf{parameter catalogue}.
-With the render image catalogue at hand, it is possible to use the previously rendered brushstrokes to render the image as whole with the newly rendered brushstrokes of the image patch embedded.
+This is why it makes sense to save the rendered brushstrokes for all parameters, forming a \textbf{render image catalog}.
+Equally, the collection of brushstrokes that shall later compose the image shall be called a \textbf{parameter catalog}.
+With the render image catalog at hand, it is possible to use the previously rendered brushstrokes to stitch the image as a whole with the newly rendered brushstrokes of the image patch embedded.
 
-As this will cause the border strokes to be surrounded by other brushstrokes to all sides (even if not all of them are freshly rendered) the effect of the partial update routine vanishes.
+As this will cause the border strokes to be surrounded by other brushstrokes to all sides (even if not all of them are freshly rendered), the effect of the partial update routine vanishes.
 
-The other problem that will occur for very large input images, is that the stitching of brushstrokes itself takes up a huge mount of RAM.
-Going into detail, each brushstroke must be placed on the virtual canvas individually,  where the canvas' size is that of the input image.
-This would equate to a couple thousand 1MP images being stored in RAM before they are stitched to a single 1MP images.
-As a single 1MP image carries roughly $1000 \times 1000 \times 4 \text{channels} \times 8 Bit = 32 \times 10^{6} Bit = 4 \times 10^{6} Byte = 4 MB$ of information, a few thousand of these will easily eat up the RAM of most graphics cards.
+The other problem for huge input images is that the stitching of brushstrokes takes up a considerable amount of memory.
+In detail, each brushstroke must be placed on the virtual canvas individually,  where the canvas' size is that of the input image.
+This would equate to a couple of thousand 1MP images being stored in memory before they are stitched to a single 1MP images.
+As a single 1MP image carries roughly $1000 \times 1000 \times 4 \text{channels} \times 8 Bit = 32 \times 10^{6} Bit = 4 \times 10^{6} Byte = 4 MB$ of information, a few thousand of these will easily eat up the memory of most graphics cards.
 
-Luckily, the previous work-around for optimizing only 256 brushstrokes will work as well without rendering the full image at every step.
-Since most brushstrokes are not re-rendered anyway and thus will not be supplied with a gradient, their main task is to regulate losses for edge strokes of the image patch.
-As this does not need far away strokes but only those close the strokes that are optimized, a ring of pre-rendered strokes around the re-rendered patch will suffice.
+Luckily, the previous workaround for optimizing only 256 brushstrokes will work as well without rendering the full image at every step.
+Since most brushstrokes are not re-rendered and thus will not be supplied with a gradient, their main task is to regulate losses for edge strokes of the image patch.
+As this does not need far away strokes, but only those close to the optimized strokes, a ring of pre-rendered strokes around the re-rendered patch will suffice.
 
-\todo{approximate the amount of brushstrokes needed to surround the patch}
-This allows to reduce the amount of involved brushstrokes per optimization step from a few thousand down to a couple hundred.
-Besides allowing for the partial update routine to be performed at all, it also should increase performance significantly compared to an approach that involves all brushstrokes at any time.
+\todo{approximate the number of brushstrokes needed to surround the patch}
+This reduces the number of involved brushstrokes per optimization step from a few thousand down to a couple hundred.
+Besides allowing for the partial update routine to be performed at all, it should also increase performance significantly compared to an approach that involves all brushstrokes.
 
 \subsection{Image Placing \& Blending}
 \labsubsec{placing_blending}
 As the update and optimization procedure has now been explained thoroughly, it is now time to explain the process of placing and blending a rendered brushstroke a bit further.
 
-After each stroke has been rendered it needs to be placed according to the translation parameters that were introduced in section \ref{sssec:layout}.
+After each stroke has been rendered, it needs to be placed according to the translation parameters (see \ref{sssec:layout}).
 This requires dynamically placing each brushstroke inside zero-filled tensor.
 
-By calculating the global position of each pixel in the rendered image individually, it is possible to scatter the pixels of the original rendered image into the larger zero-filled tensor and obtain a globally placed brushstroke.
+By calculating each pixel's global positioning in the rendered image individually, it is possible to scatter the pixels of the original rendered image into the larger zero-filled tensor and obtain a globally placed brushstroke.
 
-What is more complicated though is the task of blending the resulting canvas-sized renders together or stitching them.
-Due to the canvas' alpha channel it is possible to blend only relevant information while the rest of the image will be ignored.
+The task of blending the resulting canvas-sized renders together, or stitching them, is more complicated, though.
+Due to the canvas' alpha channel, it is possible to blend only relevant information while the rest of the image will be ignored.
 
 As far as conventional alpha blending goes, two images are blended by multiplying each pixel value with the alpha value of the top-layer image while the background image is multiplied with the complement to the alpha value:
 \begin{align}
@@ -721,18 +723,16 @@ As far as conventional alpha blending goes, two images are blended by multiplyin
 \end{align}
 \todo{correct this equation and make it nicer}
 
-For multiple layers this process can be repeated in various fashions, after the strokes are ordered according to their accuracy.
-Either one could start from the bottom and blend the two back-most strokes, followed by the next third last strokes and so one, or one could start this process from the front with the two strokes in the very front being blended at first, then the stroke with the third highest accuracy \etc.
+For multiple layers, this process can be repeated in various fashions, after the strokes are ordered according to their accuracy.
+Either one could start from the bottom and blend the two back-most strokes, followed by the next third last strokes and so one, or one could start this process from the front with the two strokes in the very front being blended at first, then the stroke with the third-highest accuracy \etc.
 
 Both of the approaches would yield the same result but differ only in the order in which they were blended.
 Subsequently, both methods will have $(n-1)$ blending operations to compute per pixel.
 
-By moving from the linear approaches to a tree-based approach this number will not decrease any further.
-
-What makes it possible to reduce this number, though, is blending the strokes in  a content aware fashion.
+What reduces this number is blending the strokes in a content-aware manner.
 As looking at figure \ref{fig:stroke_on_canvas} shows, the majority of pixels for each padded brushstroke is non-informative, as the alpha value is zero.
-This hints at possibility to turn the process of blending around and instead of merging layers subsequently as a whole, merging all layers at the same time by picking relevant layers for each pixel.
-Then all non-zero layers are merged in the same way as ordinary alpha blending works but with the number of layers being reduced and information inside a layer not being coherent anymore.
+This hints at the possibility of turning the process of blending around and instead of merging all layers serially, merging layers at the same time by picking relevant layers for each pixel.
+All non-zero layers are merged in the same way as ordinary alpha blending works, but with a reduced number of layers as each layer is not spatially coherent anymore.
 
 
 The easiest way to accomplish this is to first find the maximum depth over all pixels, where the depth $k$ is the number of layers where the alpha value is not zero.
@@ -742,12 +742,13 @@ The easiest way to accomplish this is to first find the maximum depth over all p
 
 Then the top $k$ layer indices for each pixel are picked, which reduces the number of blending operations from $(n-1)$ to $(k-1)$.
 Importantly, the top $k$ indices should not be ordered by their alpha values but remain in the order that was imposed by sorting according to the accuracy value.
-Otherwise, the order will most certainly be mixed up and the pixel with the highest alpha value will always lie on top instead of the pixel that belongs to the most accurate brushstroke.
+Otherwise, the order will most certainly be mixed up, and the pixel with the highest alpha value will always lie on top instead of the pixel that belongs to the most accurate brushstroke.
 Especially as brushstroke renderings fade out towards their edges, this makes a significant difference.
 
 
-Another way of accelerating the process of alpha-blending is vectorizing the process instead of iteratively applying the computations.
-To achieve this it is necessary to construct a tensor with the following properties:
+Another way of accelerating the process of alpha-blending is \textbf{vectorizing}.
+Instead of iteratively applying the computations, a vectorized operation can perform these computations in parallel.
+Vectorizing makes it necessary to construct a tensor with the following properties:
 
 For $\tensor{I} \in [0, 1]^{H \times W \times 4} $ the image target, the shape will be defined
 as $\mathcal{S}(\tensor{I}) = (H, W, 4)$.
@@ -785,7 +786,7 @@ with $z'^{hw}$ the resulting RGB values of the blended pixel and $\tilde{\alpha}
     \rightarrow  \tilde{\alpha}^{hw}_n & = \alpha^{hw}_n \prod^{n-1}_{i=1} (1 - \alpha^{hw}_i)
 \end{align}
 
-Where $\odot$ describes the element-wise product.
+with $\odot$ the element-wise product
 
 What is left, is to find a way to construct $\tilde{\alpha}^{hw}$ from $\alpha^{hw}$.
 
@@ -864,22 +865,22 @@ $$
 $$
 alone.
 
-This is where the previous content aware alpha blending tricks becomes useful.
+This is where the previous content-aware alpha blending tricks becomes useful.
 By computing $\beta^{hw}$ only through the top $k$ values of $\alpha^{hw}$ instead of the full tensor $\alpha^{hw}$, the size will be reduced to
 $$
 k \times k \times 256 \times 256 \times 4 \si{\byte} = k^2 2^{22}\si{\byte} = k^2 \times 4\si{\mebi\byte}
 $$
-As the shape is reduced to $(k, k, H, W)$.
+as the shape is reduced to $(k, k, H, W)$.
 
-Ultimately, this accelerates optimization by a factor of $2-3$ as it will be shown in \ref{sec:exp:vectorization}.
+Ultimately, this accelerates optimization by a factor of $2-3$, as it will be shown in \ref{sec:exp:vectorization}.
 
-It must be mentioned that the upper boundary for computational complexity in using this kind of alpha-blending is $\mathcal{O}(N \log k)$ as the top $k$ search is bound by this complexity.
+It must be mentioned that the upper boundary for computational complexity in using this kind of alpha-blending is $\mathcal{O}(N \log k)$, since the top $k$ search is bound by this complexity.
 \todo{calcualte this}
 
 \subsubsection{Losses}
 \labsubsubsec{losses}
 
-In this section the different kinds of losses for the optimization procedure will be discussed.
+In this section, the different kinds of losses for the optimization procedure will be discussed.
 
 First off, the L2 loss or \textbf{mean squared error} is an obvious choice for this task.
 \begin{align}
@@ -887,10 +888,10 @@ First off, the L2 loss or \textbf{mean squared error} is an obvious choice for t
 \end{align}
 
 Since the MSE loss focuses on minimizing the pixel-wise error between the target image and the fully rendered approximation by brushstrokes, it will cause the rendered image to match the target image mainly in color.
-At the same time MSE loss is prone to blurring which results in washed out edges in the rendered image.
+At the same time, MSE loss is prone to blurring, which results in washed out edges in the rendered image.
 Thus, this loss is must be accompanied by additional losses to make up for the shortcoming of MSE loss.
 
-A popular choice for preserving content in an image which, which is associated with preserving edges, is \textbf{perceptual loss}.
+A popular choice for preserving the content in an image, which is associated with preserving edges, is \textbf{perceptual loss}.
 Perceptual loss is based on a VGG Network \cite{VGG} that is pre-trained on ImageNet \cite{ImageNet}.
 To compute the loss, the activations of deep layers (usually the fourth convolutional block) of the pre-trained VGG network are inferred and then compared using MSE loss.
 \begin{align}
@@ -898,16 +899,16 @@ To compute the loss, the activations of deep layers (usually the fourth convolut
     \labeq{percep}
 \end{align}
 The resulting distance is meant to capture how well edges between the two input images are preserved which should be equal to whether the content in both images is the same.
-Together with MSE loss perceptual loss is often used to get better reconstructions than with MSE loss alone, as edges of object in the image are better preserved, prohibiting blurriness that would occur otherwise.
+Together with MSE loss, a perceptual loss is often used to get better reconstructions than with MSE loss alone, as edges of objects in the image are better preserved, prohibiting blurriness that would occur otherwise.
 
-As an evolutionary step to perceptual loss, Zhang \etal \cite{lpips} introduced  perceptual similarity or \textbf{LPIPS loss} which weighs the different layers of the pre-trained VGG-network differently in order to increase the effectiveness of perceptual distance between two images.
+As an evolutionary step to perceptual loss, Zhang \etal \cite{lpips} introduced perceptual similarity or \textbf{LPIPS loss}, which weighs the different layers of the pre-trained VGG-network differently in order to increase the effectiveness of perceptual distance between two images.
 LPIPS loss is meant to preserve edges even better than perceptual loss does with a similar computational overhead.
 
 Besides losses that operate in pixel space, it is also necessary to restrict the action space for each brushstroke.
-As it has been explained in section \ref{ssec:render:dataset} the renderer has been trained on a limited data set which put constraints on how curved brushstrokes may be and how the ration between length and width ought to look like.
+As explained in section \ref{ssec:render:dataset}, the renderer has been trained on a limited data set, which puts constraints on how curved brushstrokes may be and how the ratio between length and width ought to look like.
 These constraints must be enforced in the optimizing process as well.
-Because the renderer has nit been trained on data that lies outside of the generated data set, it is very likely that that the renderer will break if the input parameters lie to far apart from the space it has been trained in.
-The results would then be renderings with no output, distorted brushstrokes or just noisy output, as it can be seen in \ref{ssec:ablation:renderer}.
+Because the renderer has not been trained on data outside of the generated data set, the renderer will likely break if the input parameters lie too far outside the training space.
+The results would then be renderings with no output, distorted brushstrokes, or just noisy output, as seen in \ref{ssec:ablation:renderer}.
 
 Thus, one must think of an additional loss to confine the parameter space to the same space as the generated brushstroke data during optimization.
 There are two ways of achieving this:
@@ -917,10 +918,10 @@ There are two ways of achieving this:
 \end{itemize}
 
 \paragraph{Discriminators} are a popular choice in this context because even if the data distribution is not known beforehand, a discriminator is still able to learn the distribution from data and thus point out wrong parameter combinations in this case.
-Still, a discriminator comes with a few compromises, as the target distribution will never be perfectly learned rather than well approximated by a discriminator.
-This leaves room for weaknesses as well as local minima in the discriminator's prediction which would result in worse quality for this task.
-Usually, these weaknesses are made up for during adversarial training as if the generator over fits to such weaknesses the discriminator will quickly penalize such a solution.
-In the case of the optimization routine which is employed for this problem, it is not possible to train the discriminator online as the limit amount of brushstrokes will allow the discriminator to over-fit the problem easily.
+Still, a discriminator comes with a few compromises, as the target distribution will never be entirely learned rather than well approximated by it.
+This leaves room for weaknesses as well as local minima in the discriminator's prediction, which would result in worse quality for this task.
+Usually, these weaknesses are made up for during adversarial training as if the generator overfits to such weaknesses, and the discriminator will quickly penalize such a solution.
+In the optimization routine, which is employed for this problem, it is not possible to train the discriminator online as the limited amount of brushstrokes will allow the discriminator to overfit the problem easily.
 Thus only a pre-trained discriminator with its said weaknesses can be used in this case.
 
 \paragraph{Handpicked losses} As the data distribution for the generated data set is actually known in this case (see \ref{sssec:creation}), it is also possible to manually define losses that confine the brushstrokes.
@@ -973,19 +974,19 @@ with
     \tilde{\Sigma} & = \begin{pmatrix} \frac{1}{200} & 0 \\ 0 & \frac{1}{25} \end{pmatrix} \text{ see \eqref{eq:Sigma}}
 \end{align}
 
-since the origin of the projection is at $\vec{a}(x)$, thus in the middle between $\vec{s}(x)$ and $\vec{e}(x)$ and coincides with the center of the data distribution.
+since the origin of the projection is at $\vec{a}(x) = \frac{\vec{s}(x) + \vec{e}(x)}{2}$ and coincides with the center of the data distribution.
 
-In theory, $L_{\text{KL}}$ and $L_{\text{bs}}$ should be able to capture any deviation from the source data and ensure that parameters stay withing the training space of the renderer.
-One problem that obviously could arise with this formulation is for patches with very similar brushstrokes that show a mean other than $\tilde{\mu}$ as well as  a very low values inside the covariance matrix and non-zero off-diagonal values.
-Thus is will be favorable to include as many strokes as possible when calculating this loss, ideally all strokes in the global parameter catalogue.
+In theory, $L_{\text{KL}}$ and $L_{\text{bs}}$ should be able to capture any deviation from the source data and ensure that parameters stay within the training space of the renderer.
+One problem that obviously could arise with this formulation is for patches with very similar brushstrokes that show a mean other than $\tilde{\mu}$ as well as a very low values inside the covariance matrix and non-zero off-diagonal values.
+Thus it will be favorable to include as many strokes as possible when calculating this loss, ideally all strokes in the global parameter catalog.
 
 \subsection{Style Transfer}
 \labsubsec{opt:styletransfer}
 
-One question that that arises when talking about the optimization procedure, is whether there could be style transfer performed with this approach as well.
+One question that arises when discussing the optimization procedure is whether the style transfer could be performed with this approach.
 Especially, since the optimization procedure has explicitly been compared to the approach by \citeauthor*{Gatys}~\cite{Gatys}, it is just a short way of thought to assume that such an approach could also be applicable in this case.
 
-This mainly requires to introduce a style loss as it has been done by \citeauthor*{Gatys}~\cite{Gatys}, since a content loss is already in place (see~\eqref{eq:percep}).
+This mainly requires to introduce a style loss as it has been done by \citeauthor*{Gatys}~\cite{Gatys} since a content loss is already in place (see~\eqref{eq:percep}).
 A style loss can then be implemented similarly by aggregating the activations of more layers and then calculating the gram matrices:
 \begin{align}
     \L_{\text{style}} & = \sum_{l=0}^L \frac{w_l}{4 N^2_l M^2_l} \sum_{ij} (G_{ij}^l - A_{ij}^l)^2
@@ -993,39 +994,40 @@ A style loss can then be implemented similarly by aggregating the activations of
 \end{align}
 
 The problem, which arises when trying to apply style transfer with this particular approach is the partial update routine.
-Since the gram-martices are meant to catch global second order statistics of the image, a small patch would be object to a wrongful assumption that the patch represents the whole image.
-The only chance of dealing with a local patch in a global context in image space, is a cached version of the current whole image in which the patch is embedded.
+Since the gram-matrices are meant to catch global second-order statistics of the image, a small patch would be object to a wrongful assumption that the patch represents the whole image.
+The only chance of dealing with a local patch in a global context in image space is a cached version of the whole current image in which the patch is embedded.
 
 \subsection{Optimization Details}
 \labsubsec{opt:details}
 
 As it has been explained in \refsec{opt:partialupdates}, it is not possible to optimize brushstrokes for the whole image in parallel.
-This is partly due to the memory requirements of the neural renderer which scales with the number of rendered patches.
-And partly due to the memory requirements of the placing and blending method, which scales with the number of rendered brushstrokes as well as the number of surrounding fixed brushstrokes and the patch window size.
+This is partly due to the neural renderer's memory requirements, which scales with the number of rendered patches.
+The memory requirements of placing and blending, on the other hand, scales with the number of rendered brushstrokes as well as the number of surrounding fixed brushstrokes and the patch window size.
 Experiments have shown that a combination of 256 rendered brushstrokes with 128 surrounding brushstrokes paired with a patch window size of 320x320 pixels occupies around $9.5 \si{\gibi \byte}$ of memory which leaves enough space for more advanced losses and tweaks to the network architecture.
 
 The learning rate for the optimization procedure can be significantly larger than for training the neural renderer.
-With a learning rate of $0.01$ the optimization procedure will converge significantly faster to a solution without any instability issues.
+With a learning rate of $0.01$, the optimization procedure will converge significantly faster to a solution without any instability issues.
 
 One choice, which has to be made individually per target image is how many brushstrokes will cover the image.
 As larger images obviously require more brushstrokes than smaller images, what should remain the same is the \textbf{brushstrokes density}.
-The brushstroke density will decide how many pixel on average should be covered by each brushstroke and thus be used during initialization.
+The brushstroke density will decide how many pixels on average should be covered by each brushstroke and thus be used during initialization.
 A number of $100 \frac{\text{pixels}}{\text{brushstroke}}$ has produced the best results during the experiments.
 
-Another important choice that goes along the choice of how dense the brushstrokes should be distributed, is that of how many optimization steps each brushstroke will be object to.
-As for too few steps the training will not have converged and for too many optimization will take an unnecessary amount of time.
+Another important choice that goes along the choice of how dense the brushstrokes should be distributed is that of how many optimization steps each brushstroke will be object to.
+As for too few steps, the training will not have converged, and for too many, optimization will take an unnecessary amount of time.
 As this can vary between images, since some images require more time to converge, about $1500 \frac{\text{steps}}{\text{brushstroke}}$ give constantly good results.
-There is no direct enforcement that each brushstrokes is updated exactly this often but it can be expected that due to the uniform sampling of render patches, there will be no major deviation for some brushstrokes.
+There is no direct enforcement that each brushstroke is updated exactly this often, but it can be expected that due to the uniform sampling of render patches, there will be no major deviation for some brushstrokes.
 Since 256 brushstrokes will be optimized in every step, the total number of optimization steps can be calculated together with the brushstroke density and the image's size.
 
-Another minor detail is the fact that for each render patch five consecutive optimization steps are performed as this safes memory bandwidth, since data must be written and read from memory each time a different render patch is optimized.
+Another minor detail is the fact that for each render patch, five consecutive optimization steps are performed as this safes memory bandwidth since data must be written and read from memory each time a different render patch is optimized.
 
 \subsection{Results}
 \labsubsec{results}
 
 Results can be seen in \reffig{opt:results:starry_night} for Starry Night as the standard reference image of this thesis.
-It took approximately 15,000 optimization steps which corresponds to about $2\si{\hour}$.
+It took approximately 15,000 optimization steps, which corresponds to about $2\si{\hour}$.
 The rendering consists of roughly 10,000 brushstrokes.
 
-\reffig{opt:results:photo} shows the result for natural photo as target image which took
+\reffig{opt:results:photo} shows the result for a natural photo as target image which took
 also $~2\si{\hour}$ to compute with 8.000 brushstrokes and 12.000 optimization steps.
+
