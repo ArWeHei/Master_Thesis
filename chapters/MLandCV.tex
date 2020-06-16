@@ -1,3 +1,108 @@
 \setchapterpreamble[u]{\margintoc}
 \chapter{Machine Learning and Computer Vision}
 \labch{MLandCV}
+In this chapter the theoretical backgrounds of Neural Networks ought to be explored.
+
+As Masters thesis is (partly) meant to belong to the field of physics a physical/biological
+motivation will set the foundation for the theoretical background.
+
+Thereafter the bridge to neural networks in general will be made followed by neural
+networks that are strongly associated to the field of computer vision.
+
+\section{Artificial Neural Networks}
+
+\subsection{Neurobiological Inspiration}
+
+As the name "Neural Network" already states, the inspiration for this field comes
+from nature's own structure of the brain.
+
+Within the brain, specific cells called neurons are connected to each other through
+dendrites, synapses and axons.
+What makes neurons special, is their ability to propagate messages between one another
+through their connections.
+
+If a neuron receives a signal through one of its axons, the signal is accumulated
+with other incoming signals in the cells membrane potential.
+As more signals come in the membrane potential can increase or decrease depending on
+the nature of the signal itself.
+If the neuron's membrane potential exceeds a certain threshold, the potential at the
+membrane rapidly rises and falls, which is called an action potential or "spike"
+due to the behavior of the potential over time.
+
+This spike propagates through the whole neuron and its dendrites towards the synapses.
+The synapses are the connections between the firing neuron's dendrites and the 
+receiving neuron's axons.
+At the synapse, the action potential is converted from an electrical signal to
+a chemical signal and back to an electrical signal as it enters the axon of an adjacent
+neuron, where again signals from all axons are accumulated.
+The synapses act as weights to the signal, and are capable to propagate the signal
+either as a positive or negative potential to the axon.
+
+All of this happens billions and billions of times in each human's brain at every
+given second, which makes this a highly volatile process.
+
+Obviously computers are (currently) not able to follow the exact same structure,
+ -- even though there are attempts at closing this gap \cite{brainscales} --
+as they are built on different principles.
+Besides computers working with digital signals and data, the brain, as all of nature
+works in an analog fashion.
+This comes with further differences such as the very high level of recurrency and 
+parallelism that is present in the brain when compared to a computer which works
+in a rather serial fashion.
+
+Nonetheless, when stepping one step back and looking at local structures instead of
+the bits they are made of comparisons between computers and the brain seem more likely.
+
+But should the basic element of a neural network be designed?
+Ideally, it should be capable of doing the same things as a normal neuron does.
+Additionally, it should work very efficiently and fit the digital nature of a computer.
+
+When looking at a neuron more precisely,...
+%explain the logic from neuron to perceptron
+\subsubsection{Activation Functions}
+
+\subsection{Mathematical Inspiration}
+
+While this introduction to Perceptrons is possible they can be derived more easily
+as linear classifiers.....
+%algebraic fomralism
+%bias trick
+
+
+\subsubsection{Activation Functions}
+Activation functions have already been described 
+
+\section{Loss Function}
+%What is the goal of training?
+%hint at backpropagation but this will come in later.
+
+\section{Fully Connected Neural Networks}
+\subsection{Multi Layer Perceptron}
+After motivating the perceptron, this section will focus on combining multiple layers
+of perceptrons, which make up the \textbf{multi layer perceptron (MLP)}.
+The MLP combines several perceptron layers in series which is the first step towards
+what is described as deep neural networks.
+In a first thought experiment the original input layer and the output layer shall
+be separated by an additional layer that works quite simialrly to the input layer.
+Instead of receiving a signal 'from outside' the added layer takes the input layer's
+activations as a new input signal ....
+
+
+\subsection{Deep Neural Networks}
+Deep neural networks repeat the step from the previous section over and over again
+which results in a \textbf{deep} architecture, where deep refers to the number of
+layers....
+
+
+\section{Convolutional Neural Networks}
+\subsection{Convolutions}
+%mathematical explanation of what a convolution does
+%advantage of convolutions as they use fewer weights
+%unified behavior over space
+
+\subsection{Normalization}
+%Motivate by facilitating training or look into book
+
+\subsection{Regularization}
+%addition to loss but just keep training on track
+
