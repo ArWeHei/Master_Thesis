@@ -1,25 +1,201 @@
 \setchapterpreamble[u]{\margintoc}
 \chapter{Artistic Computer Vision}
 \labch{ACV}
+This chapter shall dive into existing and related work that combines computer vision with artistic content.
 
-\section{Style Transfer}
-\labsec{ST}
+Applying computer vision techniques to images with artistic content has been interesting and challenging at the same time.
+Due to the often observed change in appearance that can be observed for many artistic images, existing CV pipelines for \ie classification usually do not work as intended.
+This makes it all the more interesting to see, how these pipelines are affected by this domain gap.
 
-\subsection{Problem Formulation}
+At the same time artistic images bring something into the mix which 
 
-\subsection{Early Approaches}
+%non-photorealistic rendering vs. photrealism
+%games and movies benefit from this
+%since the 1990's starting with artistic rendering of images (paint by numbers)
 
-\subsection{Neural Style Transfer}
-%talk about gatys approach
+%with neural network more practical applicatin of style transfer have become popular:
+% - funny iphone filters
+% - translating images between other domains (google maps, satelites etc.) -> many possible applications
+% quantitative style (materials used, color shoice etc.)
+% qualitative style (how are people drawn etc.)
 
-\subsection{State of the Art}
+% historically there have been many different approaches
+%try to group these approaches on the problem formulation and the approach
+
+%color choice
+%how to display something (is it unnaturally large or small ...)
+%direction of brush strokes
+%choice of material
+%which details are kept which details are lost?
+
+%all of this together makes style
+
+%usually style transfer formulates this much simpler (maybe see gatys formulation?):
+%create something that maintains the orginal content to some  degree but people would categorize together with other works of that 'style'
+% style is rather something by what art can be grouped together 'easily'
+
+
+\section{Problem Formulation \& Approach}
+The problem that style transfer might seem easy to capture at first, but it quickly becomes harder when trying to formulate it.
+As 'style' is simply defined as "a typical way of doing something", it includes actually all aspects 
+
+%style transfer
+%create IMAGE that catches style as well a possible, doesn't rally matter how, the pixel should make sense in the end
+
+%painterly rendering
+%create something that looks like is has been drawn with a paint brush (or any other such tool, e.g. has some gloss to it etc.)
+%don't really concentrate on deeper style but just the apprearance
+
+%drawing networks
+%do not care as much about the apprearance or the style but how to compose the image in a different parameter space, FAST
+
+%brush stroke extraction and image analysis
+%get more information about the image, that can help to classify it, or identify it. Do not get all brush strokes but those that are characteristic
+
+%drawing networks and painterly rendering are really much of the same with different focus on what matters.
+
+
+%this work would fall into painterly rendering territory paired with brush stroke extraction
+
+
+%features of DNN have been used to classify paintings
+
+\section{Brushstroke Extraction}
+%no updates in recent years
+%shift towards creating art rather than analyzing it
+
 
 \section{Painterly Rendering}
 \labsec{PR}
 
-\subsection{Problem Formulation}
+Painterly rendering has already been mentioned in \refsec{ST}, as painterly rendering
+can be viewed as a kind of style transfer.
+Only that the image is not really transformed but rather recreated entirely in a certain style.
+Through this generation process, the quantitative aspects of style are arguably embedded deeper into the resulting output but at the same time it is harder to really catch qualitative aspects as well as style transfer does.
+The additional challenges of painterly rendering makes it harder to also catch those aspects that define qualitative style.
+
+
+\section{Style Transfer}
+\labsec{ST}
+
+This field of style transfer has its origins 
+%most active field
+%style and texture are similar problem
+
+\subsection{Early Approaches}
+Earliest approaches
+%painterly rendering is some kind of style transfer but shall be dealt with explicitly
+%focus is on approaches that work only with pixels
+%filters
+%texton based approaches
+
+\subsection{Neural Style Transfer}
+The field of style transfer has really gained traction in 2015 with the publication of \textbf{A Neural Algorithm for Artistic Style} by \citeauthor*{gatys}.
+It was the first approach to transfer the style of one image to another and at the same time maintaining a high contextual fidelity.
+In retrospective, this work really kicked off neural style transfer as a field.
+
+\citeauthor*{gatys} themselves pinpoint the novelty of their approach as 'manipulations in feature spaces' as opposed to previous approaches that 'directly manipulate the pixel representation of an image'\cite{gatys}.
+They use existing neural architectures and extract information in two separate ways, such that content and style can be separated.
+
+Previous works already used \textbf{perceptual loss} to accumulate information on the content in an image \cite{percep_loss}, or check whether two images have the same content \cite{other_percep_loss}.
+%networks trained on object recognition increasingly care about the content with every layer
+Perceptual loss is based on the VGG-19 architecture \cite{VGG} which is a deep CCN trained for object classification on ImageNet \cite{imagenet}.
+By arguing that the network's layer activations increasingly respond to the content when following the networks' hierarchy.
+Some much even, that it is possible to reconstruct the content of an image by using the activations of one such layer.
+
+For reconstruction of an image's content, gradient descent is performed on a white noise image.
+The gradient descent aims to minimize the perceptual distance between the reconstruction and the target image.
+Perceptual distance is defined as the L2-distance between the activations of two images in deep layer of the VGG-network.
+
+For image vector $\vec{x}$ with $\vec{x} \in = \R^{M_0}, M_0 = H_x \dot W_x $, a layer $l$ of the network has $N_l$ feature maps of size $M_l$.
+In this case $M_l$ is equal to the height times the width of the feature map of the $l$-th layer.
+The activations of the $i$-th filter ($i \in N_l$) at position $j$ ($j \in M_l$) at layer $l$ can then be represented by matrix $F(\vec{x})_{ij}^l \in \R^{N_l \times M_l}$.
+The perceptual distance is then defined as
+\begin{align}
+    d_{\text{percep}}(\vec{x}, \vec{y}) = \sum_{i, j} (F(\vec{x})_{ij}^l - F(\vec{y})_{ij}^l)^2 = \norm{\tensor{F(\vec{x})}^l - \tensor{F(\vec{y})}^l}_2^2
+\end{align}
+, which allows to define the perceptual loss or content loss as 
+\begin{align}
+    \L_{\text{content}} = \frac{1}{2} \sum_{i, j} (F(\vec{x})_{ij}^l - F(\vec{y})_{ij}^l)^2 = \frac{1}{2} \norm{\tensor{F(\vec{x})}^l - \tensor{F(\vec{y})}^l}_2^2
+\end{align}
+
+\marginnote{The factor $\frac{1}{2}$ will cancel out when deriving $\L_{\text{content}}$ with respect to $F(\vec{x})_{ij}^l$.}
+
+Minimizing the content loss between two images, by using gradient descent the content of an image can be restored (see \reffig{content_loss}).
+
+As approximating the content of an image has now become possible, the question is whether this is possible with style as well.
+\citeauthor*{gatys} again turned to the pre-trained VGG network for this.
+They explicitly reduce style to texture for this reason and thus search for a feature space that captures \textbf{texture} rather than content.
+Subsequently, \citeauthor*{gatys} propose the use of \textbf{Gram matrices} as they capture the correlations of feature-activations over their spatial extent.
+
+The Gram matrix of a given matrix $\tensor{A}$ is the inner product of all column vectors in $\tensor{A}$.
+\begin{align}
+    G = \langle a_{i}, a_{j} \rangle = \tensor{A}^T \tensor{A} \text{ if $a_1$...$a_j$ are column vectors of $\tensor{A}$}
+\end{align}
+The resulting Gram matrix G now has the form $j \times j$ and captures texture information but no longer the global content.
+
+\refsec{problem} already mentioned that style is very complex and exists at various scales at the same time which \citeauthor*{gatys} address by using many layers.
+As these layers sit at different depths their field of view varies and each layer captures information at a different scale.
+Early layers will tend to hold small scale information, later layers will hold larger scale information with every layer.
+
+\citeauthor*{gatys} first compute the Gram matrices each layer $l$ for both the target style image and the current image.
+Then they use the L2 distance metric to measure the discrepancy between them.
+\begin{align}
+    G(\vec{x})^l & = \frac{1}{(2 N_x^l M_x^l)^2} F(\vec{x})^l{}^T F(\vec{x})^l \\
+    G(\vec{y})^l & = \frac{1}{(2 N_y^l M_y^l)^2} F(\vec{y})^l{}^T F(\vec{y})^l \\
+    d_{\text{style}}^l(\vec{x}, \vec{y}) & = \norm{G(\vec{x})^l - G(\vec{y})^l}^2_2 \\
+\end{align}
+
+\marginnote{The denominator of $\frac{1}{4 N_x^l{}^2 M_x^l{}^2}$ is squared since the Gram matrix is the product of a matrix with itself transposed.}
+
+The style distances at each layer are then weighted and summed up to make up the style loss:
+
+\begin{align}
+    \L_{\text{style}} = \sum_{l} w_l d_{\text{style}}^l(\vec{x}, \vec{y})
+\end{align}
+
+%again one can visualize the style/texture that is perceived
+
+%%That means: If the content in an image is preserved, the car which has been at the lower right corner should not appear in the center of the image, but stay at this position.
+%%Style on the other hand, does not care about its position in the image.
+%%If the artist prefers a certain color pattern, then this can be the case anywhere in the image not just in the lower right corner.
+%%Ideally, the local style should fit the content.
+%%As for the starry night image, this means that any large tree in an image should match the large cypress in the center of the image.
+%%This tree does not need to be at the center as well but can be anywhere in the image, though.
+
+% it is possbile to invert the representaiton an render what a layer 'sees'
+% 'content reconstruction'
+
+
+%before manipulation was done directly on pixels by translating texture, now the manipulation happens in feature space
+
+%mix content and style
+
+
+
+
+According to \citeauthor*{MMD} this is equivalent to calculating the \textbf{maximum mean discrepancy}
+
+
+
+
+
+%talk about gatys approach
+%explain this thouroughly
+%maximum mean discrepancy explanation
+%it is not that easy to replicate without the trained weights
+
+\subsection{State of the Art}
+%johnson
+%adain
+%wcp
+%cyclegan
+%adaptive style transfer or multiartist style transfer by dima
+
+%mention ugatit, munit, drit shortly
+
 
 \section{Drawing Networks}
+%gaining traction
 
-\subsection{Problem Formulation}
-
+%

@@ -86,7 +86,7 @@ As neural networks are inherently differentiable, the question becomes rather ho
 Previous works have shown that neural networks are capable of conditionally generating high-resolution and high-quality images.
 Conditioning the generator on brushstroke parameters as well as some noise should then output an image of the respective brushstroke with some variability to it.
 
-The basic idea was proposed by \authorcite{japanese neural renderer}~\cite{japanese neural renderer} as it facilitates training of reinforcement learning based networks.
+The basic idea was proposed by \citeauthor*{japaneseneuralrenderer}~\cite{japaneseneuralrenderer} as it facilitates training of reinforcement learning based networks.
 
 Inspired by this, the approach becomes more apparent.
 First, a neural network is trained as a differentiable renderer.
@@ -101,7 +101,7 @@ Both steps require some tricks to avoid pitfalls like computational limitations,
 \section{Neural Renderer}
 \labsec{NeuralRend}
 
-The neural renderer in \authorcite{japanese neural renderer}'s~\cite{japanese neural renderer} work improves an architecture based on SPIRAL \cite{SPIRAL}.
+The neural renderer in \citeauthor*{japanese neural renderer}'s~\cite{japanese neural renderer} work improves an architecture based on SPIRAL \cite{SPIRAL}.
 \citeauthor*{Learning2Paint}'s efforts used a differentiable renderer to facilitate deep reinforcement learning for drawing images \cite{Learning2Paint}.
 As mentioned, the renderer is required to be differentiable and ideally require as few resources as possible.
 
@@ -546,7 +546,7 @@ As it would exceed the scope of this thesis, the arising problems and cause for 
 First, the computational burden of a feed-forward approach is very high.
 Existing feed-forward drawing networks compromise image resolution to realize their implementation.
 As it was possible to implement this for small scale data like the cMNIST data set, such an approach seems feasible at first. \todo{margin explain cmnist} \todo{add image that were drawn by ff network}
-However, since compromising image resolution is not a viable option (see \refssec{dataset}, one must find ways around this problem.
+However, since compromising image resolution is not a viable option (see \refsec{dataset}, one must find ways around this problem.
 Fully convolutional architectures are a popular solution, which allows training on small scale data and inference on large scale images.
 Unfortunately, the problem of predicting many spatially brushstrokes with complex parameters has proven too difficult for fully convolutional approaches.
 
