@@ -1,58 +1,238 @@
 \setchapterpreamble[u]{\margintoc}
-\chapter{Machine Learning and Computer Vision}
+\chapter{Machine Learning \& Computer Vision}
 \labch{MLandCV}
-In this chapter the theoretical backgrounds of Neural Networks ought to be explored.
+In this chapter the theoretical backgrounds and motivation of Neural Networks ought to be explored.
 
-As Masters thesis is (partly) meant to belong to the field of physics a physical/biological motivation will set the foundation for the theoretical background.
+First, a physical/biological motivation will set the foundation for the theoretical background accompanied by a more mathematical motivation.
+Thereafter, more advanced lines of thought will be introduced that finally lead to convolutional neural networks as the current driving force in computer vision .
 
-Thereafter the bridge to neural networks in general will be made followed by neural networks that are strongly associated to the field of computer vision.
+\section[Artificial NNs]{Artificial Neural Networks}
 
-\section{Artificial Neural Networks}
+\subsection[Inspiration]{Neurobiological Inspiration}
 
-\subsection{Neurobiological Inspiration}
 %Nature is often inspiration (birds and planes)
-
+Many human achievements have at least been partially inspired by studying nature.
+A very popular example is that of airplanes and birds.
+The study of how birds are able to fly found that the shape of their wing is the essential element to flying.
+Inventors and engineers have taken this inspiration and slowly but steadily created planes and the like from it.
 %arguabnly implementations deviate from nature (plane and bird) and people say to refrain from using these analogies.
+Yet, planes are not birds, as they are not flapping their wings (yet?), but integrate of other inventions like jet engines to get the same (or better) capability of flying as birds.
 
-%scalability
+Quite similarly, the brain features a lot of insights, how intelligence or something that seems like it, can be constructed.
+In the same way humans studied birds to understand flying, researchers are now studying the brain to create better artificial intelligence.
 
-%neurophysiologist Warren McCulloch and the mathematician Walter Pitts invented first ANN
-%simplified computational model of how biological neurons might work together
+In the earliest stages of this they would try to imitate the brain, as people have tried imitating birds at first and failed similarly.
+\begin{figure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{Otto Lilienthal with his flying apparatus. \url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
+    \labfig{lilienthal}
+\end{figure}
+\marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success \cite{brainscales}.}
 
-%histrocal rollercoaster of interest (AI winter) ?
-
-%short electrical impulses are signals
-
-%it seems that neurons are often organized in consecutive layers
-
-As the name "Neural Network" already states, the inspiration for this field comes from nature's own structure of the brain.
-
-Within the brain, specific cells called neurons are connected to each other through dendrites, synapses and axons.
-What makes neurons special, is their ability to propagate messages between one another through their connections.
-
-If a neuron receives a signal through one of its axons, the signal is accumulated with other incoming signals in the cells membrane potential.
-As more signals come in the membrane potential can increase or decrease depending on the nature of the signal itself.
-If the neuron's membrane potential exceeds a certain threshold, the potential at the membrane rapidly rises and falls, which is called an action potential or "spike" due to the behavior of the potential over time.
-
-This spike propagates through the whole neuron and its dendrites towards the synapses. The synapses are the connections between the firing neuron's dendrites and the  receiving neuron's axons.
-At the synapse, the action potential is converted from an electrical signal to a chemical signal and back to an electrical signal as it enters the axon of an adjacent neuron, where again signals from all axons are accumulated.
-The synapses act as weights to the signal, and are capable to propagate the signal either as a positive or negative potential to the axon.
-
-All of this happens billions and billions of times in each human's brain at every given second, which makes this a highly volatile process.
-
-Obviously computers are (currently) not able to follow the exact same structure, -- even though there are attempts at closing this gap \cite{brainscales} -- as they are built on different principles.
-Besides computers working with digital signals and data, the brain, as all of nature works in an analog fashion.
-This comes with further differences such as the very high level of recurrency and  parallelism that is present in the brain when compared to a computer which works in a rather serial fashion.
-
-Nonetheless, when stepping one step back and looking at local structures instead of the bits they are made of comparisons between computers and the brain seem more likely.
-
-But should the basic element of a neural network be designed?
-Ideally, it should be capable of doing the same things as a normal neuron does.
-Additionally, it should work very efficiently and fit the digital nature of a computer.
-
-When looking at a neuron more precisely,...
 %start with a very much simplified model McCulloch and Pitts
 %binary input and binary output
+Warren McCulloch and Walter Pitts proposed one of the earliest models of a neuron, which targeted simplifying the real Neuron.
+\marginnote{Notably McCulloch and Pitts (1943) even preceded Hodkins and Huxley's (1952) Nobel price winning description of a neuron.}
+
+%explain biological neuron
+\subsubsection{Biological Neuron}
+For this the functioning of a neuron shall be described shortly.
+
+Human cells in that make up the brain are called \textbf{neurons}.
+They connected to each other through dendrites, synapses and axons and they use these connections to send signals.
+
+A neuron receives signals through its dendrites, which all lead to the cell body (soma).
+At the cell body the signals are accumulated.
+If the summed value of the signals' potential reaches a certain threshold, an action potential is generated.
+The new signal then travels along the axon and its branches towards other neurons.
+The axon ends in synapses which connect the axon to other neurons' dendrites.
+Synaptic transmissions are usually mediated by chemicals and not by electrical signals.
+The chemical nature of the synapse allows it to forward either an excitatory or an inhibitory signal.
+Excitatory signals will bring the cell potential closer to the threshold, while inhibitory do the opposite \cite[p.~42]{coloratlas}.
+\marginnote{Cell potentials are usually decreases by excitatory signals, as the action threshold sits below the resting potential.}
+
+What makes the brain so powerful though, is not the neuron itself with its arguably simple structure but the vast network of billions of these neurons.
+Each neuron is connected to thousands of other neurons with which it constantly communicates.
+How a signal is transported between the neurons depends on the interplay of synaptic weights, neuron connections and the threshold of each neurons.
+
+\subsubsection{Artificial Neuron}
+McCulloch and Pitts saw that powerful things can be achieved when connecting lots and lots of simple structures.
+Thus, they proposed an even simpler model of a neuron:
+
+They restricted their neuron to a binary state (on or off).
+Each neuron then has a number of incoming signals from other neurons which would either be positive or negative.
+A neuron would only become active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
+\todo{add equation with activation function, when neuron fires}
+McCulloch and Pitts then also changed the highly parallel and complex nature of biological neural networks to a single layer feed-forward network architecture.
+
+In a feed-forward network neurons are grouped into layers and operate in parallel within a layer.
+Each neuron in a layer is fed the same input signal (often described as an input layer).
+The neuron's state is then computed according to an equation such as \refeq{mcculloch}.
+The activation value of each neuron then defines an output.
+
+As this models deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
+
+In a single layer architecture a layer often consists of a single unit (see \reffig{ff_arch}.
+Basically, input signals come from one side and output signal go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
+This is not only done for practical reasons but also inspired by observation of layered neuron structures in the brain.
+
+The McCulloch-Pitts model is capable of emulating simple logical relations (|AND|, |OR|, |NOT|) but nor |XOR| which will be explained later.
+
+\subsubsection{Perceptron}
+This McCulloch's and Pitts' is very much simplified yet comes with some weaknesses.
+Thus, the \textbf{perceptron} has been introduced by Frank Rosenblatt in 1957.
+Instead of having a binary unit, he came up with a linear threshold unit (LTU).
+The LTU allows for numeric instead of binary signals which can be weighted with independent factors.
+Also they use the 'bias trick' to parametrize the threshold or bias of the unit as yet another weight for an input that is constantly one.
+The resulting equation for each LTU then reads:
+\todo{equation for LTU with bias trick}
+Equation \refeq{LTU} can then be formulated in a vectorized form such that:
+\todo{vectorized LTU}
+
+In this form the calculations for each unit become mathematically and computationally relatively easy.
+Each layer can be expressed as a vector of activations $\vec{x}$.
+Multiplying this vector with the weight matrix $\mat{W}$ and applying the element-wise activation function returns the activations for the subsequent layer.
+\marginnote{The word perceptron describes the whole function $f$ in equation \refeq{perceptron} which can consist of many LTUs}
+%simplified computational model of how biological neurons might work together
+This simple yet capable description of a unit built the base for a first surge of interest in neural networks.
+%connectionism
+
+\subsubsection{Mathematical Interpretation}
+%hyperplane
+%linear separation
+%bias trick
+The very simplistic mathematical formulation of the perceptron suggests that there might be a mathematical meaning to it besides the biological analogy.
+Indeed, the perceptron is equal to the definition of a \textbf{binary linear classifier}.
+
+A binary linear classifier, classifies inputs into two classes, hence binary.
+It does so by drawing a virtual hyperplane in input space and predicts the class for each input, depending on whether it lies above or below this hyperplane.
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{As a very simple example, this binary classifier has data on how often the words 'weightloss' and 'invest' appear in an email.
+Any time these two words appears too often and the data point is above the decision boundary, the email is classified as 'spam'}
+    \labfig{linear_class}
+\end{marginfigure}
+As the hyperplane (or decision boundary) is quantified by a linear function, the classifier is described as linear.
+
+A classic problem would be classifying email as spam.
+Given the two data inputs (\ie frequency of of the words 'weight loss' and 'invest') the classifier has to make a decision.
+For this reason the binary classifier defines a \textbf{decision boundary}.
+Any data point that lies above this decision boundary is classified as 'spam', any point beneath is classified as 'not spam'
+This makes sense as normal email rarely use the two words.
+For other people like a nutritionist, the word weight-loss can come up more frequently.
+This means the decision boundary differs for different users and their mail.
+
+To compute where a point lies relative to the decision boundary, a data point's value along each axis $x_1, x_2$ is weighted individually $w_1, w_2$ and summed with a bias $b$.
+The result is checked whether it is above or below a threshold $t$.
+\begin{align}
+    z = w_1 x_1 + w_2 x_2 + b
+\end{align}
+With the classification 'spam' if $z > r$ and 'not-spam' $z \leq r$ (\textit{in dubio pro reo}).
+Equally $z - r > 0$ holds for spam as well such that the threshold can be brought into the equation and $z$ is checked against $0$.
+$r$ can then be absorbed into the bias.
+%predistion is y, 1 is spam, 0 is not spam
+\begin{align}
+    \rightarrow z = w_1 x_1 + \hdots + w_D x_D + b - r = w_1 x_1 + \hdots + w_D x_D + b'
+\end{align}
+
+For arbitrary dimensions $D$ this becomes
+\begin{align}
+    z = w_1 x_1 + \hdots + w_D x_D + b
+\end{align}
+ where $\vec{x}$ and $\vec{w}$ can be defined by vectors
+\begin{align}
+    z = w_1 x_1 + \hdots + w_D x_D + b = \vec{w}^T \vec{x} + b
+\end{align}
+The decision boundary can be easily derived from this, since $\vec{w}$ is the orthogonal vector to the hyperplane and $\frac{b}/\norm{\vec{w}}$ is the displacement of the plane along $\vec{w}$.
+
+For a simpler notation one can define an additional 'virtual' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$.
+\begin{align}
+    z = w_0 b + \vec{w}^T \vec{x} = w_0 b + w_1 x_1 + \hdots + w_D x_D = \vec{\hat{w}}^T \vec{x}
+\end{align}
+with $x_0 = 1$ and $w_0 = b$.
+This is called the \textbf{bias trick}.
+
+\todo{take this to high-dim space and explain ability to imitate any linear function.}
+
+
+\subsubsection{Loss Function}
+Now with a mathematical definition at hand the next step is to quantify the output.
+In order to train a classifier, an objective has to be formulated though a \textbf{loss function}.
+Usually (in the supervised case), there is already data set on which the network can be trained.
+In the given example this would be mails which were read beforehand and then declared either 'spam' $\tilde{y}_i = 1$ or 'not-spam' $\tilde{y}_i = -1$
+$\tilde{y}_i$ is called the \textbf{label} for a sample $x_i$ with index $i$.
+
+With the binary linear classifier, the decision boundary has been introduced ($z_i > 0$ ?) to predict this label for any given sample.
+This is sufficient to predict a class but a lot of information is lost this way.
+For training and evaluation the information available in $z$ should be used.
+\eg a large $z$ implies that the data point is far away from the decision boundary, thus, the classifier is very sure for this classification.
+For $z \approx 0$ the classifier is not that sure and for $z = 0$ the classifier is indecisive.
+Ultimately, $z$ can be viewed as a score that is calculated for each data input.
+
+The question then becomes how to quantify how well the classifier performs on the given data.
+For this reason a loss function is defined which measures the classifier's performance on the data.
+A straight forward choice is \textbf{least squares}, where the score's distance to the label is measured.
+\begin{align}
+    \L_{\text{LS}} = \sum_i (y_i - z_i)^2
+\end{align}
+The value of the loss function become minimal for $y_i = z_i$ for $i = 1,...,N$.
+Yet, this score function is especially susceptible to outliers which will cause the decision plane to skew towards outliers with $z > 1$ or $z < -1$
+
+For this reason \textbf{support vector machines (SVM)} employ a \textbf{maximum margin} classifier.
+A maximum margin classifier seeks to find a decision boundary which as far from the closest representatives of each class as possible (see \reffig{SVM}).
+The maximum margin is defined as
+\begin{align}
+    \text{margin} = d_+ + d_-
+\end{align}
+with $d_+$ the distance to the nearest training sample with class $+1$ and $d_1$ the closest training sample for class $-1$.
+Noticeably, this requires for the data to be linearly separable, which means that there must exist a hyperplane which perfectly separates the data according to its class.
+The margin becomes maximal for $d_+ = d_-$.
+Since $w$ is orthogonal to the hyperplane, $\vec{w}$ can always be rescaled such that 
+\begin{align}
+    d_+ = d_- = \frac{1}{\norm{\vec{w}}}
+\end{align}
+
+Additionally, $\vec{w}$ can be chosen such that $z = \vec{w}_i^T \vec{x}_i + b_i \geq +1$ for $\tilde{y}_i = +1$ and vice versa for $\tilde{y}_i = -1$.
+Thus,
+\begin{align}
+    \tilde{y}_i z_i \geq 1
+\end{align}
+will hold, for all $x_i$ with equality for points on the margin, as there is always at least one point on the margin.
+
+Thus,
+\begin{align}
+    d_- = d_+ = \frac{1}{\norm{\vec{w}}}
+\end{align}
+and the margin
+\begin{align}
+    d_- + d_+ = \frac{2}{\norm{\vec{w}}}
+\end{align}
+is maximized when $\norm{\vec{w}}$ is minimized.
+
+Subsequently, the classification can be expressed as a relatively simple optimization problem.
+\begin{align}
+    \argmin_{w, b} \frac{1}{2} \norm{\vec{w}}^2
+\end{align}
+under the constraints
+\begin{align}
+    \tilde{y}_i z_i = \tilde{y}_i (\vec{w}_i^T \vec{x} + b) \geq 1 \forall i
+\end{align}
+How to solve this optimization problem shall be explained in \refssec{svmopt}
+%What is the goal of training?
+%hint at backpropagation but this will come in later.
+
+
+%loss/score function
+%(multiclass) (linear) discriminant function
+
+%classifiers come in many forms, one is an SVM with a linear kernel is identical to a perceptron
+
+%linear regression and linaer svm are identical
+
+%linear binary classification
+%find values for weights
+
+%scalability
 %neurons is activated if a number of inputs is active
 %neurons can also be inhibitant
 %focussed on logical computations
@@ -61,35 +241,93 @@ When looking at a neuron more precisely,...
 
 %perceptron invented by Frnak Rosenblatt (linear threshold unit)
 
-\subsubsection{Activation Functions}
-%weighted sum and step function (heaviside)
-
-\subsection{Mathematical Inspiration}
-%linear binary classification (like linear SVM)
-%find values for weights
 
 %perceptron is one layer of LTUs
 %weights shoul dbe reinforced when they lead to the correct output
 
-
-
-While this introduction to Perceptrons is possible they can be derived more easily as linear classifiers.....
 %algebraic fomralism
 %bias trick
 
 
-\subsubsection{Activation Functions}
-Activation functions have already been described 
-
-\section{Loss Function}
-%What is the goal of training?
-%hint at backpropagation but this will come in later.
-
-\section{Fully Connected Neural Networks}
+\section[Fully Connected NNs]{Fully Connected Neural Networks}
 \subsection{Multi-Layer Perceptron}
+With the perceptron at hand for which is capable of classification any linear separable data, the question becomes, what are the limitations to this?
+Minsky and Pappert found the limitations in 1969 with their book 'Perceptrons'.
+They oulined the limitations of perceptrons with the |XOR| problem.
+The problem becomes obvious when looking at the |XOR| problem in a 2D plane (see \reffig{XOR})
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{|OR| and |XOR| operations visualized. The |XOR| problem cannot be solved by drawing a single line.}
+    \labfig{XOR}
+\end{marginfigure}
+
+As it has been explained in the previous section, the perceptron is equal to a binary linear classifier.
+As such, the perceptron can only classify linear separable data perfectly.
+Since the |XOR| problem can obviously not be solved with a straight line separating the two classes, the perceptron is also not able to compute such an operation. 
+
+This realization led to the first decline in interest in artificial neural networks.
+
+Since then there have been ways of solving this problem for SVMs by projecting the data into a higher dimensional space.
+Another approach kept the logic as is but went to went from the existing shallow network approaches to deep networks.
+Deep Networks are ANNs which consist of more than one hidden layer.
+A single perceptron may not be capable of computing |XOR| but it is capable of calculating |AND|, |OR| and their negated forms.
+By using one perceptron with two units to compute |AND| and |OR|, a second layer perceptron can use compute |XOR|
+\begin{align}
+    XOR(x, y) = AND(OR(x, y), NOT(AND(x, y)))
+\end{align}
+
+Now, the |XOR| problem becomes solvable.
+
+\marginnote{The ability to stack multiple layers in ANNs stems from discovery of backpropagation which shall be explained in \refssec{backprop}.}
+
+As before only linear functions could be approximated by perceptrons, multiple layers of perceptrons allow for any higher degree function to be approximated as well.
+Thus, \textbf{Multi-Layer Perceptrons (MLP)} sparked new interest in the field of artificial neural networks.
+
+This interest also originated in the similarities that MLPs had to the similarly layered structure that has been found in the brain.
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{THe brains structure under a microscope}
+    \labfig{brain}
+\end{marginfigure}
+Ultimately, MLPs really start to show the connected structure in a network that is typically expected.
+
+%\marginnote{This new connectedness opens a realm to a whole field of studies on graphs, networks and network motifs \cite{network_motifs}.}
+
+%histrocal rollercoaster of interest (AI winter) ?
+%limited capabilities of the perceptron for XOR problem
+%use either higher dimensional input -> kernel trick or stack many perceptrons
+%any 2 layer MLP can approximate any continuous function (or somethign like that)
+%simialrity to network motifs, make a large network of many identical pieces
+%similar to how the brain works as well.
+
+\subsubsection{Activation Functions}
+%linear algebra shows that any linear function can approximated by just two perceptron layers for a linear activation function -> more layers do not make sense.
+Activation functions have already been used to describe the perceptron and the artificial neuron by McCulloch and Pitts.
+In both cases (as well as the binary linear classifier) the inputs are weighted and summed up to something called a \textbf{pre-activation} \cite[p.~6]{GrosseNotes}.
+The pre-activation is then checked against a threshold which is often $0$ if there is a bias term involved.
+In all previously given cases this decides whether a unit becomes active or which class the input is allocated to.
+\begin{align}
+    \sigma(z) = \frac{1}{1 + e^{-z}}
+\end{align}
+
+There are many more activation functions with different properties such as the \textbf{sigmoid activation} $\sigma$.
+\begin{align}
+    \sigma(z) = \frac{1}{1 + e^{-z}}
+\end{align}
+$\sigma$ is also inspired by nature as a neuron can fire at different rates according to its input.
+Even though this is very much simplified, the main idea is, that a strong input ('mentioning 'weightloss' hundreds of times) should lead to a strong output ('this mail is definitley spam').
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{A sigmoid function. It saturates to $1$ for very large inputs and $0$ for very small inputs.}
+    \labfig{sigmoid}
+\end{marginfigure}
+
+\reffig{sigmoid} shows that the output $\sigma(z)$ scales with the input $z$ but saturates for both very large and very small $z$.
+
 
 %inability to solve XOR problem
 %thus stack multiple 
+%non-linearity is important 
 
 %hiddenlayers
 
@@ -98,13 +336,12 @@ The MLP combines several perceptron layers in series which is the first step tow
 In a first thought experiment the original input layer and the output layer shall be separated by an additional layer that works quite simialrly to the input layer.
 Instead of receiving a signal 'from outside' the added layer takes the input layer's activations as a new input signal ....
 
-
 \subsection{Deep Neural Networks}
 %two or more hidden layers -> deep neural network
 Deep neural networks repeat the step from the previous section over and over again which results in a \textbf{deep} architecture, where deep refers to the number of layers....
 
 
-\section{Convolutional Neural Networks}
+\section[Convolutional NNs]{Convolutional Neural Networks}
 \subsection{Convolutions}
 %mathematical explanation of what a convolution does
 %advantage of convolutions as they use fewer weights
@@ -115,6 +352,8 @@ Deep neural networks repeat the step from the previous section over and over aga
 
 \subsection{Normalization}
 %Motivate by facilitating training or look into book
+Ioffe and Szegedy introduced BN to ease training of feed-forward networks.
+affine parameters $\gamma$ and $\beta$
 
 \subsection{Regularization}
 %addition to loss but just keep training on track

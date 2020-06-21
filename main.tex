@@ -65,10 +65,11 @@
 \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
 \newcommand\norm[1]{\left\lVert#1\right\rVert}
-\renewcommand\vec[1]{\underline#1}
+%\renewcommand\vec[1]{\underline#1}
 \newcommand\mat[1]{\underline{\underline{#1}}}
 \newcommand\tensor[1]{\mathbf{#1}}
 \newcommand\R{\mathbb{R}}
+\newcommand\E{\mathbb{E}}
 \renewcommand\L{\mathcal{L}}
 
 \usepackage{amsmath}
@@ -99,6 +100,14 @@
 \dictlibrary{mylib}
 
 \usepackage{subfig}
+
+\usepackage{xpatch}
+
+\xpatchbibmacro{name:andothers}{%
+  \bibstring{andothers}%
+}{%
+  \bibstring[\textit]{andothers}%
+}{}{}
 
 \begin{document}
 

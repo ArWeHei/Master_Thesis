@@ -1,36 +1,3 @@
-@article{StarGAN, 
-author = {Choi, Yunjey and Choi, Minje and Kim, Munyoung and Ha, Jung-Woo and Kim, Sunghun and Choo, Jaegul}, 
-title = {{StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation}}, 
-eprint = {1711.09020}, 
-abstract = {{Recent studies have shown remarkable success in image-to-image translation for two domains. However, existing approaches have limited scalability and robustness in handling more than two domains, since different models should be built independently for every pair of image domains. To address this limitation, we propose StarGAN, a novel and scalable approach that can perform image-to-image translations for multiple domains using only a single model. Such a unified model architecture of StarGAN allows simultaneous training of multiple datasets with different domains within a single network. This leads to StarGAN's superior quality of translated images compared to existing models as well as the novel capability of flexibly translating an input image to any desired target domain. We empirically demonstrate the effectiveness of our approach on a facial attribute transfer and a facial expression synthesis tasks.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_StarGAN-%20Unified%20Generative%20Adversarial%20Networks%20for%20Multi-Domain%20Image-to-Image%20Translation_Choi_Choo.pdf}, 
-year = {2017}
-}
-@article{undefined, 
-author = {Li, Yijun and Fang, Chen and Yang, Jimei and Wang, Zhaowen and Lu, Xin and Yang, Ming-Hsuan}, 
-title = {{Universal Style Transfer via Feature Transforms}}, 
-eprint = {1705.08086}, 
-abstract = {{Universal style transfer aims to transfer arbitrary visual styles to content images. Existing feed-forward based methods, while enjoying the inference efficiency, are mainly limited by inability of generalizing to unseen styles or compromised visual quality. In this paper, we present a simple yet effective method that tackles these limitations without training on any pre-defined styles. The key ingredient of our method is a pair of feature transforms, whitening and coloring, that are embedded to an image reconstruction network. The whitening and coloring transforms reflect a direct matching of feature covariance of the content image to a given style image, which shares similar spirits with the optimization of Gram matrix based cost in neural style transfer. We demonstrate the effectiveness of our algorithm by generating high-quality stylized images with comparisons to a number of recent methods. We also analyze our method by visualizing the whitened features and synthesizing textures via simple feature coloring.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Universal%20Style%20Transfer%20via%20Feature%20Transforms_Li_Yang.pdf}, 
-year = {2017}
-}
-@article{Gatys, 
-author = {Gatys, Leon A and Ecker, Alexander S and Bethge, Matthias}, 
-title = {{A Neural Algorithm of Artistic Style}}, 
-eprint = {1508.06576}, 
-abstract = {{In fine art, especially painting, humans have mastered the skill to create unique visual experiences through composing a complex interplay between the content and style of an image. Thus far the algorithmic basis of this process is unknown and there exists no artificial system with similar capabilities. However, in other key areas of visual perception such as object and face recognition near-human performance was recently demonstrated by a class of biologically inspired vision models called Deep Neural Networks. Here we introduce an artificial system based on a Deep Neural Network that creates artistic images of high perceptual quality. The system uses neural representations to separate and recombine content and style of arbitrary images, providing a neural algorithm for the creation of artistic images. Moreover, in light of the striking similarities between performance-optimised artificial neural networks and biological vision, our work offers a path forward to an algorithmic understanding of how humans create and perceive artistic imagery.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2015_A%20Neural%20Algorithm%20of%20Artistic%20Style_Gatys_Bethge.pdf}, 
-year = {2015}
-}
-@article{AST, 
-author = {Sanakoyeu, Artsiom and Kotovenko, Dmytro and Lang, Sabine and Ommer, Björn}, 
-title = {{A Style-Aware Content Loss for Real-time HD Style Transfer}}, 
-eprint = {1807.10201}, 
-abstract = {{Recently, style transfer has received a lot of attention. While much of this research has aimed at speeding up processing, the approaches are still lacking from a principled, art historical standpoint: a style is more than just a single image or an artist, but previous work is limited to only a single instance of a style or shows no benefit from more images. Moreover, previous work has relied on a direct comparison of art in the domain of RGB images or on CNNs pre-trained on ImageNet, which requires millions of labeled object bounding boxes and can introduce an extra bias, since it has been assembled without artistic consideration. To circumvent these issues, we propose a style-aware content loss, which is trained jointly with a deep encoder-decoder network for real-time, high-resolution stylization of images and videos. We propose a quantitative measure for evaluating the quality of a stylized image and also have art historians rank patches from our approach against those from previous work. These and our qualitative results ranging from small image patches to megapixel stylistic images and videos show that our approach better captures the subtle nature in which a style affects content.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_A%20Style-Aware%20Content%20Loss%20for%20Real-time%20HD%20Style%20Transfer_Sanakoyeu_Ommer.pdf}, 
-year = {2018}, 
-rating = {5}
-}
 @article{Art2Real, 
 author = {Tomei, Matteo and Cornia, Marcella and Baraldi, Lorenzo and Cucchiara, Rita}, 
 title = {{Art2Real: Unfolding the Reality of Artworks via Semantically-Aware Image-to-Image Translation}}, 
@@ -38,6 +5,96 @@ eprint = {1811.10666},
 abstract = {{The applicability of computer vision to real paintings and artworks has been rarely investigated, even though a vast heritage would greatly benefit from techniques which can understand and process data from the artistic domain. This is partially due to the small amount of annotated artistic data, which is not even comparable to that of natural images captured by cameras. In this paper, we propose a semantic-aware architecture which can translate artworks to photo-realistic visualizations, thus reducing the gap between visual features of artistic and realistic data. Our architecture can generate natural images by retrieving and learning details from real photos through a similarity matching strategy which leverages a weakly-supervised semantic understanding of the scene. Experimental results show that the proposed technique leads to increased realism and to a reduction in domain shift, which improves the performance of pre-trained architectures for classification, detection, and segmentation. Code is publicly available at: https://github.com/aimagelab/art2real.}}, 
 local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_Art2Real-%20Unfolding%20the%20Reality%20of%20Artworks%20via%20Semantically-Aware%20Image-to-Image%20Translation_Tomei_Cucchiara.pdf}, 
 year = {2018}
+}
+@article{lendu, 
+author = {Du, Len}, 
+title = {{How Much Deep Learning does Neural Style Transfer Really Need? An Ablation Study}}, 
+doi = {10.1109/wacv45572.2020.9093537}, 
+abstract = {{Neural style transfer has been a "killer app" for deep learning, drawing attention from and advertising the effectiveness to both the academic and the general public. However, we have found by ablative experiments that optimizing an image in the way neural style transfer does, while the objective functions (or more precisely, the functions to transform raw images to corresponding feature maps being compared) are constructed without pretrained weights or biases, worked almost as well. We can even factor out the deepness (multiple layers of alternating linear and nonlinear transformations) alltogether and have neural style transfer working to a certain extent. This raises the question how much of the the current success of deep learning in computer vision should be attributed to training, structure or simply spatially aggregating the image.}}, 
+pages = {3139--3148}, 
+volume = {00}, 
+journal = {2020 IEEE Winter Conference on Applications of Computer Vision (WACV)}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_Du_How_Much_Deep_Learning_does_Neural_Style_Transfer_Really_Need_WACV_2020_paper.pdf_Unknown_Unknown.pdf}, 
+year = {2020}
+}
+@article{undefined, 
+author = {Li, Yijun and Liu, Ming-Yu and Li, Xueting and Yang, Ming-Hsuan and Kautz, Jan}, 
+title = {{A Closed-form Solution to Photorealistic Image Stylization}}, 
+eprint = {1802.06474}, 
+abstract = {{Photorealistic image stylization concerns transferring style of a reference photo to a content photo with the constraint that the stylized photo should remain photorealistic. While several photorealistic image stylization methods exist, they tend to generate spatially inconsistent stylizations with noticeable artifacts. In this paper, we propose a method to address these issues. The proposed method consists of a stylization step and a smoothing step. While the stylization step transfers the style of the reference photo to the content photo, the smoothing step ensures spatially consistent stylizations. Each of the steps has a closed-form solution and can be computed efficiently. We conduct extensive experimental validations. The results show that the proposed method generates photorealistic stylization outputs that are more preferred by human subjects as compared to those by the competing methods while running much faster. Source code and additional results are available at https://github.com/NVIDIA/FastPhotoStyle .}}, 
+journal = {arXiv}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_1802.06474.pdf_Unknown_Unknown.pdf}, 
+year = {2018}
+}
+@article{10.1109/cvpr.2019.01027, 
+author = {Kotovenko, Dmytro and Sanakoyeu, Artsiom and Ma, Pingchuan and Lang, Sabine and Ommer, Bjorn}, 
+title = {{A Content Transformation Block for Image Style Transfer}}, 
+doi = {10.1109/cvpr.2019.01027}, 
+abstract = {{Style transfer has recently received a lot of attention, since it allows to study fundamental challenges in image understanding and synthesis. Recent work has significantly improved the representation of color and texture and computational speed and image resolution. The explicit transformation of image content has, however, been mostly neglected: while artistic style affects formal characteristics of an image, such as color, shape or texture, it also deforms, adds or removes content details. This paper explicitly focuses on a content-and style-aware stylization of a content image. Therefore, we introduce a content transformation module between the encoder and decoder. Moreover, we utilize similar content appearing in photographs and style samples to learn how style alters content details and we generalize this to other class details. Additionally, this work presents a novel normalization layer critical for high resolution image synthesis. The robustness and speed of our model enables a video stylization in real-time and high definition. We perform extensive qualitative and quantitative evaluations to demonstrate the validity of our approach.}}, 
+pages = {10024--10033}, 
+volume = {00}, 
+journal = {2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_Kotovenko_A_Content_Transformation_Block_for_Image_Style_Transfer_CVPR_2019_paper.pdf_Unknown_Unknown.pdf}, 
+year = {2019}
+}
+@article{MMD, 
+author = {Li, Yanghao and Wang, Naiyan and Liu, Jiaying and Hou, Xiaodi}, 
+title = {{Demystifying Neural Style Transfer}}, 
+eprint = {1701.01036}, 
+abstract = {{Neural Style Transfer has recently demonstrated very exciting results which catches eyes in both academia and industry. Despite the amazing results, the principle of neural style transfer, especially why the Gram matrices could represent style remains unclear. In this paper, we propose a novel interpretation of neural style transfer by treating it as a domain adaptation problem. Specifically, we theoretically show that matching the Gram matrices of feature maps is equivalent to minimize the Maximum Mean Discrepancy (MMD) with the second order polynomial kernel. Thus, we argue that the essence of neural style transfer is to match the feature distributions between the style images and the generated images. To further support our standpoint, we experiment with several other distribution alignment methods, and achieve appealing results. We believe this novel interpretation connects these two important research fields, and could enlighten future researches.}}, 
+journal = {arXiv}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_1701.01036.pdf_Unknown_Unknown.pdf}, 
+year = {2017}
+}
+@article{undefined, 
+author = {Lin, Jianxin and Pang, Yingxue and Xia, Yingce and Chen, Zhibo and Luo, Jiebo}, 
+title = {{TuiGAN: Learning Versatile Image-to-Image Translation with Two Unpaired Images}}, 
+eprint = {2004.04634}, 
+abstract = {{An unsupervised image-to-image translation (UI2I) task deals with learning a mapping between two domains without paired images. While existing UI2I methods usually require numerous unpaired images from different domains for training, there are many scenarios where training data is quite limited. In this paper, we argue that even if each domain contains a single image, UI2I can still be achieved. To this end, we propose TuiGAN, a generative model that is trained on only two unpaired images and amounts to one-shot unsupervised learning. With TuiGAN, an image is translated in a coarse-to-fine manner where the generated image is gradually refined from global structures to local details. We conduct extensive experiments to verify that our versatile method can outperform strong baselines on a wide variety of UI2I tasks. Moreover, TuiGAN is capable of achieving comparable performance with the state-of-the-art UI2I models trained with sufficient data.}}, 
+journal = {arXiv}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_2004.04634.pdf_Unknown_Unknown.pdf}, 
+year = {2020}
+}
+@article{undefined, 
+author = {Xiang, Sitao and Li, Hao}, 
+title = {{Disentangling Style and Content in Anime Illustrations}}, 
+eprint = {1905.10742}, 
+abstract = {{Existing methods for AI-generated artworks still struggle with generating high-quality stylized content, where high-level semantics are preserved, or separating fine-grained styles from various artists. We propose a novel Generative Adversarial Disentanglement Network which can fully decompose complex anime illustrations into style and content. Training such model is challenging, since given a style, various content data may exist but not the other way round. In particular, we disentangle two complementary factors of variations, where one of the factors is labelled. Our approach is divided into two stages, one that encodes an input image into a style independent content, and one based on a dual-conditional generator. We demonstrate the ability to generate high-fidelity anime portraits with a fixed content and a large variety of styles from over a thousand artists, and vice versa, using a single end-to-end network and with applications in style transfer. We show this unique capability as well as superior output to the current state-of-the-art.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_1905.10742.pdf_Unknown_Unknown.pdf}, 
+year = {2019}
+}
+@article{WCT, 
+author = {Li, Yijun and Fang, Chen and Yang, Jimei and Wang, Zhaowen and Lu, Xin and Yang, Ming-Hsuan}, 
+title = {{Universal Style Transfer via Feature Transforms}}, 
+eprint = {1705.08086}, 
+abstract = {{Universal style transfer aims to transfer arbitrary visual styles to content images. Existing feed-forward based methods, while enjoying the inference efficiency, are mainly limited by inability of generalizing to unseen styles or compromised visual quality. In this paper, we present a simple yet effective method that tackles these limitations without training on any pre-defined styles. The key ingredient of our method is a pair of feature transforms, whitening and coloring, that are embedded to an image reconstruction network. The whitening and coloring transforms reflect a direct matching of feature covariance of the content image to a given style image, which shares similar spirits with the optimization of Gram matrix based cost in neural style transfer. We demonstrate the effectiveness of our algorithm by generating high-quality stylized images with comparisons to a number of recent methods. We also analyze our method by visualizing the whitened features and synthesizing textures via simple feature coloring.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Universal%20Style%20Transfer%20via%20Feature%20Transforms_Li_Yang.pdf}, 
+year = {2017}
+}
+@article{gatys, 
+author = {Gatys, Leon A and Ecker, Alexander S and Bethge, Matthias}, 
+title = {{A Neural Algorithm of Artistic Style}}, 
+eprint = {1508.06576}, 
+abstract = {{In fine art, especially painting, humans have mastered the skill to create unique visual experiences through composing a complex interplay between the content and style of an image. Thus far the algorithmic basis of this process is unknown and there exists no artificial system with similar capabilities. However, in other key areas of visual perception such as object and face recognition near-human performance was recently demonstrated by a class of biologically inspired vision models called Deep Neural Networks. Here we introduce an artificial system based on a Deep Neural Network that creates artistic images of high perceptual quality. The system uses neural representations to separate and recombine content and style of arbitrary images, providing a neural algorithm for the creation of artistic images. Moreover, in light of the striking similarities between performance-optimised artificial neural networks and biological vision, our work offers a path forward to an algorithmic understanding of how humans create and perceive artistic imagery.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2015_A%20Neural%20Algorithm%20of%20Artistic%20Style_Gatys_Bethge.pdf}, 
+year = {2015}
+}
+@article{johnson, 
+author = {Johnson, Justin and Alahi, Alexandre and Fei-Fei, Li}, 
+title = {{Perceptual Losses for Real-Time Style Transfer and Super-Resolution}}, 
+eprint = {1603.08155}, 
+abstract = {{We consider image transformation problems, where an input image is transformed into an output image. Recent methods for such problems typically train feed-forward convolutional neural networks using a \textbackslashemph\{per-pixel\} loss between the output and ground-truth images. Parallel work has shown that high-quality images can be generated by defining and optimizing \textbackslashemph\{perceptual\} loss functions based on high-level features extracted from pretrained networks. We combine the benefits of both approaches, and propose the use of perceptual loss functions for training feed-forward networks for image transformation tasks. We show results on image style transfer, where a feed-forward network is trained to solve the optimization problem proposed by Gatys et al in real-time. Compared to the optimization-based method, our network gives similar qualitative results but is three orders of magnitude faster. We also experiment with single-image super-resolution, where replacing a per-pixel loss with a perceptual loss gives visually pleasing results.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2016_Perceptual%20Losses%20for%20Real-Time%20Style%20Transfer%20and%20Super-Resolution_Johnson_Fei-Fei.pdf}, 
+year = {2016}
+}
+@article{artsiom, 
+author = {Sanakoyeu, Artsiom and Kotovenko, Dmytro and Lang, Sabine and Ommer, Björn}, 
+title = {{A Style-Aware Content Loss for Real-time HD Style Transfer}}, 
+eprint = {1807.10201}, 
+abstract = {{Recently, style transfer has received a lot of attention. While much of this research has aimed at speeding up processing, the approaches are still lacking from a principled, art historical standpoint: a style is more than just a single image or an artist, but previous work is limited to only a single instance of a style or shows no benefit from more images. Moreover, previous work has relied on a direct comparison of art in the domain of RGB images or on CNNs pre-trained on ImageNet, which requires millions of labeled object bounding boxes and can introduce an extra bias, since it has been assembled without artistic consideration. To circumvent these issues, we propose a style-aware content loss, which is trained jointly with a deep encoder-decoder network for real-time, high-resolution stylization of images and videos. We propose a quantitative measure for evaluating the quality of a stylized image and also have art historians rank patches from our approach against those from previous work. These and our qualitative results ranging from small image patches to megapixel stylistic images and videos show that our approach better captures the subtle nature in which a style affects content.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_A%20Style-Aware%20Content%20Loss%20for%20Real-time%20HD%20Style%20Transfer_Sanakoyeu_Ommer.pdf}, 
+year = {2018}, 
+rating = {5}
 }
 @article{10.1007/978-1-4471-4519-6_1, 
 author = {Vanderhaeghe, David and Collomosse, John}, 
@@ -49,6 +106,14 @@ pages = {3--21},
 local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2012_Image%20and%20Video-Based%20Artistic%20Stylisation_Vanderhaeghe_Collomosse.pdf}, 
 year = {2012}
 }
+@article{StarGAN, 
+author = {Choi, Yunjey and Choi, Minje and Kim, Munyoung and Ha, Jung-Woo and Kim, Sunghun and Choo, Jaegul}, 
+title = {{StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation}}, 
+eprint = {1711.09020}, 
+abstract = {{Recent studies have shown remarkable success in image-to-image translation for two domains. However, existing approaches have limited scalability and robustness in handling more than two domains, since different models should be built independently for every pair of image domains. To address this limitation, we propose StarGAN, a novel and scalable approach that can perform image-to-image translations for multiple domains using only a single model. Such a unified model architecture of StarGAN allows simultaneous training of multiple datasets with different domains within a single network. This leads to StarGAN's superior quality of translated images compared to existing models as well as the novel capability of flexibly translating an input image to any desired target domain. We empirically demonstrate the effectiveness of our approach on a facial attribute transfer and a facial expression synthesis tasks.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_StarGAN-%20Unified%20Generative%20Adversarial%20Networks%20for%20Multi-Domain%20Image-to-Image%20Translation_Choi_Choo.pdf}, 
+year = {2017}
+}
 @article{AdaIN, 
 author = {Huang, Xun and Belongie, Serge}, 
 title = {{Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization}}, 
@@ -57,7 +122,7 @@ abstract = {{Gatys et al. recently introduced a neural algorithm that renders a 
 local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Arbitrary%20Style%20Transfer%20in%20Real-time%20with%20Adaptive%20Instance%20Normalization_Huang_Belongie.pdf}, 
 year = {2017}
 }
-@article{undefined, 
+@article{CycleGAN, 
 author = {Zhu, Jun-Yan and Park, Taesung and Isola, Phillip and Efros, Alexei A}, 
 title = {{Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks}}, 
 eprint = {1703.10593}, 
