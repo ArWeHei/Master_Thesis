@@ -76,7 +76,7 @@ In a single layer architecture a layer often consists of a single unit (see \ref
 Basically, input signals come from one side and output signal go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
 This is not only done for practical reasons but also inspired by observation of layered neuron structures in the brain.
 
-The McCulloch-Pitts model is capable of emulating simple logical relations (|AND|, |OR|, |NOT|) but nor |XOR| which will be explained later.
+The McCulloch-Pitts model is capable of emulating simple logical relations (\lstinline|AND|, \lstinline|OR|, \lstinline|NOT|) but nor \lstinline|XOR| which will be explained later.
 
 \subsubsection{Perceptron}
 This McCulloch's and Pitts' is very much simplified yet comes with some weaknesses.
@@ -262,30 +262,30 @@ How to solve this optimization problem shall be explained in \refssec{svmopt}
 \subsection{Multi-Layer Perceptron}
 With the perceptron at hand for which is capable of classification any linear separable data, the question becomes, what are the limitations to this?
 Minsky and Pappert found the limitations in 1969 with their book 'Perceptrons'.
-They oulined the limitations of perceptrons with the |XOR| problem.
-The problem becomes obvious when looking at the |XOR| problem in a 2D plane (see \reffig{XOR})
+They oulined the limitations of perceptrons with the \lstinline|XOR| problem.
+The problem becomes obvious when looking at the \lstinline|XOR| problem in a 2D plane (see \reffig{XOR})
 \begin{marginfigure}
     \includegraphics{otto_lilienthal}
-    \caption[]{|OR| and |XOR| operations visualized. The |XOR| problem cannot be solved by drawing a single line.}
+    \caption[]{\lstinline|OR| and \lstinline|XOR| operations visualized. The \lstinline|XOR| problem cannot be solved by drawing a single line.}
     \labfig{XOR}
 \end{marginfigure}
 
 As it has been explained in the previous section, the perceptron is equal to a binary linear classifier.
 As such, the perceptron can only classify linear separable data perfectly.
-Since the |XOR| problem can obviously not be solved with a straight line separating the two classes, the perceptron is also not able to compute such an operation. 
+Since the \lstinline|XOR| problem can obviously not be solved with a straight line separating the two classes, the perceptron is also not able to compute such an operation. 
 
 This realization led to the first decline in interest in artificial neural networks.
 
 Since then there have been ways of solving this problem for SVMs by projecting the data into a higher dimensional space.
 Another approach kept the logic as is but went from the existing shallow network approaches to deep neural networks (DNN).
 \textbf{Deep Neural Networks (DNN)} are ANNs which consist of more than one hidden layer.
-A single perceptron may not be capable of computing |XOR| but it is capable of calculating |AND|, |OR| and their negated forms.
-By using one perceptron with two units to compute |AND| and |OR|, a second layer perceptron can use compute |XOR|
+A single perceptron may not be capable of computing \lstinline|XOR| but it is capable of calculating \lstinline|AND|, \lstinline|OR| and their negated forms.
+By using one perceptron with two units to compute \lstinline|AND| and \lstinline|OR|, a second layer perceptron can use compute \lstinline|XOR|
 \begin{align}
     XOR(x, y) = AND(OR(x, y), NOT(AND(x, y)))
 \end{align}
 
-Now, the |XOR| problem becomes solvable.
+Now, the \lstinline|XOR| problem becomes solvable.
 
 \marginnote{The ability to stack multiple layers in ANNs stems from discovery of backpropagation which shall be explained in \refssec{backprop}.}
 
@@ -325,11 +325,11 @@ The activation function of a perceptron has been used up until now to make a cla
 Replacing the step function with a linear activation function (\ie identity function), each hidden-layer's perceptron would initially seem to increase the capabilities of the MLP.
 Unfortunately, this is not the case as any subsequent perceptrons with linear activations can be reduced to a single preceptron.
 \begin{align}
-    \vec{z}_2 = \mat{w}^T_2 \vec{z}_1(\vec{x}) = \mat{w}^T_2 \mat{w}^T_1 \vec{x} = \mat{w}' \vec{x}
+    \vec{z}_2 = \mat{W}^T_2 \vec{z}_1(\vec{x}) = \mat{W}^T_2 \mat{W}^T_1 \vec{x} = \mat{W}' \vec{x}
     \labeq{LAF}
 \end{align}
 
-Consequently, the step-function that was used in the |XOR| problem played an important role.
+Consequently, the step-function that was used in the \lstinline|XOR| problem played an important role.
 The reason for this is the non-linear nature of the step-function in contrast to any linear activation function.
 It can easily be shown, that \refeq{LAF} does not hold for non-linear activation functions.
 
@@ -392,24 +392,90 @@ Another activation function 'leaky ReLU' attenuates the signal below the thresho
 %Instead of receiving a signal 'from outside' the added layer takes the input layer's activations as a new input signal ....
 
 %two or more hidden layers -> deep neural network
-Deep neural networks repeat the step from the previous section over and over again which results in a \textbf{deep} architecture, where deep refers to the number of layers....
-
 
 \section[Convolutional NNs]{Convolutional Neural Networks}
-\subsection{Convolutions}
 %advantage of convolutions as they use fewer weights
+With fully connected networks at hand, it seems as if any complex function could be solved by just stacking enough hidden layers.
+While this seems compelling at first, the issue of the computational burden arises very quickly.
+Especially for broad layers with many units the number of connections and weights becomes problematic.
+For two exemplary layers with $1,000$ units each, there would be $1,000,000$ connections as well as $1,000$ biases.
+This causes two kinds of problems.
+\begin{enumerate}
+    \item Each connection represents a multiplication and summation to the activation value which introduces a computational burden.
+    \item All connections have separate weights which must be trained, which requires a vast number of training data.
+\end{enumerate}
+
+Another problem is invariance for spatially or temporally distributed data.
+If a pixel is to be shifted by a single pixel, or an audio track delayed by a second, the content does not change, and as such the result should not either.
+An FCN would likely over-fit the data and be susceptible to such variations.
+
+Thus, computer vision as a field is particularly affected by this issue.
+Since the input are often images with upwards of $64 \times 64 = 4096$ pixels.
+Hence, a different solution is needed.
+
+\subsection{Convolutions}
+A solution to the previously stated problem are convolutional layers.
+%mathematical explanation of what a convolution does
+
+A \textbf{convolution} is a mathematical operation which produces for any given point of a function $f$ the weighted average of its surroundings.
+The way the surroundings are weighted is through a kernel function $g$.
+This principle can be translated into image space where a filter $g$ is applied to each pixel and its surroundings.
+Specifically, many filters of size $k \times k$ are put on top of the image similar to tiles on a roof.
+Tiles may overlap but are evenly spaced over the area they cover.
+The spacing between the centers of each tile is called a stride $s$ and will be assumed the same along each dimension.
+The return value of each filter then defines a new grid of values much like the original input.
+Typically, the output of such a convolution is smaller than the input, since the outermost filter must still fit fully into the image.
+Yet, it is possible to avoid this problem by padding an image with values such that the output has the same size.
+
+These filters may seem very simple but they are able to capture very interesting properties in an image and transform them as well.
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{A convolution in 1D space}
+    \labfig{conv}
+\end{marginfigure}
+The easiest example would be a 3x3 filter which blurs the image it is applied to.
+The filter given in \reffig{conv_blur} results in such blurring since the signal of the pixel at the center is dominant but mixed with the signal of its surrounding pixels.
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{3x3 filter for blurring.}
+    \labfig{conv_blur}
+\end{marginfigure}
+
+Another filter like \reffig{conv_sharp} will sharpen edges in an image since the signal of the surrounding pixels is subtracted from at the center pixel signal. 
+\begin{marginfigure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{3x3 filter for sharpening edges.}
+    \labfig{conv_sharp}
+\end{marginfigure}
+
+One can easily image that these kernels can also perform blurring only along one axis or sharpening gradients in one direction.
+As many such filters are imaginable, there are often many such filters per layer, which are called filter-banks.
+The output of each filter then defines an input channel for the next layer much like the three color channels in an image.
+With many channels convolutions can become even more complex as each filter takes all previous channels as input and combines them into a new channel.
+
+Interestingly, the weights of each kernel may not be hand-crafted but can be learned similar to fully connected layers.
+
 %unified behavior over space -> invariance
-
-
-%process information hierarchically
 %each layer is a collection of image filters
 
-%mathematical explanation of what a convolution does
-\subsection{Normalization}
-%Motivate by facilitating training or look into book
-Ioffe and Szegedy introduced BN to ease training of feed-forward networks.
-affine parameters $\gamma$ and $\beta$
+\subsection{Pooling}
+%As convolutional layers can be stacked in the same way fully connected layers are stacked in MLPs they 
+A sub-type of convolutional layers are pooling layers.
+Pooling layers have the purpose of downsampling an image or layer to a lower resolution.
+Basically, downsampling can already be achieved by choosing a stride $s > 1$.
+Another way is to downsample an image without any learnable weights by using one of two specific hand-crafted kernels.
 
-\subsection{Regularization}
-%addition to loss but just keep training on track
+The first option is average pooling.
+By taking the mean of four neighboring pixels (each weight is $\frac{1}{4}$) with a stride of $s = 2$ in each channel, the input is scaled down by a factor of $2$ along each axis.
+Figuartively, four pixels will be combined into a single pixel by taking their mean.
 
+Max pooling on the other hand does not take the average but only takes the maximum value of the four inputs.
+The result will then propagate only the most dominant signals.
+
+Either way, pooling will result in loss of information but is often necessary to reduce the computational load.
+Especially when the number of channels increases for deeper layers, it is preferable to reduce memory usage and computational load along with the spatial size.
+
+Typical CNN architectures will often stack several convolutional layers then apply a single pooling layer before another stack of convolutional layers is applied.
+This way the spatial size of the input is gradually reduced while the number of channels is increased at the same time.
+ 
+%process information hierarchically

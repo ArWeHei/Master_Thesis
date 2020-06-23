@@ -9,6 +9,8 @@ This makes it all the more interesting to see, how these pipelines are affected 
 
 At the same time artistic images bring something into the mix which 
 
+%in SBR stroke is the basic unit texture synthesis fills each pixel individually.
+
 %non-photorealistic rendering vs. photrealism
 %clesly realted to texture synthesis and transfer
 %games and movies benefit from this
@@ -73,26 +75,212 @@ As 'style' is simply defined as "a typical way of doing something", it includes 
 
 %refer to painterly rendering review
 
-Painterly rendering or stroke-based rendering is a field of computer vision that tries to achieve stylization of images by reconstructing them with hard regularization. 
-One such regularization could be using only cycles or other geometric shapes..
+Painterly rendering is a field of computer vision that focusses stylization of images on giving the impression that certain tools were used.
+Most often this would be the looks of pencil drawings or brush stroke paintings as these looks are very distinctive.
 
-This limits the reconstruction's faithfulness but add a layer of abstraction that stylizes the image as well.
-Painterly rendering is seldomly included into the field of style transfer (which shall be explained in the next section) as there is not really target 'style', as it is usually understood.
-As the goal is always just reconstruction an image as good as possible with the regularization at hand the target style can only formulated very broadly, like 'pointillism' or 'painting'.
-Any control over the painting beyond that is really hard to realize.
+The use of such techniques often comes with a layer of abstraction which painterly rendering approaches often enforce explicitly though parameters.
+One could see this as a hard regularization.
+This is the reason why painterly rendering is rarely compared to style transfer (see next section) as style transfer achieves this abstraction more implicitly.
+For instance, an impressionistic style is often achieved by limiting the length and width of brush strokes.
+Nonetheless, the focus really lies on explicitly formulating an algorithm to transform images to something that looks like a painting.
 
-On the other side, the resulting representation can come in a parametrized form, such that the image can be brought into a different domain.
+There are several different key approaches how to achieve this, which shall be presented chronologically.
+
+The earliest approaches were stroke-based renderings, which artificially generated single strokes.
+With such strokes at hand the challenge mainly was to either improve the quality of these strokes or improve the algorithm which aligns them.
+This field is especially close to the approach of this thesis.
+
+In filter-based rendering filters are used to give the impression of \ie paint on canvas.
+
+Lastly, drawing networks revived stroke-based rendering with modern machine learning techniques.
+The focus of this field is really to remove the tuning of parameters and imitate the way humans would draw.
+%Along this discrepancy comes a shift in focus.
+%Style transfer wants to create something that looks like a photo of a painting by a certain artist.
+%At the same time painterly rendering focusses on imitating the real world and produce an output that looks like it has been drawn by hand.
+%One could say, that style transfer is about the broader picture and painterly rendering cares more about the details.
+%
+%As the goal is always just reconstruction an image as good as possible with the regularization at hand the target style can only formulated very broadly, like 'pointillism' or 'painting'.
+%Any control over the painting beyond that is really hard to realize.
+%
+%On the other side, the resulting representation can come in a parametrized form, such that the image can be brought into a different domain.
+
+
+
+\subsection{Stroke-Based Rendering}
+%FOCUS ON PLACING STROKES
+%two step approach: approximate and render -> flawed since the rendering matter for reconstruction.
+%SBR creates images by placing strokes according to some goals.
+%the tricky part is to define an objective function because the reconstruction is always in there
+%two approaches: greedy algorithms (genetic algos) and optimization alogrithms \cite{hertzman}
+
+%early painterly renderign techniques basically try clustering pixels with different mehtods and then repcaling them with regular shapes like stipples and tiles.
+%voronoi algorithms cannot really take color into account but just create and even spacing with some constriants.
+
+%trial and error alogrithms perturb a given set of strokes repeatedly and revert the changes if they result in a worse image.
+%Haeberli first introduced such an algorithm  (paint by numbers)
+
+
+%greedy algorithms predict a stroke and then leave it
+%greedy algorithm is optimiation based
+%paint x numbers Haeberli was the first to leave placing brush strokes to the user/artist and details of the brush strokes ar determined automatically
+%Other followed suit and automated this procedure.
+
+
+%other review
+%these properties are of interest position and density, path and orientiation, lenght and width, ordering, color, temporal coherence
+%renderign abstract the input uniformly
+
+
+%the orientation of strokes is really quite often just perpendicular to the gradient in the image
+%- arbitrary for large homegneeous color fields -> use some tricks to tackle this problem
+
+%length and width of style are often just a parameter that is loosely motivated as a style like impressionism
+%longer strokes by hertzman are just joint shorter staight strokes
+%superquadrics are used by COllomosse and Hall
+
+%order
+%hertzmann was first to order strokes according to their thickness -> start with thick background strokes and then come up with smaller foreground strokes
+%standard procedure is using low-pass fitlers and then generating mutiple layers
+%collomosse and hall ordered according to salience map
+
+%color
+%color is often just the average of the pixels or just the color at the centroid.
+%others use predefined palettes or color datasets for artists
+
+%some want temproal coherence for 'animated paintings'
+
+Stroke-based rendering focuses on generating real-looking brush strokes and composing images with these.
+Two aspects which shall be of importance in this thesis as well.
+
+\citeauthor*{paintbynumbers} introduced stroke-based rendering with his seminal work \citetitle{paintbynumbers} \cite{paintbynumbers}.
+In this work he presents two methods which would allow for reconstructing images in an abstracted representation.
+His first approach is interactive and requires a user to click a certain points in an image to place a brush stroke there.
+Then his software would automatically select a brush stroke color and size.
+He proposed several ideas on how to align the brush strokes on the canvas.
+Either users could do this on their own, or the orientation would be perpendicular to either the global gradient (uniform alignment) or local gradient (non-uniform alignment) of the image.
+\begin{marginfigure}
+    \includegraphics{haeberlihandcrafted}
+    \includegraphics{haeberligradientdriven}
+    \caption[]{Interactively painted images using \citeauthor*{paintbynumbers}'s method with a hand-selected orientation (\reffig{handselected}) and a gradient-driven orientation(\reffig{gradientdriven}).}
+    \labfig{haeberliportrait}
+\end{marginfigure}
+\citeauthor*{paintbynumbers} even introduced the use of a scanned brush stroke texture in his algorithm.
+\begin{marginfigure}
+    \includegraphics{haeberlibrushstroke}
+    \caption[]{Rendered image with a brush stroke texture}
+    \labfig{haeberlitexture}
+\end{marginfigure}
+
+Additionally to his interaction-based approach, \citeauthor*{paintbynumbers} also introduced a relaxation based approach \cite{paintbynumbers}.
+In this approach a given set of 100 brush strokes is iteratively perturbed.
+If the perturbation minimizes the energy function (L2-distance), the perturbation is kept.
+If not, another perturbation is applied.
+\begin{marginfigure}
+    \includegraphics{haeberlirelaxation}
+    \caption[]{Image approximated by relaxation.}
+    \labfig{haeberlirelaxation}
+\end{marginfigure}
+This is described by \citeauthor*{hertzmannreview} as trial-and-error algorithm and very similar to genetic algorithms which shall be explained later \cite{hertzmannreview}.
+
+Based on \citeauthor*{paintbynumbers}'s work, other authors automated the process of stroke positioning.
+At the same they improved various aspect of brush strokes which were well categorized in a review by \citeauthor*{PRreview}.
+The relevant categories are position, path and orientation, length and width, ordering, and color \cite{PRveview}.
+
+%litwinowicz
+\citeauthor*{apple} proposed a straight-forward way of placing brush strokes evenly spaced over the entire image.
+Parameters are then inferred similar to \citeauthor*{paintbynumbers}'s approach.
+To give a more random feel to these brush strokes, the obtained parameters are randomly perturbed according to preset parameters.
+Also, a weakness of orienting brush strokes perpendicular to the gradient is dealt with.
+For large uniform areas with little to no gradient, the orientation could become arbitrary.
+\citeauthor*{apple} proposes to refine the gradient field by interpolating between the boundaries of large uniformly colored areas.
+Also, \citeauthor*{apple} introduced temporal coherence to brush strokes, which meant that brush strokes move with the optical flow between frame in a video.
+
+%hertzmann
+\citeauthor*{hertzmann} reformulated the problem as an energy minimization problem in two publications \cite{hertzmanreview, Hertzmann}.
+\begin{align}
+    E(R) & = E_{\text{recon}}(R) + E_{\text{area}}(R) + E_{\text{nstr}}(R) + E_{\text{cov}}(R) \\
+    E_{\text{recon}}(R) & = \sum_{x \in W, y \in H} w_{\text{recon}}{}_{x, y} \norm{I_{x, y}(R) - I_{x, y}}^2_2 \\
+    %E_{\text{area}}(R) & = w_{\text{area}} \sum_{r \in R} \text{area){r} \\
+    %E_{\text{nstr}}(R) & = w_{\text{nstr}} (\text{\#R}) \\
+    %E_{\text{cov}}(R) & = w_{\text{cov}} (\text{\#empty pixels in $I(R)$}) \\
+\end{align}
+where $R$ is a brush stroke representation, $I$ is the target image, and $I(R)$ is the rendered representation.
+$x$ and $y$ are pixel positions.
+By adjusting the different weights, properties of the rendering can be altered.
+$w_{\text{recon}}$ can vary spatially and dictate how well the reconstruction must fit the original image in certain areas.
+
+Additionally, he added long strokes as B-splines with arbitrary control points.
+In contrast, \citeauthor*{paintbynumbers} and \citeauthor*{apple} argued that short straight brush strokes would aid the perception of impressionistic style.
+Furthermore, \citeauthor*{Hertzmann} added advanced rendering for brush strokes with synthetic textures in his work \cite{Hertzmann}.
+
+\citeauthor*{Hertzmann} combined all these aspects in his approach with advanced relaxation methods similar to \citeauthor*{paintbynumbers}.
+Based on trial-and-error search, \citeauthor*{Hertzmann} samples a local region along the many dimensions that represent a single brush stroke.
+The best set of parameters that minimizes the energy function $E$ is then picked as new parameters.
+
+In order to achieve better visual quality \citeauthor*{Hertzmann} also employs a coarse-to-fine multi-layer rendering approach.
+Hereby, he blurred the image in the early iterations of his method and fixed the brush size at a large value.
+Blurring of the image would then be gradually reduced along with the brush size.
+The final implementation is further optimized to accelerate the relaxation algorithm and allow for more brush strokes than \citeauthor*{paintbynumbers}'s approach.
+
+Ultimately, \citeauthor*{Hertzmann} achieves respectable results with his approach and many ideas of this thesis can be found in his works as well.
+
+\subsubsection{Stroke Rendering}
+
+%FOCUS ON QUALITY OF STROKES
+%physical simulations
+%Lee et al, baxter et al focused on 3D version of bristle
+
+%there are papers which focus on the material i.e. paper etc.
+
+%later
+
+
+
+\subsection{Filter-Based Rendering}
+%IMAGE PROCESSING BASED TECHNIQUES
+Parallel to his works in stroke-based rendering, \citeauthor*{imageanalogies} proposed a way of stylizing images much faster by using trainable filters.
+They call their technique 'image analogies' since the transformation between two training images is analogously applied to a test image.
+
+Basically, for creating the impression of brush strokes a photograph $A$ and a painting of that photograph $A'$ is needed.
+As this is rarely the case, \citeauthor*{iamgeanalogies} showed that using anisotropic diffusion works also reasonably well to generate $A$ from $A'$.
+Then their algorithm searches locally for the best filter parameters $F(p)$ that transform $A(p)$ into $A'(p)$.
+$p$ is an arbitrary position in the image.
+By using another search algorithm to match similar regions $B(p)$ and $A(p)$, $F(p)$ can be used to transform $B(p)$ into $B'(p)$.
+Thus $B'$ a stylized version of $B$ can be obtained by transforming it analogously to $A \rightarrow A'$.
+%Hertzmann et al 2010 smooth a painting and optimize filter parameters for the inverse transformation -> apply the filters to photos
+    %similar to superresolution and texture synthesis
+%first approach is just grouping pixels simialrly to super-pixels
+Other works like \citeauthor*{texturetransfer}~\cite{texturetransfer} have built on this principle idea which has led to a fast texture transfer algorithm \cite{fasttexturetransfer}.
+Besides only matching local region according to their pixel values, \citeauthor*{texturetransfer} obtain a flow map (which they call 'directions'), that is based on the content image's gradient.
+This flow is then also matched against the style image.
+\begin{figure}
+    \includegraphics{texturetransfer}
+    \caption[]{Target image $T$ is combined with a dictional map specially obtained from $T$ and a style image  $S$. The result maintains the direction's flow while presenting the texture from $S$.}
+    \labfig{texturetransfer}
+\end{figure}
+
+%Lee et al 2010 transfer the texture of brush stroke onto an image much like style transfer (this is the intersection)
+
+
+\subsection{Drawing Networks}
+%gaining traction
+
+%were described by hertzmann as greedy algorithms.
+
+%learning2Paint
+%SPIRAL
+%DrawNet
+%PaintNet
+
+
+%image transofrmation tasks denoising, colorization, super-resolution, semantic-segmentation, depth estimation, 
 
 \subsection{Genetic Algorithms}
 Genetic algorithms are typically not closely associated with painterly rendering, even though they represent just a different approach to algorithms for this problem.
 
 Genetic algorithms already perform a similar task in order to approximate images by other geometric shapes or even smaller photos (also known as the popular photo mosaic effect).
-\paragraph{Genetic algorithms} follow a random sampling approach that 'evolves' as genomes do.
 Starting with a random set of circles that are parameterized by their position, radius, and color, it then chooses the most successful samples and resamples in a region around these.
 This process is repeated until a certain level of convergence is reached.
-
-
-\subsection{Stroke-Based rendering}
 
 %refer to neural style transfer: a review
 
@@ -369,13 +557,3 @@ One such example is taking the posture of a person in one image and combining it
 The lines between these the applications and style transfer as it has been presented are blurry with many approaches that are capable of performing both.
 
 
-\section{Drawing Networks}
-%gaining traction
-
-%learning2Paint
-%SPIRAL
-%DrawNet
-%PaintNet
-
-
-%image transofrmation tasks denoising, colorization, super-resolution, semantic-segmentation, depth estimation, 
