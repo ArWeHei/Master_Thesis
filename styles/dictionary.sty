@@ -1,0 +1,93 @@
+\usepackage{keyval}          %Required for the solution
+\usepackage{etoolbox}        %idem
+\usepackage{ulem}            %idem
+
+\makeatletter
+\newif\if@DICT@note
+  \@DICT@notetrue
+\let\DICT@defsep=:
+\let\DICT@prefixfont=\itshape
+\let\DICT@termfont=\bfseries
+\let\DICT@notefont=\itshape
+\let\DICT@alignment\raggedright
+\let\dictemph=\uline
+\newlength{\dictskip}
+\newlength{\dictwidth}
+\newlength{\DICT@innerwidth}
+  \setlength{\dictskip}{1em}
+  \setlength{\dictwidth}{\textwidth}
+  \AtBeginDocument{%
+    \addtolength{\dictwidth}{-7pt}
+    \setlength{\DICT@innerwidth}{\dictwidth}
+    \addtolength{\DICT@innerwidth}{-.5em}
+  }
+\define@key{dictsetup}{defsep}{\gdef\DICT@defsep{#1}}
+\define@key{dictsetup}{prefixfont}{\expandafter\let\csname DICT@prefixfont\expandafter\endcsname\csname #1\endcsname}
+\define@key{dictsetup}{notefont}{\expandafter\let\csname DICT@notefont\expandafter\endcsname\csname #1\endcsname}
+\define@key{dictsetup}{dictemph}{\expandafter\let\csname dictemph\expandafter\endcsname\csname #1\endcsname}
+\define@key{dictsetup}{alignment}{%
+  \def\@tempa{#1}
+  \ifdefstring{\@tempa}{center}
+    {\let\DICT@alignment\centering}{%
+    \ifdefstring{\@tempa}{left}
+      {\let\DICT@alignment\raggedright}{%
+      \ifdefstring{\@tempa}{right}
+        {\let\DICT@alignment\raggedleft}{%
+          \@latex@error{The option #1 does not exist for the alignment-key}\@ehc
+        }
+      }
+    }
+  }
+\define@key{dictsetup}{note}{%
+  \def\@tempa{#1}
+  \ifdefstring{\@tempa}{true}
+    {\@DICT@notetrue}{%
+    \ifdefstring{\@tempa}{false}
+      {\@DICT@notefalse}{
+        \@latex@warning{The note-key does only accept boolean values}\@ehc
+      }    
+    }
+  }
+\define@key{dictsetup}{dictskip}{\setlength{\dictskip}{#1}}
+\define@key{dictsetup}{dictwidth}{\setlength{\dictwidth}{#1}}
+  \newcommand{\dictsetup}[1]{\setkeys{dictsetup}{#1}}
+\define@key{dict}{caption}{\gdef\DICT@caption{#1}}
+\define@key{dict}{prefix}{\gdef\DICT@prefix{{(\DICT@prefixfont #1)}}}
+%\define@key{dict}{label}{\label{dict:#1}}
+  \newcommand{\dictshorthand}[2]{\@namedef{DICT@#1@sh}{#2}}
+\newcommand{\dictdef}[4][]{%
+  \setkeys{dict}{#1}
+    \expandafter\let\csname #3#2caption\endcsname\DICT@caption
+    \expandafter\let\csname #3#2prefix\endcsname\DICT@prefix
+    \expandafter\gdef\csname #3@#2\endcsname{#2}
+    \expandafter\gdef\csname #3#2body\endcsname{#4}
+  \expandafter\gdef\csname DICT@#3#2\endcsname{%
+    \ifcsname #3#2prefix\endcsname\protect\@nameuse{#3#2prefix}\space\fi
+    \ifcsname #3#2caption\endcsname
+      \protect\@nameuse{#3#2caption}
+    \else
+      {\DICT@termfont\protect\@nameuse{#3@#2}}
+    \fi
+    \unskip\DICT@defsep\space
+    \protect\@nameuse{#3#2body}
+  }
+}
+\newcommand*{\dictcite}[2]{%
+  \par\vskip\dictskip
+  \vbox{
+  \DICT@alignment
+  \par\noindent\fbox{\parbox{\dictwidth}{\centering\parbox{\DICT@innerwidth}{\@nameuse{DICT@#1#2}}}}\par
+  \if@DICT@note{\DICT@notefont\smallskip \noindent(\submsntext\space\@nameuse{DICT@#1@sh})\par}\fi
+  }
+}
+\newcommand{\submsntext}{As submitted to the}
+\newcommand{\dictlibrary}[1]{\input{#1.ddx}}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%
+%A small test
+%%%%%%%%%%%%%%%%%%%%%
+
+%Uncomment the next line to see the style changes caused by \dictsetup
+%\dictsetup{defsep={.}, dictwidth=10cm, dictskip=2em, prefixfont=scshape, notefont=sffamily, dictemph=textit, alignment=center}
+
