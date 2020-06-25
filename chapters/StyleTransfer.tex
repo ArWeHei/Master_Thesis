@@ -9,6 +9,7 @@ This makes it all the more interesting to see, how these pipelines are affected 
 
 At the same time artistic images bring something into the mix which 
 
+- natural sciences have often been used in arts to analyse painting \eg chemical test on pigments
 %in SBR stroke is the basic unit texture synthesis fills each pixel individually.
 
 %non-photorealistic rendering vs. photrealism
@@ -63,13 +64,59 @@ As 'style' is simply defined as "a typical way of doing something", it includes 
 
 %features of DNN have been used to classify paintings
 
-\section{Brush Stroke Analysis}
+\section{Brush Stroke Extraction}
 %no updates in recent years
 %relatively small field
 %shift towards creating art rather than analyzing it
 %what to do with the data besides identifying forgeries?
+%computer aided forgery detection is standard
+\citeauthor*{rhythmic} were the first to extract brush strokes from paintings on a larger scale \cite{rhythmic}.
+They introduced an algorithm that leverages edge detection as well as image segmentation to find connected components in an image.
+These connected components then serve as stroke candidates.
+Each candidate is further processed to resemble a single line and checked for various properties such as width-to-length ratio.
+As a result \citeauthor*{rhythmic} claim that they detect ~60\% of brush strokes which were manually labeled on average.
+\begin{figure*}
+    \subfloat[original]{%
+        \includegraphics[width=.70\textwidth]{images/clogs}%
+        \labfig{clogs}%
+    }\qquad
+    \subfloat[extracted]{%
+        \includegraphics[width=.70\textwidth]{images/clogsbs}%
+        \labfig{clogsbs}%
+    }
+    \caption[]{Original painting and extracted brushstrokes by \citeauthor*{rhythmic}}
+    \labfig{strokes}
+\end{figure*}
 
+\citeauthor*{lamberti} later took an advanced approach and specifically modeled a brush stroke detection algorithm on the pixel level.
+They propose to randomly sample evenly spaced pixels over the image and build up connected regions by adding adjacent pixels if they are similar enough.
+This is repeated until the process comes to a stop or the brushstroke grows too large.
+If the region is too large, the similarity metric is adjusted and the growing process starts from scratch.
+If region are too small the whole seed is discarded.
+Candidate brushstrokes of the correct size are then approximated with an ellipsoid and shape constraints as well as alignment with the connected region are tested.
+\citeauthor*{lamberti} specifically fine-tune parameters in their algorithm to improve compliance with manually labeled brushstrokes.
+In the end their results fare worse on metrics proposed by \citeauthor{rhythmic} such as detection rate.
 
+\begin{figure*}
+    \subfloat[orig]{%
+        \includegraphics[width=.30\textwidth]{images/cutout_orig}%
+        \labfig{cutout_orig}%
+    }\qquad
+    \subfloat[manual]{%
+        \includegraphics[width=.30\textwidth]{images/cutout_manual}%
+        \labfig{cutout_manual}%
+    }\qquad
+    \subfloat[li]{%
+        \includegraphics[width=.30\textwidth]{images/cutout_li}%
+        \labfig{cutout_li}%
+    }\qquad
+    \subfloat[lamberti]{%
+        \includegraphics[width=.30\textwidth]{images/cutout_lamberti}%
+        \labfig{cutout_lamberti}%
+    }
+    \caption[]{Comparison of techniques on a cut out patch from van Gogh's \textit{The Little Arsienne} (a). Manually labeled brushstrokes (b) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{rhythmic} (c) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{lamberti} (d) \cite{lamberti}}
+    \labfig{cutout_strokes}
+\end{figure*}
 
 
 
