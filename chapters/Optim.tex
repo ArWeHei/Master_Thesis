@@ -5,21 +5,100 @@
 Optimzers have played a very important role for the development of neural networks and their comeback after the so-called 'AI winter'.
 
 The very early implementations of networks like the perceptron, had very straight forward rules for tuning the weights within the network.
+Yet, these update rules lacked scalability and 
 
-These networks were inspired by nature and so was training them.
-In accordance to observations made on neurons, weights were 
+As these networks were inspired by nature and so was training the netowrks.
+In accordance to observations made on neurons, weights were trained by Hebb's rule \cite{Hebb}
 %what fires together wires together (Hebb's rule)
+%doesn't scale
+%does not fit sequential architecture of ANNs
 
 \section{Optimization Problems}
-%optimization
-%lagrangian for SVM
+%As the limitations of Hebb's rule are obvious, perceptrons actually do not rely on it.
+%\refsssec{perceptron} highlighted the equivalence of a perceptron to a binary linear classifier.
+%Subsequently, different loss functions were introduced in \refsssec{losses} which reformulate the classification problem as a minimization problem.
+%This step also reduces the many 'equivalent' solutions for classification to a single 'best' solution.
+%
+%As an important note, the fact, that the data needs to be linearly separable for this, is stretched.
+%
+%SVMs with their maximum-margin loss are well suited examples for this as the optimization problem can be formulated with Lagrange multipliers:
+%
+%\refeq{maxmargin} states that the margin becomes the largest as $\norm{\vec{w}}$ is minimized.
+%At the same time the constraint in \labeq{constraint} $\tilde{y}_i (\vec{w}^T \vec{x}_i + b) \geq 1 \forall i$ must be satisfied.
+%For this purpose \labeq{constraint} can be reformultated as
+%\begin{align}
+%    \tilde{y}_i (\vec{w}^T \vec{x}_i + b) - 1 \geq 0 \forall i
+%    \labeq{min1}
+%\end{align}
+%as well as 
+%\begin{align}
+%    \norm{\vec{w}} \propto \frac{1}{2} \vec{w}^T \vec{w}
+%    \labeq{min1}
+%\end{align}.
+%
+%The constraint in \refeq{min1} can now also be seen as a minimization problem, where $- [\tilde{y}_i (\vec{w}^T \vec{x}_i + b) - 1]$ is to be minimized.
+%This makes it a second minimization problem parallel to minimizing $\frac{1}{2} \vec{w}^T \vec{w}$.
+%To allow for a trade off between these two minimization problems, \textbf{Lagrange multipliers} are introduced.
+%With 
+%
+%
+%Given Lagrange multiplier $\alpha$, the minimization problem can be combines into a single equation.
+%\begin{align}
+%    L(\vec{w}, b, \alpha) = \frac{1}{2} \vec{w}^T \vec{w} - \sum_{i=1}^N \alpha_i \left[ \tilde{y}_i (\vec{w}_i^T \vec{x}_i + b) - 1 \right]
+%    \labeq{L}
+%\end{align}
+%Now, $L$ is to be derived with respect to the variables of interest $\vec{w}$ and $b$.
+%\begin{align}
+%    \frac{\partial}{\partial \vec{w}} L(\vec{w}, b, \alpha) & = \vec{w} - \sum_{i=1}^N \alpha_i \tilde{y}_i \vec{x}_i  = 0 \equiv \vec{w} = \sum_{j=1}^N \alpha_j \tilde{y}_j \vec{x}_j
+%    \labeq{alpha_w} \\
+%    \frac{\partial}{\partial \vec{b}} L(\vec{w}, b, \alpha) & = - \sum_{k=1}^N \alpha_k \tilde{y}_k = 0 \equiv \sum_{k=1}^N \alpha_k \tilde{y}_k = 0
+%    \labeq{alpha_b}
+%\end{align}
+%
+%Inserting \refeq{alpha_w} and \refeq{alpha_b} into \refeq{L} returns:
+%\begin{align}
+%    L(\vec{w}, b, \alpha) = \sum_{i=1}^N \alpha_i - \frac{1}{2} \sum_{i,j=1}^N \alpha_i \alpha_j \tilde{y}_i \tilde{y}_j \vec{x}_i^T \vec{x}_j
+%    \labeq{alpha}
+%\end{align}
+%\marginnote{The $b$ term becomes zero due to \labeq{alpha_b}.}
+%
+%Now $\alpha*$ can be deduced by maximizing \refeq{alpha}:
+%\begin{align}
+%    \alpha* = \argmax_\alpha \sum_{i=1}^N \alpha_i - \frac{1}{2} \sum_{i,j=1}^N \alpha_i \alpha_j \tilde{y}_i \tilde{y}_j \vec{x}_i^T \vec{x}_j
+%    \labeq{alpha*} \\
+%    \text{with} \: \sum_{k=1}^N \alpha_k \tilde{y}_k = 0 \and \alpha_i \geq 0 \forall i
+%\end{align}
+
+loss functions define optimization problem
+constraints are regularizations and avoid unwanted solutions
+problems like perceptron can be solved ad hoc -> perceptron algorithmn
+generally it is necessary to find a way to find minima without solving the problem analytically -> numerical optimization
+loss functions can be drawn and an ideal solution is identical to a minimum of the loss function
+local minima are wore slutions but still pretty good
 
 
 \section{Gradient Descent}
+Find these minima iteratively by following the gradient
+The gradient can be easily calculated for simple example
+follow gradient -> find the minimum
+minibatch-gradient descent -> stochastic gradient descent
+it is even possible to apply this to nested functions and many paramters
+problem how to calculate the gradient at differrent points in the network? do not want analytical solution
+how to find the gradient for a small weight in a large network
+-> backporpagation
+
+%iterative approach
 %hwo does gradient descent work?
 
+
 \section{Backpropagation}
-%backpropagation finally allowed to train neural networks efficiently
+backpropagation finally allowed to train neural networks efficiently
+calculate derivative along with the network itself step-wise
+gradient is at the end and needs to be brought every where
+build the network of defined building blocks with known derivatives
+combine all these derivatives and get gradient everywhere
+
+
 
 %forward pass
 %reverse pass
@@ -27,18 +106,20 @@ In accordance to observations made on neurons, weights were
 %vanishing gradient problem
 
 \section{Vanishing Gradients}
+problemn fro deep networks -> vanishing gradient
+first layers at the input are not really optimized
 \subsection{Normalization}
-\subsection{Residual Networks}
-%Motivate by facilitating training or look into book
+normalize inputs at every layer such that weights cannot become too large s.t. gradients vanish or are weird
 Ioffe and Szegedy introduced BN to ease training of feed-forward networks.
 affine parameters $\gamma$ and $\beta$
+\subsection{Residual Networks}
+introduce skip connections to allow the gradient to skip some layers and then be applied
+%Motivate by facilitating training or look into book
 
 
 \section{Optimization Algorithms}
 \subsection{Momentum}
-\subsection{Stochastic Gradient Descent}
+momentum stabilizes gradient decent to overcome small local minima or regions with low gradient
 \subsection{AdaM}
-\subsection{Other Algorithms}
-
-\section{Reinforcemnt Learning}
+AdaM is more advanced and defacto standard
 

@@ -213,6 +213,7 @@ Thus,
 and the margin
 \begin{align}
     d_- + d_+ = \frac{2}{\norm{\vec{w}}}
+    \labeq{maxmargin}
 \end{align}
 is maximized when $\norm{\vec{w}}$ is minimized.
 
@@ -223,6 +224,7 @@ Subsequently, the classification can be expressed as a relatively simple optimiz
 under the constraints
 \begin{align}
     \tilde{y}_i z_i = \tilde{y}_i (\vec{w}_i^T \vec{x} + b) \geq 1 \forall i
+    \labeq{constraint}
 \end{align}
 How to solve this optimization problem shall be explained in \refssec{svmopt}
 
@@ -481,5 +483,40 @@ This way the spatial size of the input is gradually reduced while the number of 
 %process information hierarchically
 
 \section{Recurrent Neural Networks}
+imprtant to generate sequences
+more efficient than just predicting everything at once
+speech is good example: first word matters for the next few words, but the first word a few senteces ago is mostly irrelevant
 \subsection{Long-term Short Memory}
+LSTM is a substructure
+expalin and show iamge
 
+
+\section{Types of Learning}
+types of training are not clearly separated, there is weakly supervised training and the like
+more or less categorizes networks by their setups a.k.a. how they learn.
+most application fall in this category
+straight forward
+classify this, generate this
+
+\subsection{Supervised Learning}
+GIve a predefined problem and tell the network which metric to look for and how to solve the problem
+
+\subsection{Reinforcemnt Learning}
+No loss directly but a score is given to evaluate performance
+loss would be differentiable
+e.g. game: loss cannot be calcualted but a score can be given at the and or in between
+Reinforcement learning is employed when there is a lack of gradients at some point in the pipeline.
+A very well known example are AIs which play computer games.
+The interaction with a game happens through a predefined interface which is usually not differentiable.
+This has two main reasons:
+\begin{enumerate}
+    \item Humans or algorithms do not need a differentiable interface with a computer game.
+    \item It is very hard to think of a way to make an action like moving a figure in chess differentiable.
+\end{enumerate}
+
+Yet, AIs like Google Alpha Go are based on neural networks.
+Reinforcement learning allows for this as is introduces learning techniques that formulate ...
+
+\subsection{Unsupervised Learning}
+Just give a bunch of data and see whether it can be ordered or represented in an efficient way
+Usually there is still an intention but its not that narrow

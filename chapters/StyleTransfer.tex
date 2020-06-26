@@ -1,15 +1,20 @@
 \setchapterpreamble[u]{\margintoc}
 \chapter{Artistic Computer Vision}
 \labch{ACV}
-This chapter shall dive into related work that combines computer vision with artistic content.
+Applying computer vision techniques to images with artistic content is an interesting and challenging task at the same time.
+Due to the often observed change in appearance in many artistic images (\eg abstraction), existing CV pipelines for \ie classification usually do not work as intended.
+This makes it all the more interesting to see, how these pipelines are affected by this domain gap and whether this can be overcome.
 
-Applying computer vision techniques to images with artistic content has been interesting and challenging at the same time.
-Due to the often observed change in appearance that can be observed for many artistic images, existing CV pipelines for \ie classification usually do not work as intended.
-This makes it all the more interesting to see, how these pipelines are affected by this domain gap.
+Yet, at the same time artistic images combined with computer vision often results in interesting and fascinating applications for users.
+A popular example for this is \textbf{style transfer}, where normal images are filtered such that they look like paintings.
+Another example is art created with the help of neural networks \cite{GANart}.
+Research in the artistic field also incorporates techniques from computer vision and natural sciences to aid the detection of forgeries \cite{picassomatissefake} \cite{guardianarticle}.
 
-At the same time artistic images bring something into the mix which 
+These examples show that computer vision can play an important role in the artistic domain and the other way around.
+Since this thesis is deeply anchored at the intersection of both fields, different problems and their proposed solutions shall be presented.
 
-- natural sciences have often been used in arts to analyse painting \eg chemical test on pigments
+
+
 %in SBR stroke is the basic unit texture synthesis fills each pixel individually.
 
 %non-photorealistic rendering vs. photrealism
@@ -39,10 +44,6 @@ At the same time artistic images bring something into the mix which
 % style is rather something by what art can be grouped together 'easily'
 
 
-\section{Problem Formulation \& Approach}
-The problem that style transfer might seem easy to capture at first, but it quickly becomes harder when trying to formulate it.
-As 'style' is simply defined as "a typical way of doing something", it includes actually all aspects 
-
 %style transfer
 %create IMAGE that catches style as well a possible, doesn't rally matter how, the pixel should make sense in the end
 
@@ -64,17 +65,23 @@ As 'style' is simply defined as "a typical way of doing something", it includes 
 
 %features of DNN have been used to classify paintings
 
-\section{Brush Stroke Extraction}
+\section{Brushstroke Extraction}
 %no updates in recent years
 %relatively small field
 %shift towards creating art rather than analyzing it
 %what to do with the data besides identifying forgeries?
 %computer aided forgery detection is standard
-\citeauthor*{rhythmic} were the first to extract brush strokes from paintings on a larger scale \cite{rhythmic}.
-They introduced an algorithm that leverages edge detection as well as image segmentation to find connected components in an image.
+Brushstroke extraction is one way of retrieving data for image analysis.
+Other approaches rely on patch-based analysis via neural networks \cite{patchbased} or texton statistics \cite{textons}.
+Yet, the most impressive results have been obtained when analyzing drawings on the pencil-stroke level \cite{picassomatissefake}.
+Similar (if few) approaches exist for paintings and show that such approaches are feasible and open the door for one major application of brush stroke extraction.
+
+\citeauthor*{rhythmic} were the first to extract brush strokes from many paintings on a larger scale and combine it with forgery detection \cite{rhythmic}.
+They introduced an algorithm that leverages edge detection as well as image segmentation to find connected components (regions enclosed by a continuous edge) in an image.
 These connected components then serve as stroke candidates.
-Each candidate is further processed to resemble a single line and checked for various properties such as width-to-length ratio.
+Each candidate is further processed to a single-line representation and then checked for various properties such as width-to-length ratio.
 As a result \citeauthor*{rhythmic} claim that they detect ~60\% of brush strokes which were manually labeled on average.
+They further obtain features from their line representation and are able to achieve respectable results in forgery detection and classification of artistic periods.
 \begin{figure*}
     \subfloat[original]{%
         \includegraphics[width=.70\textwidth]{images/clogs}%
@@ -95,7 +102,8 @@ If the region is too large, the similarity metric is adjusted and the growing pr
 If region are too small the whole seed is discarded.
 Candidate brushstrokes of the correct size are then approximated with an ellipsoid and shape constraints as well as alignment with the connected region are tested.
 \citeauthor*{lamberti} specifically fine-tune parameters in their algorithm to improve compliance with manually labeled brushstrokes.
-In the end their results fare worse on metrics proposed by \citeauthor{rhythmic} such as detection rate.
+In the end their results fare worse on metrics proposed by \citeauthor{rhythmic} such as detection rate but better in their own metrics.
+Notably, \citeauthor*{lamberti} seems to be the only publication solely aimed at brushstroke extraction.
 
 \begin{figure*}
     \subfloat[orig]{%
@@ -119,37 +127,41 @@ In the end their results fare worse on metrics proposed by \citeauthor{rhythmic}
 \end{figure*}
 
 
-
 \section{Style Transfer}
 \labsec{ST}
 
-This field of style transfer has its origins 
-%most active field
-%style and texture are similar problem
+Style transfer is probably the most popular and advanced field in artistic computer vision.
+The goal of style transfer is to generate an image representation which resembles the content of an input image but features the style of another image or image collection.
+With the focus lying on altering the image on the pixel-level such that the stylized image and the style-template seem to belong to the same group of images (\eg images drawn by van Gogh)
+
+This definition of style is hard to quantify, and thus relies on human judgement.
+Subsequently, many publications offer expert- or non-expert-based quality estimates, which are hard to compare and thus shall not be further mentioned.
+Then again, such an open definition of style allows the same techniques to be applied to related problems such as texture transfer or image-to-image translation.
+
+The high quality that recent style transfer has achieved over the years requires to compare any stylization approach with this field as well.
 
 \subsection{Early Approaches}
 %IMAGE PROCESSING BASED TECHNIQUES
 %filters or LIC as approaches
 
-\citeauthor*{imageanalogies} proposed a way of stylizing images by using trainable filters.
+As one of the earlies approaches, \citeauthor*{imageanalogies} proposed a fast way of stylizing images by using trainable filters, while contemporary approaches relied on painterly rendering (see \refsec{PR}).
 They call their technique 'image analogies' since the transformation between two training images is analogously applied to a test image.
 
 Basically, for creating the impression of brush strokes, a photograph $A$ and a painting of that photograph $A'$ are required.
 As this is rarely the case, \citeauthor*{iamgeanalogies} showed that using anisotropic diffusion works also reasonably well to generate $A$ from $A'$.
-Then their algorithm searches locally around a position $p$ for the best filter parameters $F(p)$ that transform $A(p)$ into $A'(p)$.
-By using another search algorithm to match similar regions $B(p)$ and $A(p)$, $F(p)$ can be used to transform $B(p)$ into $B'(p)$.
-Thus $B'$ -- a stylized version of $B$ -- can be obtained by transforming it analogously to $A \rightarrow A'$.
-%Hertzmann et al 2010 smooth a painting and optimize filter parameters for the inverse transformation -> apply the filters to photos
-    %similar to superresolution and texture synthesis
-%first approach is just grouping pixels simialrly to super-pixels
-Other works like \citeauthor*{texturetransfer}~\cite{texturetransfer} have built on this principle idea which has led to a fast texture transfer algorithm \cite{fasttexturetransfer}.
-Besides only matching local region according to their pixel values, \citeauthor*{texturetransfer} obtain a flow map (which they call 'directions'), that is based on the content image's gradient.
+Then an algorithm searches locally around a spatial position $p$ for the best filter parameters $F(p)$ that transform $A(p)$ into $A'(p)$.
+By using another search algorithm to match similar regions $B(p)$ and $A(p)$, $F(p)$ can then be used to transform $B(p)$ into $B'(p)$.
+Thus $B'$ -- a stylized version of $B$ -- can be obtained by transforming $B \rightarrow B'$ analogously to $A \rightarrow A'$.
+
+Other works like \citeauthor*{texturetransfer}~\cite{texturetransfer} have built on this basic idea and advanced versions of it \cite{fasttexturetransfer} \cite{texturetransfer}.
+Besides only matching local regions according to their pixel values, \citeauthor*{texturetransfer} obtain a flow map (which they call 'directions'), that is based on the content image's gradient.
 This flow is then also matched against the style image.
 \begin{figure}
     \includegraphics{texturetransfer}
     \caption[]{Target image $T$ is combined with a dictional map specially obtained from $T$ and a style image  $S$. The result maintains the direction's flow while presenting the texture from $S$.}
     \labfig{texturetransfer}
 \end{figure}
+They are able to transfer texture (but only texture) from a given painting to a content image reasonably well.
 
 %Lee et al 2010 transfer the texture of brush stroke onto an image much like style transfer (this is the intersection)
 %painterly rendering is some kind of style transfer but shall be dealt with explicitly
@@ -167,26 +179,28 @@ This flow is then also matched against the style image.
 
 \subsection{Neural Style Transfer}
 %A bit similar to transfer learning -> utilize the pretrained features especially of the early layers.
-The field of style transfer has really gained traction in 2015 with the publication of \textbf{A Neural Algorithm for Artistic Style} by \citeauthor*{gatys}.
-It was the first approach to transfer the style of one image to another and at the same time maintaining a high contextual fidelity.
-In retrospective, this work really kicked off neural style transfer as a field.
+Despite some previous admirable results\cite{texturetransfer}, style transfer really gained traction in 2015 with the publication of \citetitle{gatys} by \citeauthor*{gatys}.
+It was the first approach to transfer the style as more than just texture of one image to another and at the same time maintaining a high contextual fidelity.
+In retrospective, this work really kicked started neural style transfer for the following years.
+Because of the weight this publication has and some similarities in the approach of this thesis this work is presented more extensively.
+
 
 \citeauthor*{gatys} themselves pinpoint the novelty of their approach as 'manipulations in feature spaces' as opposed to previous approaches that 'directly manipulate the pixel representation of an image'\cite{gatys}.
 They use existing neural architectures and extract information in two separate ways, such that content and style can be separated.
 
-Previous works already used \textbf{perceptual loss} to accumulate information on the content in an image \cite{percep_loss}, or check whether two images have the same content \cite{other_percep_loss}.
-%networks trained on object recognition increasingly care about the content with every layer
-Perceptual loss is based on the VGG-19 architecture \cite{VGG} which is a deep CCN trained for object classification on ImageNet \cite{imagenet}.
-By arguing that the network's layer activations increasingly respond to the content when following the networks' hierarchy.
-Some much even, that it is possible to reconstruct the content of an image by using the activations of one such layer.
+Previous works already used \textbf{perceptual loss} to gain information on content in an image \cite{percep_loss}, or check whether two images have the same content \cite{other_percep_loss}.
+Perceptual loss is based on the VGG-19 architecture \cite{VGG} which is a deep CNN trained for object classification on ImageNet \cite{imagenet}.
+\citeauthor*{gatys} argue that the network's layer activations increasingly respond to the content when following the networks' hierarchy.
+So much even, that it is possible to reconstruct the content of an image by imitating the activations of one such layer (same content does not imply pixel-wise identity).
 
 For reconstruction of an image's content, gradient descent is performed on a white noise image.
 The gradient descent aims to minimize the perceptual distance between the reconstruction and the target image.
-Perceptual distance is defined as the L2-distance between the activations of two images in deep layer of the VGG-network.
+Perceptual distance is defined as the L2-distance between the activations of two images in a deep layer of the VGG-network.
 
-For image vector $\vec{x}$ with $\vec{x} \in = \R^{M_0}, M_0 = H_x \dot W_x $, a layer $l$ of the network has $N_l$ feature maps of size $M_l$.
-In this case $M_l$ is equal to the height times the width of the feature map of the $l$-th layer.
-The activations of the $i$-th filter ($i \in N_l$) at position $j$ ($j \in M_l$) at layer $l$ can then be represented by matrix $F(\vec{x})_{ij}^l \in \R^{N_l \times M_l}$.
+\marginnote{An image vector is often used to represent a 2-dimensional image as a single column vector such that spatial information is neglected at first. Yet, the position inside the image vector still corresponds directly to a specific position in the original 2D representation}
+For an image vector $\vec{x}$ with $\vec{x} \in = \R^{M_0}, M_0 = H_x \dot W_x $, a layer $l$ of the network has $N_l$ feature maps of size $M_l$.
+In this case $M_l$ is equal to the height times the width of the feature map of the $l$-th layer  $M_l = H_l \dot W_l $.
+The activations of the $i$-th filter ($i \in N_l$) at position $j$ ($j \in M_l$) at layer $l$ can then be represented by a matrix $F(\vec{x})_{ij}^l \in \R^{N_l \times M_l}$.
 The perceptual distance is then defined as
 \begin{align}
     d_{\text{percep}}(\vec{x}, \vec{y}) = \sum_{i, j} (F(\vec{x})_{ij}^l - F(\vec{y})_{ij}^l)^2 = \norm{\tensor{F(\vec{x})}^l - \tensor{F(\vec{y})}^l}_2^2
@@ -198,17 +212,16 @@ The perceptual distance is then defined as
 
 \marginnote{The factor $\frac{1}{2}$ will cancel out when deriving $\L_{\text{content}}$ with respect to $F(\vec{x})_{ij}^l$.}
 
-Minimizing the content loss between two images, by using gradient descent the content of an image can be restored (see \reffig{content_style_loss}).
-
+Minimizing the content loss between two images by using gradient descent restores the content of an image (see \reffig{content_style_loss}).
 \begin{figure*}
     \includegraphics{content_style_loss}
     \caption[]{Reconstructions of content(bottom) and style(top) using different layers. \cite{gatys}}
     \labfig{content_style_loss}
 \end{figure*}
 
-As approximating the content of an image has now become possible, the question is whether this is possible with style as well.
-\citeauthor*{gatys} again turned to the pre-trained VGG network for this.
-They explicitly reduce style to texture for this reason and thus search for a feature space that captures \textbf{texture} rather than content.
+As approximating the content of an image is possible, the question is whether the same is possible for style.
+\citeauthor*{gatys} again turn to a pre-trained VGG network for this.
+They identify style as texture and thus search for a feature space that captures \textbf{texture} much like perceptual loss captures content.
 Subsequently, \citeauthor*{gatys} propose the use of \textbf{Gram matrices} as they capture the correlations of feature-activations over their spatial extent.
 
 The Gram matrix of a given matrix $\tensor{A}$ is the inner product of all column vectors in $\tensor{A}$.
@@ -217,11 +230,11 @@ The Gram matrix of a given matrix $\tensor{A}$ is the inner product of all colum
 \end{align}
 The resulting Gram matrix G now has the form $j \times j$ and captures texture information but no longer the global content.
 
-\refsec{problem} already mentioned that style is very complex and exists at various scales at the same time which \citeauthor*{gatys} address by using many layers.
-As these layers sit at different depths their field of view varies and each layer captures information at a different scale.
-Early layers will tend to hold small scale information, later layers will hold larger scale information with every layer.
+Arguably, style/texture is very complex and exists at various scales at the same time which \citeauthor*{gatys} address by using many layers at the same time.
+As these layers sit at increasing depths their field of view increases as well and each layer captures information at a different scale.
+Early layers will tend to hold small scale information, later layers will hold larger scale information.
 
-\citeauthor*{gatys} first compute the Gram matrices each layer $l$ for both the target style image and the current image.
+\citeauthor*{gatys} first compute the Gram matrices of each layer $l$ for both the target-style image and the current image.
 Then they use the L2 distance metric to measure the discrepancy between them.
 \begin{align}
     G(\vec{x})^l & = \frac{1}{(2 N_x^l M_x^l)^2} F(\vec{x})^l{}^T F(\vec{x})^l \\
@@ -229,7 +242,7 @@ Then they use the L2 distance metric to measure the discrepancy between them.
     d_{\text{style}}^l(\vec{x}, \vec{y}) & = \norm{G(\vec{x})^l - G(\vec{y})^l}^2_2 \\
 \end{align}
 
-\marginnote{The denominator of $\frac{1}{4 N_x^l{}^2 M_x^l{}^2}$ is squared since the Gram matrix is the product of a matrix with itself transposed.}
+\marginnote{The denominator of $\frac{1}{4 N_x^l{}^2 M_x^l{}^2}$ is squared since the Gram matrix is the product of a matrix with its transposed self.}
 
 The style distances at each layer are then weighted and summed up to make up the style loss:
 
@@ -243,26 +256,26 @@ This style loss can again by used together with gradient descent in order to che
 Specifically the local consistency of each texture becomes larger, the deeper the layer sits.
 
 %mix content and style
-\citeauthor*{gatys} now combine the losses for one content image $\vec{c}$ with a style image $\vec{s}$ and optimize $\vec{x}$ in the same way the reconstructions have been obtained.
+\citeauthor*{gatys} now combine the losses for a content image $\vec{c}$ with a style image $\vec{s}$ and optimize $\vec{x}$ in the same way previous reconstructions have been obtained.
 
 \begin{align}
     \L_{\text{total}} = \lambda_{\text{content}} \L_{\text{content}}(\vec{x}, \vec{c}) + \lambda_{\text{style}} \L_{\text{style}}(\vec{x}, \vec{s})
 \end{align}
 
+
+The result of this can be seen in \reffig{gatys_ST}
 \begin{marginfigure}
     \includegraphics{gatys_ST}
     \caption[]{Style transfer examples by \citeauthor*{gatys}. \cite{gatys}}
     \labfig{content_style_loss}
 \end{marginfigure}
 
-The result of this can be seen in \reffig{gatys_ST}
-
 \subsubsection{Follow-Up Research}
 There has been some follow-up research on \citeauthor*{gatys}'s work which addresses mainly how the style loss works.
 
 \citeauthor*{MMD} have shown that the style loss is equivalent to calculating the \textbf{maximum mean discrepancy (MMD)} between the features of each layer \cite{MMD}.
-MMD is a test-statistic for a null hypothesis $p=q$ with the data $X = \{x_i\}^n_{i=1}$, sampled from $p$, and $Y = \{y_i\}^n_{i=1}$, sampled from q, at hand.
-It can be used as a difference measure as well and vanishes only if $p=q$.
+MMD is a test-statistic for a null hypothesis $p=q$ with data $X = \{x_i\}^n_{i=1}$, sampled from $p$, and $Y = \{y_i\}^n_{i=1}$, sampled from $q$, at hand.
+It can be used as a difference measure and vanishes only if $p=q$.
 \begin{align}
     \text{MMD}^2[X, Y] & = \frac{1}{n^2} \sum^n_{i=1} \sum^n_{i'=1} k(\vec{x}_i, \vec{x}_{i'}) \\
     & + \frac{1}{m^2} \sum^m_{j=1} \sum^m_{j'=1} k(\vec{y}_j, \vec{y}_{j'}) \\
@@ -270,37 +283,33 @@ It can be used as a difference measure as well and vanishes only if $p=q$.
 \end{align}
 
 MMD can be based on different kernel functions $k$ and \citeauthor*{MMD} have shown that the style loss is equivalent to the squared MMD with a polynomial kernel.
-Consequently they were able to show, that style transfer work with different kernel functions as well and even by explicitly matching the batch statistics (see \reffig{MMD}):
+Consequently they were able to show, that style transfer works with different kernel functions as well and even by explicitly matching the batch statistics (see \reffig{MMD}):
 \begin{align}
     d_{\text{style}}^l(\vec{x}, \vec{y}) & = \frac{1}{N_l} \sum_{i = 1}^{N_l} \left( (\mu^i_{F(\vec{x})^l} - \mu^i_{F(\vec{y})^l}) + (\sigma^i_{F(\vec{x})^l} - \sigma^i_{F(\vec{y})^l}) \right)
 \end{align}
-
 \begin{figure}
     \includegraphics{MMD}
     \caption[]{Reconstructed textures for Starry Night using different kernel functions $k$ \cite{MMD}}
     \labfig{MMD}
 \end{figure}
 
-
 \citeauthor*{LenDu} tested whether pre-trained weights play an important role when performing style transfer.
-He was able to show basic style transfer even with random initialized networks, but results vary wisely depending on the random initialization.
-Ultimately, it is possible so obtain some style transfer with this technique but the pre-trained weights seem to play an important role in stablizing the reconstruction process.
+He was able to show basic style transfer even with random initialized networks, but results vary widely depending on parameters of the random initialization.
+Ultimately, it is possible so obtain some style transfer with this technique but the pre-trained weights seem to play an important role in stabilizing the reconstruction process.
 
 \subsection{State of the Art}
 
 \subsubsection{Real-Time Style Transfer}
 %johnson
-Following \citeauthor*{gatys} seminal work, other have followed suit in trying to stylize images with neural networks.
-\citeauthor*{Johnson} were the first to use the same losses but train a feed-forward architecture with it \cite{johnson}.
-They were able to significantly speed up the stylization process like this as stylization was performed in a single feed-forward pass instead of a lengthy gradient descent optimization.
+Following \citeauthor*{gatys} seminal work, others have followed suit in trying to stylize images with neural networks.
+\citeauthor*{Johnson} were the first to use the same losses but train a feed-forward architecture \cite{johnson}.
+They were able to significantly speed up the stylization process like this as stylization is performed in a single feed-forward pass instead of a lengthy gradient descent optimization.
 Ultimately, this enabled them to generate stylized images in real-time from a given content image, using a deep residual convolutional neural network.
 \begin{figure*}
     \includegraphics{johnson_net}
     \caption[]{Training set-up by \citeauthor*{johnson}. \cite{johnson}}
     \labfig{johnson_net}
 \end{figure*}
-
-%markov random field ansatz?
 
 %adain
 \subsubsection{Arbitrary \& Universal Style Transfer}
@@ -385,19 +394,17 @@ The results show good visual quality, especially concerning the details and loss
 Also this approach focusses on stylizing not only for a single image but the style of an artist in general.
 
 \citeauthor*{dima} take this further and focus on stylizing different content specifically.
-This means, a person is differently depicted than a tree, considering level of detail, colorscheme \etc. , which holds with real-world experience.
-They achieve this by using the same fixed-point loss that \citeauthor*{artsiom} but combine it with a second update step.
+This means, a person is differently depicted than a tree, considering the level of detail, colorscheme \etc. , which holds with real-world experience.
+They achieve stylization that resembles this behavior by using the same fixed-point loss that \citeauthor*{artsiom} used but combine it with a second update step.
 In this second update step they require similar scenes to be placed closely in feature space and dissimilar scene to lie further apart.
 They add a transformation block between encoder and decoder shape the feature space accordingly.
 
 \subsubsection{Others}
-There exist many other approaches that are capable of transferring style.
+There exist many other approaches that are capable of transferring style -- often as a byproduct of texture transfer or image-to-image translation.
 Some focus very heavily on stylization of portraits using self-attention modules \cite{ugatit}.
 Others choose an approach similar to cycleGAN but add a shared encoding space for content and separate attribute spaces where style is encoded \cite{unit, munit, drit, drit++}.
 With the latter ones mainly focussing on separating shape and appearance of images and recombining them arbitrarily.
 One such example is taking the posture of a person in one image and combining it with the clothes and appearance of a person in another image.
-
-The lines between these the applications and style transfer as it has been presented are blurry with many approaches that are capable of performing both.
 
 
 \section{Painterly Rendering}
@@ -405,32 +412,30 @@ The lines between these the applications and style transfer as it has been prese
 
 %refer to painterly rendering review
 
-Painterly rendering is a field of computer vision that focusses stylization of images on giving the impression that certain tools were used.
-Most often this would be the looks of pencil drawings or brush stroke paintings as these looks are very distinctive.
-Thus, painterly renderings rely on a brush stroke or a pencil line as its smallest unit which generates the data.
-Style transfer, in contrast, still uses individual pixels as smallest unit.
+Painterly rendering is a field of computer vision that understand stylization of images as giving the impression that a certain medium was used.
+Most often this would be the looks of pencil drawings or paintings as their looks are very distinctive, especially when compared to regular photographs.
+Thus, painterly renderings rely on a brushstroke or a pencil line as its smallest unit from which the data is generated.
+Style transfer, in contrast, relies on pixels as its smallest unit.
 
-The use of these larger units often comes with a level of abstraction which painterly rendering approaches often enforce explicitly though the coarseness said units.
+The use of these larger units automatically comes with a level of abstraction which painterly rendering approaches often reinforce though the adjusting the coarseness of said units.
 One could see this as a hard regularization.
-This is the reason why painterly rendering is rarely compared to style transfer (which has been described in the last section) as style transfer achieves this abstraction more implicitly.
-For instance, an impressionistic style is often achieved by limiting the length and width of brush strokes in painterly renderings.
+Style transfer (see \refsec{ST}), on the other hand, aims to learn this abstraction.
+Still, an impressionistic style in painterly rendering could be achieved by limiting the length and width of brush strokes in painterly renderings.
 
-There are several different key approaches how to achieve this, which shall be presented chronologically.
+This thesis' approach follows similar regularization to painterly rendering and thus different key approaches shall be presented.
 
-The earliest approaches were stroke-based renderings, which artificially generate single strokes.
-With such strokes at hand the challenge is to both improve the quality of these strokes and improve the algorithm which aligns them.
-This field is especially close to the approach of this thesis.
+The earliest approaches to painterly rendering were stroke-based renderings, which artificially generate single brushstrokes.
+The challenge then becomes twofold 1) improve the quality of these strokes and 2) improve the algorithm which aligns them.
+Both problems will again come up in this thesis.
 
 Early filter-based rendering approaches then appeared with superior computational efficiency and ultimately led to style transfer and texture transfer.
-This has already been explained int he previous section but shall be mentioned here to place it historically.
+This has already been explained in the previous section but shall be mentioned here to place it historically and contextually.
 
 Lately, drawing networks revived stroke-based rendering with modern machine learning techniques.
-The focus of this field is really to remove any hand-tuning of parameters that stroke based rendering required and imitate the way humans would draw.
+The focus of this field is really to remove any hand-tuning of parameters that stroke-based rendering required before and to a certain degree imitate the way humans would draw.
 
 
 \subsection{Stroke-Based Rendering}
-Stroke-based rendering focuses on generating real-looking brush strokes and composing images with these.
-Two aspects which are of importance in this thesis as well.
 
 \citeauthor*{paintbynumbers} introduced stroke-based rendering with his seminal work \citetitle{paintbynumbers} \cite{paintbynumbers}.
 In this work he presents two methods which would allow for reconstructing images in an abstracted representation.
@@ -516,24 +521,16 @@ They were able to generate a 3D model of paint on canvas from this which they co
 Indeed, they were successful up to a point, where deviations to \cite{wetbrush} became visible for too many stacked layers of paint.
 
 
-
-
 \subsection{Drawing Networks}
 %gaining traction
-Drawing networks belong to the realm of printerly rendering approaches, yet are rarely compared with their predecessors.
+Drawing networks belong to the realm of painterly rendering approaches, yet are rarely compared with their predecessors as their architectures differ significantly.
+Drawing network often rely on recurrent architectures (see \refsec{RNN}) or iterative approaches where the current state of the drawing is taken into account along the target-image.
 
-Some of the first approaches to rediscover this area used recurrent neural networks to imitate predefined stroke sequences \cite{sketchRNN, graves}.
+Some of the first approaches used the mentioned recurrent neural networks to imitate predefined stroke sequences \cite{sketchRNN, graves}.
 Such approaches require paired data where the sequence for a sketch or handwriting is already known.
+Obviously, this data is hard to acquire such that SPIRAL was the first publication to gain more attention in this field.
 
-%SPIRAL
-%SPIRAL was first
-%relies on a graphics engine
-%reinforcement learning
-%the networks predicts strokes repeatedly based on the current state of the canvas.
-%Discrimiantor critiques the result.
-%Data like MNIST works well, CelebA is very blurry
-%Main novelty is unsupervised training
-\citetitle{SPIRAL} (SPIRAL) by \citeauthor*{SPIRAL} were the first to break this barrier and learn sequences without such paired data \cite{SPIRAL}.
+\citetitle{SPIRAL} (SPIRAL) by \citeauthor*{SPIRAL} was the first approach to learn drawing sequences without such paired data \cite{SPIRAL}.
 They used a graphics engine and deep reinforcement learning, to train their network.
 Based on the current state of the canvas, SPIRAL predicts an action in form of brush stroke parameters.
 This process is iteratively applied to the canvas $N$ times.
@@ -544,9 +541,9 @@ Tests on images, such as the CelebA faces data set, show limitations as SPIRAL c
 
 
 Other approaches followed suit, after \citeauthor*{SPIRAL}'s seminal work.
-Many approaches were inpsired by \citeauthor{worldmodel}'s idea to encode an environment through an autoencoder into latent space.
-A model is then trained on this fewer-dimensional latentspace representation instead of the real-world data.
-
+They would often combine the idea behind SPIRAL with \citeauthor{worldmodel}'s idea to encode an environment through an autoencoder into latent space.
+A model is then trained on this fewer-dimensional latent space representation instead of the real-world data.
+\citeauthor{worldmodel} call their idea a 'world model'.
 
 %strokenet
 \citeauthor*{strokenet} employ differentiable rendering combined with two encoders to predict a single brush stroke in a feed-forward manner \cite{strokenet}.
@@ -581,7 +578,7 @@ They do not use a differentiable renderer but a sliding-window approach which al
 Notably, they train each network specifically for an image, as the training does not generalize well for different images.
 They argue that this can be seen as a form of style transfer but such reconstructions mainly show a simple color shift.
 
-\citeauthor*{LpaintB}'s approach is the closest approach to this thesis, considering the goal of their approach.
+\citeauthor*{LpaintB}'s approach is another approach close to this thesis, considering the goal of their approach.
 They are able to generate stroke-based renderings of high-resolution photographs as well as images of painting just shy of 1 megapixel.
 Each network is specifically trained for a single target image, which takes at least $1 \si{\hour}$ to accomplish \cite{paintbot}.
 
@@ -595,12 +592,6 @@ This process is repeated until a certain level of convergence is reached.
 
 %refer to neural style transfer: a review
 
-\begin{marginfigure}
-    \includegraphics{genetic_starry_night}
-    \caption[]{Starry Night approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
-    \labfig{genetic}
-\end{marginfigure}
-
 As well as this does work, it is very much computationally expensive as most samples will not fit the image, thus searching for the small set of fitting shapes requires to evaluate all the wrong shapes as well.
 Considering artworks, brushstrokes have many more degrees of freedom, and artworks usually consist of upwards of a few thousand brushstrokes.
 Consequently, it would be considerably more challenging to apply to this problem until computational resources have become a few magnitudes more powerful.
@@ -610,6 +601,7 @@ Consequently, it would be considerably more challenging to apply to this problem
     \caption[]{Photo mosaic of Starry Night using only images by the Hubble Space Telescope. \url{http://www.astro.uvic.ca/~alexhp/new/figures/starrynight_HST.001.jpg}}
     \labfig{photomosaic}
 \end{figure}
+
 
 
 \section{Conclusion}

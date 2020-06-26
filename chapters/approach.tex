@@ -9,7 +9,22 @@
 \section{Motivation}
 \labsec{motivation}
 
-\todo{two stage approach be Ha and Schmidhuber 'world model'}
+previous approaches have several problems
+-very low resolution only (learning2paint)
+-no brush strokes (style transfer)
+-bad reconstruction(SPIRAL)
+-hand-crafted/do not generalize (painterly rendering)
+-bad brush storkes (brushs troke extraction)
+-train whole network for a single image(drawingnet)
+-too inefficient (genetic algorithms)
+
+pick an orthogonal approach to drawing networks
+seems as a step back but could show whether it is possible at all
+emphasize more on the decoder quality than others did
+
+Goal is twofold: extract brush strokes is first
+see whether this stylizes normal images as well.
+
 
 The basic approach of this work consists of two steps:
 \begin{enumerate}
@@ -64,12 +79,6 @@ This process is repeated until a certain level of convergence is reached.
 As well as this does work, it is very much computationally expensive as most samples will not fit the image, thus searching for the small set of fitting shapes requires to evaluate all the wrong shapes as well.
 Considering artworks, brushstrokes have many more degrees of freedom, and artworks usually consist of upwards of a few thousand brushstrokes.
 Consequently, it would be considerably more challenging to apply to this problem until computational resources have become a few magnitudes more powerful.
-
-\begin{figure}
-    \includegraphics{photomosaic_starry_night}
-    \caption[]{Photo mosaic of Starry Night using only images by the Hubble Space Telescope. \url{http://www.astro.uvic.ca/~alexhp/new/figures/starrynight_HST.001.jpg}}
-    \labfig{photomosaic}
-\end{figure}
 
 This premise can be overcome, though, by using a differentiable renderer.
 A \textbf{differentiable renderer} is capable of creating/rendering shapes in the pixel domain.
@@ -438,15 +447,15 @@ As explained in \ref{sec:PR}, there exist a variety of approaches for this kind 
 Some of these promise a fast inference of parameters from images, which makes the optimization approach in this work seem like a step back at first.
 The following section is dedicated to justifying the chosen approach by comparing the existing state-of-the-art approaches.
 
-The targeted task is to approximate the representation of an image with roughly 1,000,000 pixels =  1MP by means of $\approx 10.000$ brushstrokes (see section \ref{ssec:motivation}).
+The targeted task is to approximate the representation of an image with roughly 1,000,000 pixels = 1MP by means of $\approx 10.000$ brushstrokes (see section \ref{ssec:motivation}).
 
 \subsubsection{Genetic Algorithms}
 \labsubsubsec{genalg}
 \todo{put much of this into the related work section}
-Genetic algorithms are possibly the simplest approach.
+Genetic algorithms are possibly the most straight-forward approach.
 As it was laid out in sections \ref{sec:motivation} and \ref{sec:genetic}, genetic algorithms use random sampling and previous best results to approximate fitting solutions to the rendering problem, which was described in section \ref{sec:renderproblem}.
 
-The current state-of-the-art solutions are capable of finding a solution in $\approx 1h$ when searching for an approximation of a 1MP image with simple geometric shapes like circles or triangles.
+Current state-of-the-art solutions are capable of finding a solution in $\approx 1h$ when searching for an approximation of a 1MP image with simple geometric shapes like circles or triangles.
 This corresponds to roughly $1 \times 10^{9}$ sampling steps.
 The time frame and the number of sampling steps depend on target shape density, target accuracy, sampling rate per shape, and degrees of freedom (with the latter requiring more sampling).
 
