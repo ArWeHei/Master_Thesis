@@ -228,6 +228,9 @@ under the constraints
 \end{align}
 How to solve this optimization problem shall be explained in \refssec{svmopt}
 
+\subsection{Regularization}
+constraints are regularizations and avoid unwanted solutions
+
 %\todo{perceptron usually just have a step function as activation for classification}
 %What is the goal of training?
 %hint at backpropagation but this will come in later.
@@ -456,6 +459,11 @@ The output of each filter then defines an input channel for the next layer much 
 With many channels convolutions can become even more complex as each filter takes all previous channels as input and combines them into a new channel.
 
 Interestingly, the weights of each kernel may not be hand-crafted but can be learned similar to fully connected layers.
+
+convolutions are equal to sparse dense laters
+many convolutions increase the field of view with fewer paramters
+convolutions are associateve and distributive
+
 
 %unified behavior over space -> invariance
 %each layer is a collection of image filters
