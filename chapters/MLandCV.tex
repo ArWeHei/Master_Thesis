@@ -1,80 +1,77 @@
 \setchapterpreamble[u]{\margintoc}
 \chapter{Machine Learning \& Computer Vision}
 \labch{MLandCV}
-In this chapter the theoretical backgrounds and motivation of Neural Networks ought to be explored.
+In this chapter the theoretical backgrounds and motivation of neural networks ought to be explored.
 
-First, a physical/biological motivation will set the foundation for the theoretical background accompanied by a more mathematical motivation.
-Thereafter, more advanced lines of thought will be introduced that finally lead to convolutional neural networks as the current driving force in computer vision .
+First, a physical/biological motivation will set the foundation for the theoretical background accompanied by a more mathematical motivation later on.
+Thereafter, more advanced lines of thought will be introduced that finally lead to convolutional neural networks as the current driving force in computer vision.
 
 \section[Artificial NNs]{Artificial Neural Networks}
 
 \subsection[Inspiration]{Neurobiological Inspiration}
 
-%Nature is often inspiration (birds and planes)
 Many human achievements have at least been partially inspired by studying nature.
 A very popular example is that of airplanes and birds.
-The study of how birds are able to fly found that the shape of their wing is the essential element to flying.
-Inventors and engineers have taken this inspiration and slowly but steadily created planes and the like from it.
-%arguabnly implementations deviate from nature (plane and bird) and people say to refrain from using these analogies.
-Yet, planes are not birds, as they are not flapping their wings (yet?), but integrate of other inventions like jet engines to get the same (or better) capability of flying as birds.
+By studying how birds can fly, people found out that the shape of their wings is essential.
+Inventors and engineers have taken this as inspiration and slowly but steadily came up with planes and the like.
+However, planes are not birds, as they are not flapping their wings (yet?), but in combination with other inventions like jet engines, the obtain the same (or better) capability of flying like birds.
 
-Quite similarly, the brain features a lot of insights, how intelligence or something that seems like it, can be constructed.
-In the same way humans studied birds to understand flying, researchers are now studying the brain to create better artificial intelligence.
+Similarly, the brain features a lot of insights, how intelligence or something that seems like it can be modeled.
+In the same way, that humans studied birds to understand flying, researchers are now studying the brain to create better artificial intelligence.
 
-In the earliest stages of this they would try to imitate the brain, as people have tried imitating birds at first and failed similarly.
+In the earliest stages of this research, they would try to imitate the brain, as people have tried imitating birds at first; and they failed similarly.
 \begin{figure}
     \includegraphics{otto_lilienthal}
-    \caption[]{Otto Lilienthal with his flying apparatus. \url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
+    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. \url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
     \labfig{lilienthal}
 \end{figure}
 \marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success \cite{brainscales}.}
 
-%start with a very much simplified model McCulloch and Pitts
-%binary input and binary output
-Warren McCulloch and Walter Pitts proposed one of the earliest models of a neuron, which targeted simplifying the real Neuron.
+Warren McCulloch and Walter Pitts proposed one of the earliest models of an artificial neuron.
+They aimed at simplifying models of a biological neuron at the time.
 \marginnote{Notably McCulloch and Pitts (1943) even preceded Hodkins and Huxley's (1952) Nobel price winning description of a neuron.}
 
-%explain biological neuron
 \subsubsection{Biological Neuron}
-For this the functioning of a neuron shall be described shortly.
+For this reason, the functioning of a neuron shall be described shortly.
 
-Human cells in that make up the brain are called \textbf{neurons}.
-They connected to each other through dendrites, synapses and axons and they use these connections to send signals.
+Human cells that make up the brain are called \textbf{neurons}.
+They connected through dendrites, synapses, and axons.
+These connections allow neurons to exchange signals with other neurons.
 
 A neuron receives signals through its dendrites, which all lead to the cell body (soma).
-At the cell body the signals are accumulated.
-If the summed value of the signals' potential reaches a certain threshold, an action potential is generated.
-The new signal then travels along the axon and its branches towards other neurons.
-The axon ends in synapses which connect the axon to other neurons' dendrites.
+The cell body accumulates these signals.
+If the summed value of the signals' potentials reaches a certain threshold, an action potential (spike) is generated.
+The spike then travels as a signal along the axon and its branches towards other neurons.
+Axons end in synapses that connect to other neurons' dendrites.
 Synaptic transmissions are usually mediated by chemicals and not by electrical signals.
 The chemical nature of the synapse allows it to forward either an excitatory or an inhibitory signal.
 Excitatory signals will bring the cell potential closer to the threshold, while inhibitory do the opposite \cite[p.~42]{coloratlas}.
-\marginnote{Cell potentials are usually decreases by excitatory signals, as the action threshold sits below the resting potential.}
+\marginnote{Cell potentials are decreases by excitatory signals, as the action threshold sits below the resting potential.}
 
-What makes the brain so powerful though, is not the neuron itself with its arguably simple structure but the vast network of billions of these neurons.
-Each neuron is connected to thousands of other neurons with which it constantly communicates.
-How a signal is transported between the neurons depends on the interplay of synaptic weights, neuron connections and the threshold of each neurons.
+What makes the brain so powerful, though, is not the neuron itself with its arguably simple structure but the vast network of billions of these neurons.
+Each neuron is connected to thousands of other neurons with which it communicates.
+How a signal is transported between neurons depends on the interplay of synaptic weights, neural connections, and the threshold of each neuron.
 
 \subsubsection{Artificial Neuron}
-McCulloch and Pitts saw that powerful things can be achieved when connecting lots and lots of simple structures.
-Thus, they proposed an even simpler model of a neuron:
-
+McCulloch and Pitts saw that powerful things could be achieved when connecting lots and lots of simple structures.
+Thus, they proposed an even simpler model of a neuron: \\
 They restricted their neuron to a binary state (on or off).
-Each neuron then has a number of incoming signals from other neurons which would either be positive or negative.
-A neuron would only become active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
+Each neuron gathers signals from other neurons, which are either positive or negative.
+A neuron only becomes active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
 \todo{add equation with activation function, when neuron fires}
 McCulloch and Pitts then also changed the highly parallel and complex nature of biological neural networks to a single layer feed-forward network architecture.
 
-In a feed-forward network neurons are grouped into layers and operate in parallel within a layer.
+In a feed-forward network, neurons are grouped into layers and operate in parallel within a layer.
+They do not interact within a layer.
 Each neuron in a layer is fed the same input signal (often described as an input layer).
 The neuron's state is then computed according to an equation such as \refeq{mcculloch}.
 The activation value of each neuron then defines an output.
 
-As this models deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
+As this model deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
 
-In a single layer architecture a layer often consists of a single unit (see \reffig{ff_arch}.
-Basically, input signals come from one side and output signal go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
-This is not only done for practical reasons but also inspired by observation of layered neuron structures in the brain.
+In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}.
+Basically, input signals come from one side, and output signals go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
+This is not only done for practical reasons but also inspired by the observation of layered neuron structures in the brain.
 
 The McCulloch-Pitts model is capable of emulating simple logical relations (\lstinline|AND|, \lstinline|OR|, \lstinline|NOT|) but nor \lstinline|XOR| which will be explained later.
 
@@ -82,47 +79,44 @@ The McCulloch-Pitts model is capable of emulating simple logical relations (\lst
 This McCulloch's and Pitts' is very much simplified yet comes with some weaknesses.
 Thus, the \textbf{perceptron} has been introduced by Frank Rosenblatt in 1957.
 Instead of having a binary unit, he came up with a linear threshold unit (LTU).
-The LTU allows for numeric instead of binary signals which can be weighted with independent factors.
-Also they use the 'bias trick' to parametrize the threshold or bias of the unit as yet another weight for an input that is constantly one.
+The LTU allows for numeric instead of binary signals, which can be weighted with independent factors.
+Also, a unit's threshold/bias is parameterized as another weight with a constant input using the 'bias trick'.
 The resulting equation for each LTU then reads:
 \todo{equation for LTU with bias trick}
 Equation \refeq{LTU} can then be formulated in a vectorized form such that:
 \todo{vectorized LTU}
 
-In this form the calculations for each unit become mathematically and computationally relatively easy.
+In this form, the calculations for each unit become mathematically and computationally relatively easy.
 Each layer can be expressed as a vector of activations $\vec{x}$.
-Multiplying this vector with the weight matrix $\mat{W}$ and applying the element-wise activation function returns the activations for the subsequent layer.
+Multiplying this vector with the weight matrix $\mat{W}$ and applying the element-wise activation function returns the activations for the subsequent layer.\\
 \marginnote{The word perceptron describes the whole function $f$ in equation \refeq{perceptron} which can consist of many LTUs}
 %simplified computational model of how biological neurons might work together
-This simple yet capable description of a unit built the base for a first surge of interest in neural networks.
-%connectionism
+This capable yet straightforward description of a unit built the base for the first surge of interest in neural networks (connectionism).
 
 \subsubsection{Mathematical Interpretation}
-%hyperplane
-%linear separation
-%bias trick
-The very simplistic mathematical formulation of the perceptron suggests that there might be a mathematical meaning to it besides the biological analogy.
+The simplistic mathematical formulation of the perceptron suggests that there might be a mathematical meaning besides the biological analogy.
 Indeed, the perceptron is equal to the definition of a \textbf{binary linear classifier}.
 
-A binary linear classifier, classifies inputs into two classes, hence binary.
-It does so by drawing a virtual hyperplane in input space and predicts the class for each input, depending on whether it lies above or below this hyperplane.
+A binary linear classifier categorizes inputs into two classes, hence binary.
+It does so by drawing a virtual hyperplane in input space and predicts the class for each input.
+The decision depends on whether a point lies above or below this hyperplane.
 \begin{marginfigure}
     \includegraphics{otto_lilienthal}
-    \caption[]{As a very simple example, this binary classifier has data on how often the words 'weightloss' and 'invest' appear in an email.
-Any time these two words appears too often and the data point is above the decision boundary, the email is classified as 'spam'}
+    \caption[]{As a simple example, this binary classifier has data on how often the words 'weight loss' and 'invest' appear in an email.
+Any time these two words appear too often, the data point is above the decision boundary. An email is then classified as 'spam'}
     \labfig{linear_class}
 \end{marginfigure}
 As the hyperplane (or decision boundary) is quantified by a linear function, the classifier is described as linear.
 
 A classic problem would be classifying email as spam.
-Given the two data inputs (\ie frequency of of the words 'weight loss' and 'invest') the classifier has to make a decision.
-For this reason the binary classifier defines a \textbf{decision boundary}.
+Given two data inputs (\ie frequency of the words 'weight loss' and 'invest'), the classifier has to make a decision.
+For this reason, the binary classifier defines a \textbf{decision boundary}.
 Any data point that lies above this decision boundary is classified as 'spam', any point beneath is classified as 'not spam'
-This makes sense as normal email rarely use the two words.
-For other people like a nutritionist, the word weight-loss can come up more frequently.
-This means the decision boundary differs for different users and their mail.
+Since regular emails rarely use the two words, they do not classify as spam.\\
+Other people \ie nutritionists, on the other hand, will have the word weight loss come up more frequently.
+This means the decision boundary must differ for different users and their mail.
 
-To compute where a point lies relative to the decision boundary, a data point's value along each axis $x_1, x_2$ is weighted individually $w_1, w_2$ and summed with a bias $b$.
+To compute where a point lies relative to the decision boundary, a data point's value along each axis $x_1, x_2$ is weighted individually $w_1, w_2$, and summed with a bias $b$.
 The result is checked whether it is above or below a threshold $t$.
 \begin{align}
     z = w_1 x_1 + w_2 x_2 + b
@@ -130,7 +124,6 @@ The result is checked whether it is above or below a threshold $t$.
 With the classification 'spam' if $z > r$ and 'not-spam' $z \leq r$ (\textit{in dubio pro reo}).
 Equally $z - r > 0$ holds for spam as well such that the threshold can be brought into the equation and $z$ is checked against $0$.
 $r$ can then be absorbed into the bias.
-%predistion is y, 1 is spam, 0 is not spam
 \begin{align}
     \rightarrow z = w_1 x_1 + \hdots + w_D x_D + b - r = w_1 x_1 + \hdots + w_D x_D + b'
 \end{align}
@@ -145,12 +138,14 @@ For arbitrary dimensions $D$ this becomes
 \end{align}
 The decision boundary can be easily derived from this, since $\vec{w}$ is the orthogonal vector to the hyperplane and $\frac{b}/\norm{\vec{w}}$ is the displacement of the plane along $\vec{w}$.
 
-For a simpler notation one can define an additional 'virtual' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$.
+For a simpler notation, one can define an additional 'virtual' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$ (same 'bias trick' as before)
 \begin{align}
     z = w_0 b + \vec{w}^T \vec{x} = w_0 b + w_1 x_1 + \hdots + w_D x_D = \vec{\hat{w}}^T \vec{x}
 \end{align}
 with $x_0 = 1$ and $w_0 = b$.
-This is called the \textbf{bias trick}.
+The output $z$ can also be seen as a function of $x$.
+Then, $w$ can describe any function linear in $f$.
+%\todo{explain ability to imitate any linear function.}
 
 This description also holds for perceptrons with more than one unit.
 In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matrices with multiple column vectors.
@@ -159,41 +154,41 @@ In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matric
     \vec{w} \rightarrow (\vec{w}_1, \vec{w}_2, ...) = \mat{W}
     \rightarrow \vec{z} = \mat{\hat{W}}^T \vec{X}
 \end{align}
-%\todo{take this to high-dim space and explain ability to imitate any linear function.}
 
 
 \subsubsection{Loss Function}
-Now with a mathematical definition at hand the next step is to quantify the output.
-In order to train a classifier, an objective has to be formulated though a \textbf{loss function}.
-Usually (in the supervised case), there is already data set on which the network can be trained.
+With a mathematical definition at hand, the next step is to quantify the output.
+In order to train a classifier, an objective has to be formulated through a \textbf{loss function}.
+Usually, there is already a data set for the network to train on.\\
 In the given example this would be mails which were read beforehand and then declared either 'spam' $\tilde{y}_i = 1$ or 'not-spam' $\tilde{y}_i = -1$
 $\tilde{y}_i$ is called the \textbf{label} for a sample $x_i$ with index $i$.
 
-With the binary linear classifier, the decision boundary has been introduced ($z_i > 0$ ?) to predict this label for any given sample.
-This is sufficient to predict a class but a lot of information is lost this way.
-For training and evaluation the information available in $z$ should be used.
-\eg a large $z$ implies that the data point is far away from the decision boundary, thus, the classifier is very sure for this classification.
-For $z \approx 0$ the classifier is not that sure and for $z = 0$ the classifier is indecisive.
-Ultimately, $z$ can be viewed as a score that is calculated for each data input.
+With the binary linear classifier, the decision boundary has been introduced (check $z_i > 0$) to predict a label for any given sample.
+This is sufficient to predict a class, but much information is lost this way.
+For training and evaluation, the information available in $z$ should be used.\\
+\eg, a large $z_i$ implies that the data point $x_i$ sits far from the decision boundary.
+Thus, the classifier is very sure of this classification.
+For $z_i \approx 0$, the classifier is not that sure, and for $z_i = 0$ the classifier is indecisive.
+Ultimately, $z_i$ can be seen as a score that is calculated for each data input.
 
-The question then becomes how to quantify how well the classifier performs on the given data.
-For this reason a loss function is defined which measures the classifier's performance on the data.
-A straight forward choice is \textbf{least squares}, where the score's distance to the label is measured.
+The question then becomes how to quantify how well the classifier performs on given data.
+Hence, a loss function is defined, which measures the classifier's performance on the data.
+A popular choice is \textbf{least squares}, where the score's distance to the label is measured.
 \begin{align}
     \L_{\text{LS}} = \sum_i (y_i - z_i)^2
 \end{align}
-The value of the loss function become minimal for $y_i = z_i$ for $i = 1,...,N$.
-Yet, this score function is especially susceptible to outliers which will cause the decision plane to skew towards outliers with $z > 1$ or $z < -1$
+The value of the loss function becomes minimal for $y_i = z_i, i = 1,...,N$.
+Yet, this score function is especially susceptible to outliers which will cause the decision plane to skew towards outliers with $z_i > 1$ or $z_i < -1$
 
-For this reason \textbf{support vector machines (SVM)} employ a \textbf{maximum margin} classifier.
-A maximum margin classifier seeks to find a decision boundary which as far from the closest representatives of each class as possible (see \reffig{SVM}).
+For this reason \textbf{support vector machines (SVM)} employ a \textbf{maximum margin} classifier.\\
+A maximum margin classifier seeks to find a decision boundary which is as far from the closest representatives of each class as possible (see \reffig{SVM}).
 The maximum margin is defined as
 \begin{align}
     \text{margin} = d_+ + d_-
 \end{align}
-with $d_+$ the distance to the nearest training sample with class $+1$ and $d_1$ the closest training sample for class $-1$.
-Noticeably, this requires for the data to be linearly separable, which means that there must exist a hyperplane which perfectly separates the data according to its class.
-The margin becomes maximal for $d_+ = d_-$.
+with $d_+$ the distance to the nearest training sample with class $+1$ and $d_1$ to closest training sample with class $-1$.
+Noticeably, this requires the data to be linearly separable, which means that a hyperplane must exist that perfectly separates the data according to its class.
+The margin becomes ideal for $d_+ = d_-$.
 Since $w$ is orthogonal to the hyperplane, $\vec{w}$ can always be rescaled such that 
 \begin{align}
     d_+ = d_- = \frac{1}{\norm{\vec{w}}}
@@ -204,7 +199,7 @@ Thus,
 \begin{align}
     \tilde{y}_i z_i \geq 1
 \end{align}
-will hold, for all $x_i$ with equality for points on the margin, as there is always at least one point on the margin.
+will hold, for all inputs $x_i$ with equality for points on the margin, as there is always at least one point of each class on the margin.
 
 Thus,
 \begin{align}
@@ -226,48 +221,22 @@ under the constraints
     \tilde{y}_i z_i = \tilde{y}_i (\vec{w}_i^T \vec{x} + b) \geq 1 \forall i
     \labeq{constraint}
 \end{align}
-How to solve this optimization problem shall be explained in \refssec{svmopt}
+How to solve this optimization problem shall be explained in \refssec{svmopt}.
 
 \subsection{Regularization}
-constraints are regularizations and avoid unwanted solutions
-
-%\todo{perceptron usually just have a step function as activation for classification}
-%What is the goal of training?
-%hint at backpropagation but this will come in later.
-
-
-%loss/score function
-%(multiclass) (linear) discriminant function
-
-%classifiers come in many forms, one is an SVM with a linear kernel is identical to a perceptron
-
-%linear regression and linaer svm are identical
-
-%linear binary classification
-%find values for weights
-
-%scalability
-%neurons is activated if a number of inputs is active
-%neurons can also be inhibitant
-%focussed on logical computations
-
-%explain the logic from neuron to perceptron
-
-%perceptron invented by Frnak Rosenblatt (linear threshold unit)
-
-
-%perceptron is one layer of LTUs
-%weights shoul dbe reinforced when they lead to the correct output
-
-%algebraic fomralism
-%bias trick
-
+Regularizations, combined with loss functions, penalize possible solutions deemed wrong for any particular reason.
+A very common regularization is L2 regularization on the weights.
+It is expected that networks with very large weights generalize poorly.
+Hence, all weights are summed up and multiplied with a regularization constant $\lambda$ \cite{grosse}.
+\begin{align}
+	\mathcal{R} = \frac{\lambda}{2} \sum_{i = 1}^D w_i^2
+\end{align}
 
 \section[Fully Connected NNs]{Fully Connected Neural Networks}
 \subsection{Multi-Layer Perceptron}
-With the perceptron at hand for which is capable of classification any linear separable data, the question becomes, what are the limitations to this?
+With the perceptron, which is capable of classification any linear separable data, at hand, the question becomes: What are the limitations to this?
 Minsky and Pappert found the limitations in 1969 with their book 'Perceptrons'.
-They oulined the limitations of perceptrons with the \lstinline|XOR| problem.
+They oulined the limitations of perceptrons with the \lstinline|XOR| problem \cite{perceptron}.
 The problem becomes obvious when looking at the \lstinline|XOR| problem in a 2D plane (see \reffig{XOR})
 \begin{marginfigure}
     \includegraphics{otto_lilienthal}
@@ -281,20 +250,21 @@ Since the \lstinline|XOR| problem can obviously not be solved with a straight li
 
 This realization led to the first decline in interest in artificial neural networks.
 
-Since then there have been ways of solving this problem for SVMs by projecting the data into a higher dimensional space.
-Another approach kept the logic as is but went from the existing shallow network approaches to deep neural networks (DNN).
+Since then, there have been ways of solving this problem for SVMs by projecting the data into a higher dimensional space with various kernel functions \cite{ommer}.
+Another approach keeps the logic but goes from the shallow network approach to a deep neural network (DNN).
 \textbf{Deep Neural Networks (DNN)} are ANNs which consist of more than one hidden layer.
 A single perceptron may not be capable of computing \lstinline|XOR| but it is capable of calculating \lstinline|AND|, \lstinline|OR| and their negated forms.
-By using one perceptron with two units to compute \lstinline|AND| and \lstinline|OR|, a second layer perceptron can use compute \lstinline|XOR|
+By using one perceptron with two units to compute \lstinline|AND| and \lstinline|OR|, a second layer perceptron can in fact compute \lstinline|XOR|
 \begin{align}
     XOR(x, y) = AND(OR(x, y), NOT(AND(x, y)))
 \end{align}
 
-Now, the \lstinline|XOR| problem becomes solvable.
+Thus, DNNs solve the \lstinline|XOR| problem.
 
-\marginnote{The ability to stack multiple layers in ANNs stems from discovery of backpropagation which shall be explained in \refssec{backprop}.}
+\marginnote{The ability to stack \textit{and train} multiple layers in ANNs stems from the discovery of backpropagation which shall be explained in \refssec{backprop}.}
 
-As before only linear functions could be approximated by perceptrons, multiple layers of perceptrons allow for any higher degree function to be approximated as well.
+Perceptrons, until then, could approximate only linear functions.
+Multiple layers of perceptrons now promise to approximate any higher degree function just as well.
 Thus, \textbf{Multi-Layer Perceptrons (MLP)} sparked new interest in the field of artificial neural networks.
 
 This interest also originated in the similarly layered structure that has been found in the brain.
@@ -325,7 +295,7 @@ MLPs are also called \textbf{fully connected networks} since each unit is connec
 %linear algebra shows that any linear function can approximated by just two perceptron layers for a linear activation function -> more layers do not make sense.
 These newfound capabilities for MLPs are not only restricted to binary operations but will translate into continuous space.
 In this case the hidden-layer perceptrons get stripped of their activation function.
-The activation function of a perceptron has been used up until now to make a class prediction $y$ from the score $z$, which is also called pre-activation.
+The activation function of a perceptron has been used, up until now, to make a class prediction $y_i$ from a score $z_i$, which is also called pre-activation~\cite[p.~6]{GrosseNotes}.
 
 Replacing the step function with a linear activation function (\ie identity function), each hidden-layer's perceptron would initially seem to increase the capabilities of the MLP.
 Unfortunately, this is not the case as any subsequent perceptrons with linear activations can be reduced to a single preceptron.
@@ -336,10 +306,10 @@ Unfortunately, this is not the case as any subsequent perceptrons with linear ac
 
 Consequently, the step-function that was used in the \lstinline|XOR| problem played an important role.
 The reason for this is the non-linear nature of the step-function in contrast to any linear activation function.
-It can easily be shown, that \refeq{LAF} does not hold for non-linear activation functions.
+It can easily be shown that \refeq{LAF} does not hold if a non-linear activation function is used.
 
 Thus, the question becomes which other activation functions there are that go beyond binary classification.
-An early popular choice are sigmoid functions (logistic function or $\tanh$).
+An early popular choice was sigmoid functions (logistic function or $\tanh$).
 Especially the logistic function is popular due to its similarity to the step-function amongst other things.
 \begin{align}
     \sigma(z) = \frac{1}{1 + e^{-z}}
@@ -365,48 +335,14 @@ Another activation function 'leaky ReLU' attenuates the signal below the thresho
     \labfig{lrelu}
 \end{marginfigure}
 
-
-%move on from step function as activation
-%Activation functions have already been used to describe the perceptron and the artificial neuron by McCulloch and Pitts.
-%In both cases (as well as the binary linear classifier) the inputs are weighted and summed up to something called a \textbf{pre-activation} \cite[p.~6]{GrosseNotes}.
-%The pre-activation is then checked against a threshold which is often $0$ if there is a bias term involved.
-%In all previously given cases this decides whether a unit becomes active or which class the input is allocated to.
-%\begin{align}
-%    \sigma(z) = \frac{1}{1 + e^{-z}}
-%\end{align}
-%
-%There are many more activation functions with different properties such as the \textbf{sigmoid activation} $\sigma$.
-%\begin{align}
-%    \sigma(z) = \frac{1}{1 + e^{-z}}
-%\end{align}
-%$\sigma$ is also inspired by nature as a neuron can fire at different rates according to its input.
-%Even though this is very much simplified, the main idea is, that a strong input ('mentioning 'weightloss' hundreds of times) should lead to a strong output ('this mail is definitley spam').
-%
-%\reffig{sigmoid} shows that the output $\sigma(z)$ scales with the input $z$ but saturates for both very large and very small $z$.
-
-
-%inability to solve XOR problem
-%thus stack multiple 
-%non-linearity is important 
-
-%hiddenlayers
-
-%After motivating the perceptron, this section will focus on combining multiple layers of perceptrons, which make up the \textbf{multi layer perceptron (MLP)}.
-%The MLP combines several perceptron layers in series which is the first step towards what is described as deep neural networks.
-%In a first thought experiment the original input layer and the output layer shall be separated by an additional layer that works quite simialrly to the input layer.
-%Instead of receiving a signal 'from outside' the added layer takes the input layer's activations as a new input signal ....
-
-%two or more hidden layers -> deep neural network
-
 \section[Convolutional NNs]{Convolutional Neural Networks}
-%advantage of convolutions as they use fewer weights
-With fully connected networks at hand, it seems as if any complex function could be solved by just stacking enough hidden layers.
+With fully connected networks at hand, it seems as if any complex function could be solved by just stacking enough hidden layers.\\
 While this seems compelling at first, the issue of the computational burden arises very quickly.
 Especially for broad layers with many units the number of connections and weights becomes problematic.
 For two exemplary layers with $1,000$ units each, there would be $1,000,000$ connections as well as $1,000$ biases.
 This causes two kinds of problems.
 \begin{enumerate}
-    \item Each connection represents a multiplication and summation to the activation value which introduces a computational burden.
+    \item Each connection represents a multiplication and summation to the activation value with an associated computational cost.
     \item All connections have separate weights which must be trained, which requires a vast number of training data.
 \end{enumerate}
 
@@ -414,17 +350,17 @@ Another problem is invariance for spatially or temporally distributed data.
 If a pixel is to be shifted by a single pixel, or an audio track delayed by a second, the content does not change, and as such the result should not either.
 An FCN would likely over-fit the data and be susceptible to such variations.
 
-Thus, computer vision as a field is particularly affected by this issue.
+Computer vision as a field is particularly affected by this issue.
 Since the input are often images with upwards of $64 \times 64 = 4096$ pixels.
 Hence, a different solution is needed.
 
 \subsection{Convolutions}
 A solution to the previously stated problem are convolutional layers.
-%mathematical explanation of what a convolution does
 
 A \textbf{convolution} is a mathematical operation which produces for any given point of a function $f$ the weighted average of its surroundings.
 The way the surroundings are weighted is through a kernel function $g$.
-This principle can be translated into image space where a filter $g$ is applied to each pixel and its surroundings.
+This principle can be translated into image space where a filter $g$ is applied to each pixel and its surroundings.\\
+\marginnote{A convolution is commutative $f * g = g * f$, associative $f * (g * h) = (f * g) * h$ and distributive $f * (g + h) = f * g + f* h$.} 
 Specifically, many filters of size $k \times k$ are put on top of the image similar to tiles on a roof.
 Tiles may overlap but are evenly spaced over the area they cover.
 The spacing between the centers of each tile is called a stride $s$ and will be assumed the same along each dimension.
@@ -453,42 +389,42 @@ Another filter like \reffig{conv_sharp} will sharpen edges in an image since the
     \labfig{conv_sharp}
 \end{marginfigure}
 
-One can easily image that these kernels can also perform blurring only along one axis or sharpening gradients in one direction.
-As many such filters are imaginable, there are often many such filters per layer, which are called filter-banks.
+One can easily imagine that these kernels can also perform blurring only along one axis or sharpening gradients in one direction.
+As many such filters are imaginable, there are often many filters applied per layer called filter-banks.
 The output of each filter then defines an input channel for the next layer much like the three color channels in an image.
-With many channels convolutions can become even more complex as each filter takes all previous channels as input and combines them into a new channel.
-
+With many channels convolutions can become even more complex as each filter takes all previous channels as input and combines them into a new channel.\\
 Interestingly, the weights of each kernel may not be hand-crafted but can be learned similar to fully connected layers.
 
-convolutions are equal to sparse dense laters
-many convolutions increase the field of view with fewer paramters
-convolutions are associateve and distributive
+As convolutions qualify as linear functions, there exists an equal fully connected layer to each convolutional layer.
+The weights of such an FC layer would be sparse, though, which means there are many values equal to zero.
+This property makes it clear that convolutions are more efficient than fully connected layers by imposing some simple restrictions.
 
-
-%unified behavior over space -> invariance
-%each layer is a collection of image filters
+Similar behavior also occurs when comparing convolutional layers with different kernel sizes.
+By using a larger kernel, the 'field of view' (the area that each pixel in the result layer 'sees') increases as well.
+At the same time, a larger kernel increases the number of parameters significantly.
+\marginnote{A convolutional kernel with the size of the input would be equivalent to a fully connected layer.}
+The same field of view can also be obtained, though, when using two convolutions in series.\\
+\eg two layers with kernel size $3 \times 3$ have the same field of view like a single layer with kernel size $5 \times 5$ but fewer weights.
 
 \subsection{Pooling}
-%As convolutional layers can be stacked in the same way fully connected layers are stacked in MLPs they 
 A sub-type of convolutional layers are pooling layers.
 Pooling layers have the purpose of downsampling an image or layer to a lower resolution.
-Basically, downsampling can already be achieved by choosing a stride $s > 1$.
-Another way is to downsample an image without any learnable weights by using one of two specific hand-crafted kernels.
+Basically, downsampling can already be achieved by choosing a convolutional layer with stride $s > 1$.
+Another way is to downsample an image without any learnable weights is by using one of two specific hand-crafted kernels.
 
-The first option is average pooling.
+The first option is average-pooling.
 By taking the mean of four neighboring pixels (each weight is $\frac{1}{4}$) with a stride of $s = 2$ in each channel, the input is scaled down by a factor of $2$ along each axis.
-Figuartively, four pixels will be combined into a single pixel by taking their mean.
+Figuratively, four pixels will be combined into a single pixel by taking their mean.
 
-Max pooling on the other hand does not take the average but only takes the maximum value of the four inputs.
+On the other hand, max-pooling does not take the average but only takes the maximum value of the four inputs.
 The result will then propagate only the most dominant signals.
 
 Either way, pooling will result in loss of information but is often necessary to reduce the computational load.
 Especially when the number of channels increases for deeper layers, it is preferable to reduce memory usage and computational load along with the spatial size.
 
-Typical CNN architectures will often stack several convolutional layers then apply a single pooling layer before another stack of convolutional layers is applied.
-This way the spatial size of the input is gradually reduced while the number of channels is increased at the same time.
- 
-%process information hierarchically
+Typical CNN architectures will often stack several convolutional layers then apply a single pooling layer.
+Then another stack of convolutional layers is applied.
+This way, the input's spatial size is gradually reduced, while the number of channels is increased at the same time.
 
 \section{Recurrent Neural Networks}
 imprtant to generate sequences
@@ -528,3 +464,4 @@ Reinforcement learning allows for this as is introduces learning techniques that
 \subsection{Unsupervised Learning}
 Just give a bunch of data and see whether it can be ordered or represented in an efficient way
 Usually there is still an intention but its not that narrow
+
