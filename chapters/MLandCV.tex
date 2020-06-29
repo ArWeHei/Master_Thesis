@@ -427,41 +427,44 @@ Then another stack of convolutional layers is applied.
 This way, the input's spatial size is gradually reduced, while the number of channels is increased at the same time.
 
 \section{Recurrent Neural Networks}
-imprtant to generate sequences
-more efficient than just predicting everything at once
-speech is good example: first word matters for the next few words, but the first word a few senteces ago is mostly irrelevant
-\subsection{Long-term Short Memory}
-LSTM is a substructure
-expalin and show iamge
+All previously presented networks have in common that they generate simple outputs $y_i$ such as a class from simple inputs $x_i$ such as the frequency of a certain word.
+In fact, images and even videos can act as inputs and outputs.
+Nevertheless, the larger the output, the harder it is to train.
+Recurrent neural networks are specialized for sequences of data as inputs and/or outputs.\\
+Again, the email-spam problem can be manipulated such that a recurrent network fits the task.
+The classifier should check whether an email classifies as spam by analyzing whether an email is well written or just a bunch of buzzwords.
+Such an approach could be realized by taking the whole email as an input of an FC layer.
+However, similar to how convolutional layers are more efficient than FC layers for images, are recurrent networks more efficient for sequences.
 
+Instead of feeding a whole sentence at once, RNNs take only one word at a time as input.
+Then the activation for a hidden layer is calculated and stored.
+During the next part of the input sequence, the previously stored activations provide an additional input besides the sequence snippet.
+Then new activations are generated, which are again stored for the next step of the sequence.
+This process is repeated until the sequence is complete, and then an output is generated.
+
+Recurrent neural networks are prevalent in natural language processing as language can easily be visualized as a sequence.
 
 \section{Types of Learning}
-types of training are not clearly separated, there is weakly supervised training and the like
-more or less categorizes networks by their setups a.k.a. how they learn.
-most application fall in this category
-straight forward
-classify this, generate this
+Neural networks are often categorized into different groups.
+One popular way of grouping is by categorizing the training according to the way the data is structured~\cite{grosse}.
 
 \subsection{Supervised Learning}
-GIve a predefined problem and tell the network which metric to look for and how to solve the problem
+If data is available, which already shows the network's desired behavior, training falls into the supervised learning category.
+Referencing the previous example, this would mean that there are emails available that are already labeled as 'spam' or 'not-spam'.
+The network can then imitate this behavior from the data. \\
+Most problems fall into the supervised category as they are also the easiest to solve~\cite{grosse}.
 
-\subsection{Reinforcemnt Learning}
-No loss directly but a score is given to evaluate performance
-loss would be differentiable
-e.g. game: loss cannot be calcualted but a score can be given at the and or in between
-Reinforcement learning is employed when there is a lack of gradients at some point in the pipeline.
-A very well known example are AIs which play computer games.
-The interaction with a game happens through a predefined interface which is usually not differentiable.
-This has two main reasons:
-\begin{enumerate}
-    \item Humans or algorithms do not need a differentiable interface with a computer game.
-    \item It is very hard to think of a way to make an action like moving a figure in chess differentiable.
-\end{enumerate}
-
-Yet, AIs like Google Alpha Go are based on neural networks.
-Reinforcement learning allows for this as is introduces learning techniques that formulate ...
+\subsection{Reinforcement Learning}
+In reinforcement learning, there is no such paired data available.
+However, the result can be evaluated how good it solves the problem.
+The resulting score is called a reward.\\
+Most AIs trained to play games such as Google Alpha Go~\cite{alphago} are based on reinforcement learning.
+They also overcome the problem that calculating the reward is often based on undifferentiable outputs such as the score in a video game~\cite{grosse}.
 
 \subsection{Unsupervised Learning}
-Just give a bunch of data and see whether it can be ordered or represented in an efficient way
-Usually there is still an intention but its not that narrow
+Unsupervised learning has to deal with data that has no labels.
+Usually, this means finding patterns in the data on its own~\cite{grosse}.
+Considering the email-spam problem: A network is given all the email data without labels spam or not-spam.
+Ideally, the network is then able to find patterns in emails which allow grouping these emails.
+These groups are then evaluated, and hopefully, one group coincides with the 'spam' label or any other desired label.
 

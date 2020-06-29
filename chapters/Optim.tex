@@ -153,12 +153,12 @@ AdaM is a more advanced version of AdaGrad and adds a version of momentum.
 The momentum and the sum of squares are replaced by exponentially decaying average $m_t$ and $v_t$ which serve the same purpose.
 Both $m_t$ and $v_t$ are corrected ($\hat{m}_t, \hat{v}_t$) for biases at early iteration due to the exponential average
 \begin{align}
-    m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t
-    v_t = \beta_1 v_{t-1} + (1 - \beta_2) g_t g_t^T
-    \hat{m}_t = \frac{m_t}{1 - \beta_1^t}
-    \hat{v}_t = \frac{v_t}{1 - \beta_2^t}
+    m_t & = \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
+    v_t & = \beta_1 v_{t-1} + (1 - \beta_2) g_t g_t^T \\
+    \hat{m}_t & = \frac{m_t}{1 - \beta_1^t} \\
+    \hat{v}_t & = \frac{v_t}{1 - \beta_2^t} \\
     \Delta \mat{w}_t & = - \frac{\eta}{\sqrt{\epsilon \mat{I} + \text{diag}(v_t)}} \cdot \frac{1}{N} \frac{\partial L^k}{\partial \mat{w}_t} \cdot \vec{x}^k + m_t \\
-    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t
+    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t \\
 \end{align}
 
 AdaM along with SGD has in recent years become the de facto standard for training neural network in computer vision.
@@ -238,7 +238,8 @@ These calculated gradients are then forwarded to their respective nodes and the 
 This way gradients for all nodes a propagated (hence back\textit{propagation}) until they reach the end nodes.
 As these gradients $\frac{\partial f}{\partial x_1}$ and $\frac{\partial f}{\partial x_2}$ are those which were sought originally, backprop is complete.
 \begin{align}
-    \frac{\partial f}{\partial x_1} & = \frac{\partial f}{\partial z_3} \cdot \frac{\partial z_3}{\partial x_1} + \frac{\partial f}{\partial z_4} \cdot \frac{\partial z_4}{\partial x_1} = 2 z_2 z_3 \cdot 1 + z_1 \cdot 1 = 2 z_2 z_3 + z_1 \\
+    \frac{\partial f}{\partial x_1} & = \frac{\partial f}{\partial z_3} \cdot \frac{\partial z_3}{\partial x_1} + \frac{\partial f}{\partial z_4} \cdot \frac{\partial z_4}{\partial x_1} \\
+    & = 2 z_2 z_3 \cdot 1 + z_1 \cdot 1 = 2 z_2 z_3 + z_1 \\
     \frac{\partial f}{\partial x_2} & = \frac{\partial f}{\partial z_5} \cdot \frac{\partial z_5}{\partial x_2} = z_1 \cdot 1 = z_1 \\
 \end{align}
 In case of neural networks the end nodes are weights, parameters and inputs.

@@ -29,7 +29,6 @@ Since this thesis is deeply anchored at the intersection of both fields, differe
 % qualitative style (how are people drawn etc.)
 
 % historically there have been many different approaches
-%try to group these approaches on the problem formulation and the approach
 
 %color choice
 %how to display something (is it unnaturally large or small ...)
@@ -565,6 +564,8 @@ Then he used an LSTM-based agent to predict a sequence of brush stroke parameter
 As the whole pipeline is differentiable, \citeauthor{neuralpainters} was able to avoid the use of reinforcement learning.
 Results show better image reconstruction than SPIRAL when using the generator, but slightly worse results when combining the obtained action with the original renderer.
 \citeauthor{neuralpainters} also presents the capability of reconstructing content similar to \citeauthor{gatys} by minimizing the perceptual loss directly in action space with his network.
+\marginnote{Long short-term memory (LSTM) is a basic building block in recurrent neural networks which allows to store information for many steps.
+It specifically learns which inputs to look at, when to forget something and which outputs to generate from the current state of the network.}
 
 %learning2Paint
 \citeauthor*{learning2paint} also employ a pre-trained decoder and use more advanced reinforcement learning techniques \cite{learning2paint}.

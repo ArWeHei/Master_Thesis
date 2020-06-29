@@ -9,21 +9,21 @@
 \section{Motivation}
 \labsec{motivation}
 
-previous approaches have several problems
--very low resolution only (learning2paint)
--no brush strokes (style transfer)
--bad reconstruction(SPIRAL)
--hand-crafted/do not generalize (painterly rendering)
--bad brush storkes (brushs troke extraction)
--train whole network for a single image(drawingnet)
--too inefficient (genetic algorithms)
-
-pick an orthogonal approach to drawing networks
-seems as a step back but could show whether it is possible at all
-emphasize more on the decoder quality than others did
-
-Goal is twofold: extract brush strokes is first
-see whether this stylizes normal images as well.
+%previous approaches have several problems
+%-very low resolution only (learning2paint)
+%-no brush strokes (style transfer)
+%-bad reconstruction(SPIRAL)
+%-hand-crafted/do not generalize (painterly rendering)
+%-bad brush storkes (brushs troke extraction)
+%-train whole network for a single image(drawingnet)
+%-too inefficient (genetic algorithms)
+%
+%pick an orthogonal approach to drawing networks
+%seems as a step back but could show whether it is possible at all
+%emphasize more on the decoder quality than others did
+%
+%Goal is twofold: extract brush strokes is first
+%see whether this stylizes normal images as well.
 
 
 The basic approach of this work consists of two steps:
@@ -186,30 +186,30 @@ Even though this data set still has some weaknesses, it is probably the best cho
 
 Other 'honorable mentions' are painting programs such as \todo{these two weird software stuff things}, which allow for even more authentic brushstrokes but lack any well-documented interface in order to generate a vast number of brushstrokes.
 
-\begin{figure*}
+\begin{marginfigure}
     \subfloat[Photograph]{%
-        \includegraphics[width=.29\textwidth]{images/real_red_stroke}%
+        \includegraphics[width=.8\textwidth]{images/real_red_stroke}%
         \labfig{strokes:real}%
     }\qquad
     \subfloat[ArtRage]{%
-        \includegraphics[width=.29\textwidth]{images/artrage_red_stroke}%
+        \includegraphics[width=.8\textwidth]{images/artrage_red_stroke}%
         \labfig{strokes:artrage}%
-    }
-    \subfloat[Affinity Photo]{%
-        \includegraphics[width=.29\textwidth]{images/affinity_red_stroke}%
-        \labfig{strokes:affinity}%
-    }
+    }\qquad
+    %\subfloat[Affinity Photo]{%
+    %    \includegraphics[width=.8\textwidth]{images/affinity_red_stroke}%
+    %    \labfig{strokes:affinity}%
+    %}\qquad
     \subfloat[libmypaint]{%
-        \includegraphics[width=.29\textwidth]{images/affinity_red_stroke}%
+        \includegraphics[width=.8\textwidth]{images/affinity_red_stroke}%
         \labfig{strokes:libmypaint}%
-    }
+    }\qquad
     \subfloat[FluidPaint]{%
-        \includegraphics[width=.29\textwidth]{images/fluidpaint_red_stroke}%
+        \includegraphics[width=.8\textwidth]{images/fluidpaint_red_stroke}%
         \labfig{strokes:fluidpaint}%
     }
     \caption[]{Comparison of similar brushstrokes in each data set}
     \labfig{strokes}
-\end{figure*}
+\end{marginfigure}
 
 \todo{talk about RGBA advantages}
 
@@ -381,15 +381,16 @@ As part of the hyper-parameter search, different tweaks to the architecture have
     \item Various combinations of activation and normalization functions.
 \end{itemize}
 
-\begin{figure*}
-    \resizebox{1.5\textwidth}{!}{
-        \input{images/vgg16.tex}
-    }
-    \resizebox{1.5\textwidth}{!}{
-        \input{images/vgg16.tex}
-    }
-        \caption{Visualization of the generator and discriminator architectures}\labfig{genarch}
-\end{figure*}
+\todo{reinsert these figures}
+%\begin{figure*}
+%    \resizebox{1.5\textwidth}{!}{
+%        \input{images/generator.tex}
+%    }
+%    \resizebox{1.5\textwidth}{!}{
+%        \input{images/discriminator.tex}
+%    }
+%        \caption{Visualization of the generator and discriminator architectures}\labfig{genarch}
+%\end{figure*}
 
 The discriminator is designed after the same principles and resembles a VGG encoder network.
 First, three convolutional layers are applied, followed by a downsampling /pooling layer.
