@@ -2,56 +2,57 @@
 \chapter{Outlook}
 \labch{Outlook}
 
-As the previous chapter stated that "there is much to wish for", now a few ideas for future work shall be presented.
+As the previous chapter stated that "there is much to wish for", now a few ideas for future work will be presented.
 
 %can this be realized in a feed-forward manner?
-First an foremost, it would still be desirable to implement a feed-forward approach.
+First and foremost, it would still be desirable to implement a feed-forward approach.
 Such an approach would ideally be capable of predicting parametrizations much faster once it is trained.
-It is important though, that such an approach should not end in a single network trained per image if there is no advantage in doing so.
-One such advantage could be stochastically generating parametrizations much like in VAEs.
-This would allow to sample many possible parametrizations for a painting relatively fast.
-With many such parametrizations at hand it would possibly be easier to get meaningful results from analysis of these parameters.
+It is crucial, though, that such an approach should not end in a single network trained per image if there is no other advantage in doing so.
+One such advantage could be stochastically generating parametrizations, much like in VAEs.
+It would allow sampling of many possible parametrizations for a painting relatively fast.
+With many such parametrizations at hand, it would be easier to get meaningful results from the analysis of these parameters.
 
 Other ideas for improvement mainly affect the neural renderer.\\
-One such idea concerns the efficiency of the renderer.
-Rendering that many brushstrokes comes with high computational costs and slows down the optimization process significantly.
+One such idea concerns the renderer's efficiency.
+Rendering many brushstrokes comes with high computational costs and slows down the optimization process significantly.
 One solution to this would be weight-pruning.
-Weight-pruning removes unnecessary weights or even layers in a network, such that similar results can be achieved with fewer operations.
-\citeauthor*{pruning} showed that some networks can be pruned significantly~cite{pruning} and it would very interesting if this accelerates rendering and thus optimization.
-Another interesting aspect would be the behavior of the gradients during backpropagation in such a pruned network.\\
+Weight-pruning removes unnecessary weights or even entire layers in a network, such that similar results can be achieved with fewer operations.
+\citeauthor*{pruning} showed that some networks could be pruned significantly~cite{pruning}, and it would be fascinating if this accelerates rendering and optimization.
+Another interesting aspect would be the gradients' behavior during backpropagation in such a pruned network, as a gradients path might be more direct.\\
 This idea goes hand in hand with a question raised in the previous chapter.
-Would it be desirable to resort to a simpler renderer.
-With a simpler architecture and probably less focus on realism or an entirely different parametrization, it is imaginable that the renderer could be trained more efficiently.
-This could possibly allow for larger render windows or larger stroke variability, which in turn could improve the optimization procedure. \\
+Would it be desirable to resort to a simpler renderer?
+With a simple architecture and probably less focus on realism or an entirely different parametrization, it is imaginable that the renderer could be trained more efficiently.
+This could possibly allow for either larger render windows or larger stroke variability, which in turn could improve the optimization procedure. \\
 In contrast, it is also imaginable to improve the rendering quality of the neural renderer further.
-One short-coming of the existing renderer is its lack of detail.
+One shortcoming of the existing renderer is its lack of detail.
 It would be desirable to get even more perception of liquid paint in three dimensions.
-For this reason another render parameter that controls lighting is thinkable. \\
+For this reason, another render parameter that controls lighting is possible. \\
 
-Yet, another idea which does not affect the renderer directly concerns the blending of brushstrokes.
-Pixel-blending brushstrokes is far from the way brushstrokes are layered in real paintings.
-Brushstrokes would usually mix their colors with underlying brushstrokes or drag-along colors of brushstrokes which cross their path.
-Such a behavior was not envisaged in this thesis.
+However, another idea that does not affect the renderer directly concerns the blending of brushstrokes.
+Pixel-blending of brushstrokes is far from the way brushstrokes are layered in real paintings.
+Brushstrokes would usually mix their colors with underlying brushstrokes or drag-along colors of brushstrokes that cross their path.
+Such behavior was not envisaged in this thesis.
 Thus, it would definitely be interesting to employ a more advanced approach to this, similar to \citeauthor*{wetbrush} and their painting simulation.
-However, such a complex additional step adds more overhead and also more variables to optimize.\\
+However, such a complicated additional step adds more overhead and also more variables to optimize.\\
 The presented blending algorithm of this thesis was already optimized for performance.
-Yet, as it resembles the only non-differentiable part in the optimization-pipeline it would be interesting to substitute it with a differentiable network.
-The main advantage of such a step would be the additional capability to get gradients for the position of the render window as well.
-Other attempts at calculating such gradients artificially failed and it would add more versatility to the optimization procedure.
+Nevertheless, as it resembles the only non-differentiable part in the optimization-pipeline, it would be interesting to substitute it with a differentiable implementation.
+The main advantage of such a change would be the additional capability to get gradients for the render window position as well.
+Other attempts at calculating such gradients artificially failed, and it would add more versatility to the optimization procedure.
 Additionally, it would aid the promotion of variable stroke densities over the image.
-%improve renderer by a lot and find away to make this more efficient?
+%improve renderer by a lot and find a way to make this more efficient?
 %brushstrokes are not blended naturally
 %brush strokes lack some detail -> maybe add environment variable or such
 
 At last, combining a parametrized representation with style transfer would be an exciting thought.
-Ideally, such style transfer would copy not only colorschemes and textures but also the 'handwriting' of an artist, the brushwork.
-Combined with a high quality rendering of brushstrokes such a combined approach could overcome the lack of detail which some style transfer approaches currently suffer from.
-Such an approach is certainly further down the line but will take a few more improvements when it comes to the capabilities of painterly rendering or brushstroke extraction.
+Ideally, such style transfer would copy not only color schemes and textures but also the 'handwriting' of an artist, the brushwork.
+Combined with a high-quality rendering of brushstrokes, such a combined approach could overcome the lack of detail some style transfer approaches currently suffer.
+Such an approach will certainly come up further down the line, but it will take a few more improvements when it comes to the capabilities of painterly rendering or brushstroke extraction.
 %combine with style transfer
-% parametrized representation is interesting for graph neural networks and other ermerging techniques.
+% parametrized representation is interesting for GNNs and other emerging techniques.
 
 In the end, artistic computer vision offers a lot to look out for.
-It serves as a nice show-case for the capabilities of neural networks, yet it still is now capable to really support art historians in their research.
-However, with further evolution of computer vision and neural networks, the  field of artistic computer vision will eventually get there.
-Hopefully, it will be possible some day to perfectly imitate the style, the brushwork, and the materials that some of the all-time great artists used.
+It serves as a nice showcase for the capabilities of neural networks, yet it still cannot support art historians in their research.
+However, with further evolution of computer vision and neural networks, the field of artistic computer vision will eventually get there.
+Hopefully, it will be possible someday to perfectly imitate the style, the brushwork, and the materials that some of the all-time great artists used.
 It would possibly allow to revive their artistic skills once again.
+
