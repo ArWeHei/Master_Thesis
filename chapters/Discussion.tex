@@ -2,18 +2,99 @@
 \chapter{Discussion}
 \labch{Discussion}
 
-%goal achieved?
+The original goal of this thesis was to come up with a feed-forward architecture, which can predict brushstrokes in a painting.
+This architecture should be built around a differentiable renderer, which renders brushstrokes from parameters.
+Such an approach would have two use-cases:
+\begin{enumerate}
+    \item Generate 'brushstroke representations' of input paintings, which describes paintings as brushstrokes instead of pixels.
+    \item Render images as paintings as well as possible if the input is a photograph.
+\end{enumerate}
 
-%appraoch is very slow
-%brushstrokes are not blended naturally
-%brush strokes lack some detail -> maybe add environment variable or such
-%nice image resolution
-%can this be realized in a feed-forward manner?
-%Is this something that will be used in the future
+Especially the aspiration of achieving this with a single feed-forward approach has been proven difficult.
+For once, existing approaches either restrict themselves to very low image resolutions, or they predict brushstrokes in an iterative manner.
+As both these compromises ought to be avoided, an orthogonal approach has been chosen.
+This approach places many brushstrokes on a virtual canvas.
+Then the brushstroke parameters are iteratively optimized through backpropagation.
+It was possible to show that a target image with a resolution of $\approx 1$ megapixel can be approximated with such a set-up.
 
-%is probably a state of the art painterly rendering appraoch
+Nevertheless, this approach features some weaknesses.
+First of all, it takes approximately one hour per image to obtain a brushstroke representation.
+Then, the approach struggles with large uniformly colored regions in images.
+The best approximations could really be gathered if single brushstrokes are clearly visible and set themselves apart from the background.
+And at last, the optimization requires many constraints and lots of compromises are necessary to keep the computational burden low.
+The limited data set with only a single control-point which was used to train the renderer is a good example for this.
 
-%brush stroke extraction depends heavily on the image, some strokes are very good, some are just wrong.
-%comparable to previous brush stroke extraction algorithms
+Still, the results could be compared to what others have previously achieved.
+The closest approaches to this thesis are those by \citeauthor*{LpaintB} and \citeauthor*{neuralpainters}.\\
+\citeauthor*{LpaintB} were able to recreate a painting by sliding a window over it for which brushstrokes are predicted in a feed-forward manner.
+The network is specifically trained for a single image and shows style transfer-like behavior if applied to other images.
+It takes about an hour to train the network per 1 MP image, as the author claim.\\
+\citeauthor*{neuralpainters} focusses his work on training a recurrent approach to predicting brushstrokes.
+However, he showed a first approach which recreated content in an image by optimizing the brushstroke parameters directly.\\
+Both approaches presented a differentiable renderer as a key-element, much like this thesis.
 
+Compared to both of these approaches, this thesis put more effort into building a suitable renderer.
+It seems to have paid off when looking at the details in the image.
+Brushstroke show fading and narrowing towards their ends which lines up with real-world observations.\\
+When rendering images of van Gogh paintings, it seems as if a majority of brushstrokes aligns with the 'flow' of the original painting.
+Especially, in 'Starry Night' brushstrokes would also follow the curly flow which can be seen in the original.
+Compared to \citeauthor*{LpaintB} the visual quality seems to have improved while a similar amount of time is necessary to approximate a single painting.\\
+Considering the stylization of photos, this thesis was only able to offer a single oil painting-like style.
+\citeauthor*{LpaintB} offer more styles (\eg watercolor).
+As comparing this stylization is highly subjective, readers are recommended to look at the provided stylizations of the same image and build their own verdict (see \reffig{final_stylization}).
+A noteworthy aspect, is how well this thesis' approach aligns brushstrokes with edges in the stylization, much like artists presumably would choose to do.
+
+\citeauthor*{neuralpainters} presented a stylization approach very close to the approach of this thesis.
+Arguably, it comes up with a very nice level of abstraction.
+As this thesis focussed harder on being closer to the original image, they are hard to compare.
+Nonetheless, it would be desirable to achieve similar abstraction by tweaking the approach of this thesis.
+
+
+Another comparison has was made to brushstroke extraction.
+\citeauthor*{lamberti} presented an approach specifically aimed at extracting brushstroke properties from painting images.
+This theses also aimed at extracting brushstrokes from images to allow for follow-up analysis.
+Up until now there has not been a known neural network-based approach to do so.
+Comparisons showed that the \citeauthor*{lamberti} were able to better extract single brushstrokes more precisely.
+Still, the rendering based approach of this thesis was able to better cover the whole image area.
+Also, it seems that this approach is able to broadly capture group dynamics.
+This could be seen as a first step towards accurately parametrizing paintings with a neural network.
+
+
+%Verdict
+Ultimately, it was indeed possible to generate a brushstroke parametrization for images of painting.
+Although it was not possible to achieve this with a feed-forward approach, the subsequent optimization-based approach still fares well against state-of-the-art counter-parts.
+It could even be argued that such an optimization-based approach scales easier than other approaches and helps to enable such high resolution images sizes.
+Especially the image resolution of up to one megapixel is noteworthy and probably a key-factor to generating such detailed renderings.
+%%goal achieved?
+%%nice image resolution
+
+Surprisingly, stylization of photographs, which was originally a byproduct of the approach, gave relatively good results.
+It could be argued that it is comparable in quality to the best approaches as of mid-2020.
+%%is probably a state of the art painterly rendering approach in terms of quality
+The other actual goal of generating accurate brush stroke representations of images, has not been quite so successful.
+The comparison to brushstroke extraction algorithms showed that brush strokes are not captured as accurately as hoped.
+Especially, when comparing the details to the original paintings, it becomes obvious that the rendered brushstrokes still look significantly different.
+Thus the results seem relatively appealing from afar, but less so when getting closer.
+
+This raises the question whether the extended work that went into the renderer was worth it.
+It seems that the goal of generating real-looking brushstrokes may clash with having a versatile and more efficient renderer.
+For future approaches it should definitely be asked whether the renderer should emphasize even more on realism or rather tend towards a more simplistic approach. 
+%was it worth putting that much effort into the renderer?
+This is maybe also a question which could have been dealt with in the course of this thesis.
+There are other ways that could be thought of, how brushstrokes are parameterized and it would have been interesting which differences it had made.
+%more testing with regard to the brushstrokes could have been performed
+%Other approaches to the brushstroke renderer, use paths instead of predefined and paired samples...
+
+Another aspect would have been testing different optimizers (\eg L-BGFS) besides the standard AdaM-optimizer.
+%different optimizers should have been tested (L-BGFS)
+
+At last the question arises whether this work will be relevant for the future.
+As artistic style transfer is more of a niche than a mainstream field in computer vision, it seems as if there is little relevance in this work.
+Nevertheless, it was possible to show that state-of-the-art results in painterly rendering can be achieved by employing an approach which others could call dated.
+Also it is imaginable that the resulting brushstroke parametrization could be used for other purposes such a style transfer on a brushstroke-level.
+%Is this something that will be used in the future? / relevance?
 % parametrized representation is interesting for graph neural networks and other ermerging techniques.
+Other possible improvements and future ideas which are based on this approach shall be explained in the next chapter.
+
+All-in-all, the results are two-faced stylization works reasonable well but parametrizing painting leaves much to wish for.
+Still, the approach and its results could be seen as a proof-of-concept for simple optimization-based approximation.
