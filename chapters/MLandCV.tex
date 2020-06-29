@@ -6,7 +6,7 @@ In this chapter the theoretical backgrounds and motivation of neural networks ou
 First, a physical/biological motivation will set the foundation for the theoretical background accompanied by a more mathematical motivation later on.
 Thereafter, more advanced lines of thought will be introduced that finally lead to convolutional neural networks as the current driving force in computer vision.
 
-\section[Artificial NNs]{Artificial Neural Networks}
+\section{Artificial Neural Networks}
 
 \subsection[Inspiration]{Neurobiological Inspiration}
 
@@ -232,7 +232,7 @@ Hence, all weights are summed up and multiplied with a regularization constant $
 	\mathcal{R} = \frac{\lambda}{2} \sum_{i = 1}^D w_i^2
 \end{align}
 
-\section[Fully Connected NNs]{Fully Connected Neural Networks}
+\section{Fully Connected Neural Networks}
 \subsection{Multi-Layer Perceptron}
 With the perceptron, which is capable of classification any linear separable data, at hand, the question becomes: What are the limitations to this?
 Minsky and Pappert found the limitations in 1969 with their book 'Perceptrons'.
@@ -335,7 +335,7 @@ Another activation function 'leaky ReLU' attenuates the signal below the thresho
     \labfig{lrelu}
 \end{marginfigure}
 
-\section[Convolutional NNs]{Convolutional Neural Networks}
+\section{Convolutional Neural Networks}
 With fully connected networks at hand, it seems as if any complex function could be solved by just stacking enough hidden layers.\\
 While this seems compelling at first, the issue of the computational burden arises very quickly.
 Especially for broad layers with many units the number of connections and weights becomes problematic.

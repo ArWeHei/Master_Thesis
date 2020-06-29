@@ -148,9 +148,10 @@
 
 \author[Arthur Willy Heimbrecht]{Arthur Willy Heimbrecht}
 
-\date{June 2nd 2020}
+\date{02.07.2020}
 
 \publishers{supervised by Professors Björn Ommer and Tilman Plehn}
+
 
 %----------------------------------------------------------------------------------------
 
@@ -160,35 +161,39 @@
 %        OPENING PAGE & Abstract
 %----------------------------------------------------------------------------------------
 
-\makeatletter
-\extratitle{
-	% In the title page, the title is vspaced by 9.5\baselineskip
-	\vspace*{9\baselineskip}
-	\vspace*{\parskip}
-	\begin{center}
-		% In the title page, \huge is set after the komafont for title
-		\usekomafont{title}\huge\@title
-	\end{center}
-}
-\makeatother
+%\makeatletter
+%\extratitle{
+%	% In the title page, the title is vspaced by 9.5\baselineskip
+%	\vspace*{9\baselineskip}
+%	\vspace*{\parskip}
+%	\begin{center}
+%		% In the title page, \huge is set after the komafont for title
+%		\usekomafont{title}\huge\@title
+%	\end{center}
+%}
+%\makeatother
 
 %----------------------------------------------------------------------------------------
 %	OUTPUT TITLE PAGE AND PREVIOUS
 %----------------------------------------------------------------------------------------
+\include{chapters/titlepages-ger} % select either german
+\include{chapters/titlepages-eng} % or english title page
+\include{chapters/abstracts}
+
 
 % Note that \maketitle outputs the pages before here
 
 % If twoside=false, \uppertitleback and \lowertitleback are not printed
 % To overcome this issue, we set twoside=semi just before printing the title pages, and set it back to false just after the title pages
-\KOMAoptions{twoside=semi}
-\maketitle
-\KOMAoptions{twoside=false}
+%\KOMAoptions{twoside=semi}
+%\maketitle
+%\KOMAoptions{twoside=false}
 
 %----------------------------------------------------------------------------------------
 %	PREFACE
 %----------------------------------------------------------------------------------------
 
-\input{chapters/preface.tex}
+%\input{chapters/preface.tex}
 
 %----------------------------------------------------------------------------------------
 %	TABLE OF CONTENTS & LIST OF FIGURES/TABLES
@@ -278,6 +283,7 @@
 \include{chapters/Discussion}
 \include{chapters/Outlook}
 
+
 \appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
 
 \pagelayout{wide} % No margins
@@ -287,8 +293,7 @@
 \include{chapters/Appendix}
 %----------------------------------------------------------------------------------------
 
-\backmatter % Denotes the end of the main document content
-\setchapterstyle{plain} % Output plain chapters from this point onwards
+%\setchapterstyle{plain} % Output plain chapters from this point onwards
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -296,35 +301,38 @@
 
 % The bibliography needs to be compiled with biber using your LaTeX editor, or on the command line with 'biber main' from the template directory
 
+\chapter{Bibliography}
 \defbibnote{bibnote}{Here are the references in citation order.\par\bigskip} % Prepend this text to the bibliography
 \printbibliography[heading=bibintoc, title=Bibliography, prenote=bibnote] % Add the bibliography heading to the ToC, set the title of the bibliography and output the bibliography note
 
 %----------------------------------------------------------------------------------------
 %	LISTS
 %----------------------------------------------------------------------------------------
-
+\chapter{List of Figures}
 \listoffigures % Output the list of figures
 
 % Comment both of the following lines to have the LOF and the LOT on different pages
 \let\cleardoublepage\bigskip
 \let\clearpage\bigskip
 
-\listoftables % Output the list of tables
+%\listoftables % Output the list of tables
 
+\include{chapters/deposition}
+\backmatter % Denotes the end of the main document content
 %----------------------------------------------------------------------------------------
 %	NOMENCLATURE
 %----------------------------------------------------------------------------------------
 
 % The nomenclature needs to be compiled on the command line with 'makeindex main.nlo -s nomencl.ist -o main.nls' from the template directory
 
-\nomenclature{$c$}{Speed of light in a vacuum inertial frame}
-\nomenclature{$h$}{Planck constant}
+%\nomenclature{$c$}{Speed of light in a vacuum inertial frame}
+%\nomenclature{$h$}{Planck constant}
 
-\renewcommand{\nomname}{Notation} % Rename the default 'Nomenclature'
-\renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document.} % Prepend this text to the nomenclature
+%\renewcommand{\nomname}{Notation} % Rename the default 'Nomenclature'
+%\renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document.} % Prepend this text to the nomenclature
 
 
-\printnomenclature % Output the nomenclature
+%\printnomenclature % Output the nomenclature
 
 %----------------------------------------------------------------------------------------
 %	BACK COVER
