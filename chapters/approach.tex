@@ -29,7 +29,7 @@
 The basic approach of this work consists of two steps:
 \begin{enumerate}
     \item A differentiable renderer which can generate images of brushstrokes from a parameter representation.
-    \item An optimization procedure that iteratively approximates an image through brushstrokes representations.
+    \item An optimization procedure that iteratively approximates an image through brushstroke representations.
 \end{enumerate}
 
 Having two separate steps can be motivated by comparing the optimization procedure to the actual process of painting an image.
@@ -43,7 +43,7 @@ Instead, an artist uses a brush or other utilities (see Pollock or others) to pl
     }
     \labfig{painting_tools}
 \end{marginfigure}
-Doing so -- of course -- limits the control over each drop of paint but maintains enough control to still create very delicate details in paintings.
+Doing so limits the control over each drop of paint but maintains enough control to still create very delicate details in paintings.
 This trade-off depends on the brush's size, such that an artist must choose the brush size depending on the content.
 
 An example would be the painting of a uniformly colored sky.
@@ -62,7 +62,7 @@ A comparable example is the game of Tangram.
 
 Tangram is a Chinese puzzle game that has the objective of replicating a given silhouette only with a set of 7 unique shapes.
 The shapes may not overlay or be cut or anything.
-Quite similarly, the objective of an optimizer is to replicate an image by only using brushstrokes.
+Quite similarly, the objective of an optimizer is to replicate an image by only using brushstrokes (which may overlap).
 
 
 Genetic algorithms already perform a similar task in order to approximate images by other geometric shapes or even smaller photos (also known as the popular photo mosaic effect).
@@ -83,10 +83,10 @@ Consequently, it would be considerably more challenging to apply to this problem
 This premise can be overcome, though, by using a differentiable renderer.
 A \textbf{differentiable renderer} is capable of creating/rendering shapes in the pixel domain.
 In contrast to conventional renderers, it does so by solely using differentiable operations.
-Thus, the previously described task becomes feasible, as random sampling can be replaced by gradient descent.
-Ordinary renderers usually do not rely on differentiable operations, as faster operations with more straightforward logic render images well enough already.
+Thus, the previously described task becomes feasible as random sampling can be replaced by gradient descent.
+Ordinary renderers usually do not rely on differentiable operations as faster operations with more straightforward logic render images well enough already.
 
-Nonetheless, it is theoretically possible to create a differentiable renderer \cite{something}.
+Nonetheless, it is theoretically possible to create a differentiable renderer \cite{worldmodel}.
 
 When talking about rendering brushstrokes, it would be even harder to think of a differentiable pipeline to draw brushstrokes of reasonable quality from a set of parameters.
 
@@ -95,7 +95,7 @@ As neural networks are inherently differentiable, the question becomes rather ho
 Previous works have shown that neural networks are capable of conditionally generating high-resolution and high-quality images.
 Conditioning the generator on brushstroke parameters as well as some noise should then output an image of the respective brushstroke with some variability to it.
 
-The basic idea was proposed by \citeauthor*{japaneseneuralrenderer}~\cite{japaneseneuralrenderer} as it facilitates training of reinforcement learning based networks.
+The basic idea was proposed by \citeauthor*{neuralpainters}~\cite{neuralpainters} as it facilitates training of reinforcement learning based networks.
 
 Inspired by this, the approach becomes more apparent.
 First, a neural network is trained as a differentiable renderer.
@@ -111,8 +111,8 @@ Both steps require some tricks to avoid pitfalls like computational limitations,
 \labsec{NeuralRend}
 
 \todo{move this into the related work section and shorten it further}
-The neural renderer in \citeauthor*{japanese neural renderer}'s~\cite{japanese neural renderer} work improves an architecture based on SPIRAL \cite{SPIRAL}.
-\citeauthor*{Learning2Paint}'s efforts used a differentiable renderer to facilitate deep reinforcement learning for drawing images \cite{Learning2Paint}.
+The neural renderer in \citeauthor*{neuralpainters}'s~\cite{neuralpainters} work improves an architecture based on SPIRAL \cite{SPIRAL}.
+\citeauthor*{Learning2Paint}'s efforts used a differentiable renderer to facilitate deep reinforcement learning for drawing images \cite{learning2paint}.
 As mentioned, the renderer is required to be differentiable and ideally require as few resources as possible.
 
 \subsection{Data Set}
@@ -477,7 +477,7 @@ Ultimately, this means that genetic algorithms are not an option for this task, 
 \todo{put much of this into the related work section}
 Next in the line are algorithm-based approaches that extract brushstrokes from an image using standard computer vision techniques.
 
-Besides texton based image characterization \cite{textons} and pure filter based approaches \cite{filters} there have been approaches to extract brushstrokes or some of their characteristics \cite{brushstrokecharacteristics} \cite{brushstrokeextraction}.
+Besides texton based image characterization \cite{textons} and pure filter based approaches \cite{conv_based} there have been approaches to extract brushstrokes or some of their characteristics \cite{brushstrokecharacteristics} \cite{brushstrokeextraction}.
 
 The latter would pose a valid option for the task at hand.
 Unfortunately, the best existing techniques fail to detect brushstrokes reliably over the whole image but only identify the most significant ones (see figure \ref{fig brushstrokeextracted}) /todo{add example image}.
@@ -620,9 +620,9 @@ Subsequently, an area of high stroke density will not have enough strokes availa
 The core of the problem is the previously imposed lattice structure that propagates local density shifts along its principal axes.
 
 One possible solution is getting rid of the lattice structure and replacing it with a more random structure that also covers the image sufficiently.
-This can be accomplished by using \textbf{super-pixels} \cite{superpixels}.
-Superpixels were popular in the pre-neural network era of computer vision and were often used in image segmentation tasks (\cite{img segmentation with SP}).
-Nevertheless, superpixels are also a popular starting point for brushstroke extraction algorithms \cite{brushs stroke extraction}.
+This can be accomplished by using \textbf{super-pixels}.
+Superpixels were popular in the 'pre-neural network era' of computer vision and were used in image segmentation tasks \cite{superpixel_segmentation}.
+Nevertheless, superpixels-like aglorithms are also a popular starting point for brushstroke extraction algorithms \cite{lamberti}.
 
 Basically, superpixels are pairwise disjoint groups of pixels in an image that would usually join pixels with similar colors in a local region.
 Straight away, it is obvious why this is interesting for brushstroke extraction.
@@ -921,7 +921,7 @@ At the same time, MSE loss is prone to blurring, which results in washed out edg
 Thus, this loss is must be accompanied by additional losses to make up for the shortcoming of MSE loss.
 
 A popular choice for preserving the content in an image, which is associated with preserving edges, is \textbf{perceptual loss}.
-Perceptual loss is based on a VGG Network \cite{VGG} that is pre-trained on ImageNet \cite{ImageNet}.
+Perceptual loss is based on a VGG Network \cite{VGG} that is pre-trained on ImageNet \cite{imagenet}.
 To compute the loss, the activations of deep layers (usually the fourth convolutional block) of the pre-trained VGG network are inferred and then compared using MSE loss.
 \begin{align}
     L_{\text{perceptual}} = \frac{1}{H_f, W_f} \sum_{p \in \text{pixels}} \norm{f(p) - f'(p)}_2^2

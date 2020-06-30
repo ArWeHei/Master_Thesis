@@ -11,15 +11,15 @@ Without training, neural networks are of little use and would basically just gen
 This is where optimizers come in.
 Optimzers have played a very important role for the development of neural networks and their comeback after the so-called 'AI winter'.
 The goal of an optimizer, is to find weights such that a neural network fulfills its intended task.
-Mathematically this equal to finding a minimum of a loss function which has been introduced in \refsec{lossfunctions}.
+Mathematically this equal to finding a minimum of a loss function which has been introduced in \refsec{ANN}.
 
 The optimizer is defined as an algorithms which searches for weights, which minimize said loss function.
 Hence, the network is optimized according to its loss function.
 
 Very early implementations of networks like the perceptron or the McCulloch-Pitts model, had very straight forward algorithms for finding these weights.
 As these networks were inspired by nature and so was the optimizer.
-In accordance to observations made on neurons, weights were trained according to Hebb's rule \cite{ommer}.
-Simply speaking it says "What fires together, wires together"\cite{hebb}.
+In accordance to observations made on neurons, weights were trained according to Hebb's rule~\cite{ommer}.
+Simply speaking it says "neurons wire together if they fire together"~\cite{hebb}.
 Say, two neurons are in subsequent layers of a network and given some input, they are both activated.
 Then Hebb's rule states that the weight that connects them is increased like
 \begin{align}
@@ -34,14 +34,14 @@ A learning rate too high will often results in uncontrolled behaviour as the opt
 A too-low learning rate results in slow convergence and thus wasted time.
 Also, an optimizer with a low learning rate can more easily get stuck in local minima (more on that later).
 
-Even though the conformity of Hebb's rule with nature has been shown \cite{Lomo}, it is rather obvious that it does not factor in the loss function.
+Even though the conformity of Hebb's rule with nature has been shown~\cite{Lomo}, it is rather obvious that it does not factor in the loss function.
 Other approaches have tried to improve Hebb's learning rule and also address problems like instability~\cite{ojas_rule}.
 Still, Hebb's rule is clearly not well suited for finding suitable weights.
 
 A slightly more intuitive, yet not inspired by nature, optimization algorithm is the perceptron algorithm.
 As the name states, it is used to update a perceptron.
 
-\refsec{perceptron} already stated, that the perceptron is equal to a linear classifier.
+\refsec{ANN} already stated, that the perceptron is equal to a linear classifier.
 The perceptron algorithm leverages this analogy and implements a very straight forward optimization algorithm: \\
 If the perceptron correctly classifies a point, then do not change anything. 
 If a point is wrongly classified, move the decision boundary in direction of the wrongly classified point.\\
@@ -109,7 +109,7 @@ Thus, \labeq{gradientrule} can be rewritten in vectorized notation:
 Gradient descent allows to find minima for any loss function as long as the output is differentiable in any weight $w$.
 This means that the same principle also applies to deep neural networks.
 However, there are two problems left.\\
-First, how to obtain the gradient easily (especially for many layers), as analytical differentiation is hard to do for every weight, yet numerical differentiation\cite{numerical_diff} is very costly.
+First, how to obtain the gradient easily (especially for many layers), as analytical differentiation is hard to do for every weight, yet numerical differentiation is very costly~\cite{ommer}.
 The answer to this is automatic differentiation with back-propagation, which will be explained in the next section.\\
 The second problem is, how to avoid local minima.
 One could argue, that local minima would also solve the problem sufficiently and especially for many weights it is unlikely to find the global minimum.
@@ -129,7 +129,7 @@ Instead of taking the mean over the whole data set, it takes the mean over a min
 Typical choices are in the order of 32 samples per mini-batch plus-minus an order of magnitude.
 
 \subsection{Momentum}
-Another solution is adding momentum to SGD \cite{momentum}.\\
+Another solution is adding momentum to SGD.\\
 By saving the direction of the previous SGD update and including it into its current step, the 'momentum' from the previous step is carried over \cite{ommer}.
 \begin{align}
     \mat{w}_t & = \mat{w}_{t-1} + \Delta \mat{w}_{t-1}
@@ -294,5 +294,4 @@ Batch norm normalizes over the channel \textit{and} the mini-batch to obtain bro
 \subsection{Residual Networks}
 Residual networks are another take on tackling the vanishing gradient problem in very deep neural networks 
 They introduce skip connections, which forward the signal of a layer add it to the activations of a different layer down the line.
-This way the gradients get also forwarded during backprop and maintain their amplitude~\cite{res_net}.
-
+This way the gradients get also forwarded during backprop and maintain their amplitude~\cite{resnet}.

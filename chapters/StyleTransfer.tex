@@ -7,7 +7,7 @@ This makes it all the more interesting to see, how these pipelines are affected 
 
 Yet, at the same time artistic images combined with computer vision often results in interesting and fascinating applications for users.
 A popular example for this is \textbf{style transfer}, where normal images are filtered such that they look like paintings.
-Another example is art created with the help of neural networks \cite{GANart}.
+Another example is art created with the help of neural networks \cite{CV_art}.
 Research in the artistic field also incorporates techniques from computer vision and natural sciences to aid the detection of forgeries \cite{picassomatissefake} \cite{guardianarticle}.
 
 These examples show that computer vision can play an important role in the artistic domain and the other way around.
@@ -71,7 +71,7 @@ Since this thesis is deeply anchored at the intersection of both fields, differe
 %what to do with the data besides identifying forgeries?
 %computer aided forgery detection is standard
 Brushstroke extraction is one way of retrieving data for image analysis.
-Other approaches rely on patch-based analysis via neural networks \cite{patchbased} or texton statistics \cite{textons}.
+Other approaches rely on analysis via convolutional neural networks \cite{conv_based} or texton statistics \cite{textons}.
 Yet, the most impressive results have been obtained when analyzing drawings on the pencil-stroke level \cite{picassomatissefake}.
 Similar (if few) approaches exist for paintings and show that such approaches are feasible and open the door for one major application of brush stroke extraction.
 
@@ -104,26 +104,26 @@ Candidate brushstrokes of the correct size are then approximated with an ellipso
 In the end their results fare worse on metrics proposed by \citeauthor{rhythmic} such as detection rate but better in their own metrics.
 Notably, \citeauthor*{lamberti} seems to be the only publication solely aimed at brushstroke extraction.
 
-\begin{figure*}
+\begin{marginfigure}
     \subfloat[orig]{%
-        \includegraphics[width=.30\textwidth]{images/cutout_orig}%
+        \includegraphics[width=.90\textwidth]{images/cutout_orig}%
         \labfig{cutout_orig}%
     }\qquad
     \subfloat[manual]{%
-        \includegraphics[width=.30\textwidth]{images/cutout_manual}%
+        \includegraphics[width=.90\textwidth]{images/cutout_manual}%
         \labfig{cutout_manual}%
     }\qquad
     \subfloat[li]{%
-        \includegraphics[width=.30\textwidth]{images/cutout_li}%
+        \includegraphics[width=.90\textwidth]{images/cutout_li}%
         \labfig{cutout_li}%
     }\qquad
     \subfloat[lamberti]{%
-        \includegraphics[width=.30\textwidth]{images/cutout_lamberti}%
+        \includegraphics[width=.90\textwidth]{images/cutout_lamberti}%
         \labfig{cutout_lamberti}%
     }
     \caption[]{Comparison of techniques on a cut out patch from van Gogh's \textit{The Little Arsienne} (a). Manually labeled brushstrokes (b) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{rhythmic} (c) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{lamberti} (d) \cite{lamberti}}
     \labfig{cutout_strokes}
-\end{figure*}
+\end{marginfigure}
 
 
 \section{Style Transfer}
@@ -147,7 +147,7 @@ As one of the earlies approaches, \citeauthor*{imageanalogies} proposed a fast w
 They call their technique 'image analogies' since the transformation between two training images is analogously applied to a test image.
 
 Basically, for creating the impression of brush strokes, a photograph $A$ and a painting of that photograph $A'$ are required.
-As this is rarely the case, \citeauthor*{iamgeanalogies} showed that using anisotropic diffusion works also reasonably well to generate $A$ from $A'$.
+As this is rarely the case, \citeauthor*{imageanalogies} showed that using anisotropic diffusion works also reasonably well to generate $A$ from $A'$.
 Then an algorithm searches locally around a spatial position $p$ for the best filter parameters $F(p)$ that transform $A(p)$ into $A'(p)$.
 By using another search algorithm to match similar regions $B(p)$ and $A(p)$, $F(p)$ can then be used to transform $B(p)$ into $B'(p)$.
 Thus $B'$ -- a stylized version of $B$ -- can be obtained by transforming $B \rightarrow B'$ analogously to $A \rightarrow A'$.
@@ -156,7 +156,12 @@ Other works like \citeauthor*{texturetransfer}~\cite{texturetransfer} have built
 Besides only matching local regions according to their pixel values, \citeauthor*{texturetransfer} obtain a flow map (which they call 'directions'), that is based on the content image's gradient.
 This flow is then also matched against the style image.
 \begin{figure}
-    \includegraphics{texturetransfer}
+    %\includegraphics{texturetransfer.eps}
+    %\fontsize{7pt}{7pt}\selectfont
+    \begin{tiny}
+    \def\svgwidth{\textwidth}
+    \import{./images/}{texturetransfer.pdf_tex}
+    \end{tiny}
     \caption[]{Target image $T$ is combined with a dictional map specially obtained from $T$ and a style image  $S$. The result maintains the direction's flow while presenting the texture from $S$.}
     \labfig{texturetransfer}
 \end{figure}
@@ -187,8 +192,10 @@ Because of the weight this publication has and some similarities in the approach
 \citeauthor*{gatys} themselves pinpoint the novelty of their approach as 'manipulations in feature spaces' as opposed to previous approaches that 'directly manipulate the pixel representation of an image'\cite{gatys}.
 They use existing neural architectures and extract information in two separate ways, such that content and style can be separated.
 
-Previous works already used \textbf{perceptual loss} to gain information on content in an image \cite{percep_loss}, or check whether two images have the same content \cite{other_percep_loss}.
-Perceptual loss is based on the VGG-19 architecture \cite{VGG} which is a deep CNN trained for object classification on ImageNet \cite{imagenet}.
+%Previous works already used \textbf{perceptual loss} to visualize representations in classifiers 
+
+%gain information on content in an image \cite{percep_loss}, or check whether two images have the same content \cite{other_percep_loss}.
+\textbf{Perceptual loss} is based on the VGG-19 architecture \cite{VGG} which is a deep CNN trained for object classification on ImageNet \cite{imagenet}.
 \citeauthor*{gatys} argue that the network's layer activations increasingly respond to the content when following the networks' hierarchy.
 So much even, that it is possible to reconstruct the content of an image by imitating the activations of one such layer (same content does not imply pixel-wise identity).
 
@@ -468,7 +475,7 @@ This is described by \citeauthor*{hertzmannreview} as trial-and-error algorithm 
 
 Based on \citeauthor*{paintbynumbers}'s work, other authors automated the process of stroke positioning.
 At the same they improved various aspect of brush strokes which were well categorized in a review by \citeauthor*{PRreview}.
-The relevant categories are position, path and orientation, length and width, ordering, and color \cite{PRveview}.
+The relevant categories are position, path and orientation, length and width, ordering, and color \cite{PRreview}.
 
 %litwinowicz
 \citeauthor*{apple} proposed a straight-forward way of placing brush strokes evenly spaced over the entire image.
@@ -495,9 +502,9 @@ $w_{\text{recon}}$ can vary spatially and dictate how well the reconstruction mu
 
 Additionally, he added long strokes as B-splines with arbitrary control points.
 In contrast, \citeauthor*{paintbynumbers} and \citeauthor*{apple} argued that short straight brush strokes would aid the perception of impressionistic style.
-Furthermore, \citeauthor*{Hertzmann} added advanced rendering for brush strokes with synthetic textures in his work \cite{Hertzmann}.
+Furthermore, \citeauthor*{Hertzmann} added advanced rendering for brush strokes with synthetic textures in his work~\cite{Hertzmann}.
 
-\citeauthor*{Hertzmann} combined all these aspects in his approach with advanced relaxation methods similar to \citeauthor*{paintbynumbers}.
+\citeauthor*{Hertzmann} combined all these aspects in his approach with advanced relaxation methods similar to~\citeauthor*{paintbynumbers}.
 Based on trial-and-error search, \citeauthor*{Hertzmann} samples a local region along the many dimensions that represent a single brush stroke.
 The best set of parameters that minimizes the energy function $E$ is then picked as new parameters.
 
@@ -517,7 +524,7 @@ Ultimately, they were able to showcase a drawing by a real artist based on the s
 \citeauthor*{wetbrush} took this even further by including more accurate simulations of fluid dynamics and even single bristles in a brush stroke.
 They were able to generate a 3D model of paint on canvas from this which they could make subject to different lighting \cite{wetbrush}.
 \citeauthor*{adobe} tried to imitate this with the goal to achieve real-time simulation of the methods presented by \citeauthor*{wetbrush}.
-Indeed, they were successful up to a point, where deviations to \cite{wetbrush} became visible for too many stacked layers of paint.
+Indeed, they were successful up to a point, where deviations to \cite{wetbrush} became visible for too many stacked layers of paint~\cite{adobe}.
 
 
 \subsection{Drawing Networks}
@@ -607,7 +614,7 @@ Consequently, it would be considerably more challenging to apply to this problem
 
 \section{Conclusion}
 Works like these show that there is interest in improving the missing details in style transfer.
-Ultimately, it it would be desirable that the fields of style transfer and painterly rendering converge further.
+Ultimately, it would be desirable that the fields of style transfer and painterly rendering converge further.
 Style transfer brings impressive perception of style.
 Painterly rendering brings realistic composition and/or low-level details.
 

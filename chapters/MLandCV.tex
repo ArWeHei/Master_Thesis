@@ -7,6 +7,7 @@ First, a physical/biological motivation will set the foundation for the theoreti
 Thereafter, more advanced lines of thought will be introduced that finally lead to convolutional neural networks as the current driving force in computer vision.
 
 \section{Artificial Neural Networks}
+\labsec{ANN}
 
 \subsection[Inspiration]{Neurobiological Inspiration}
 
@@ -25,7 +26,7 @@ In the earliest stages of this research, they would try to imitate the brain, as
     \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. \url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
     \labfig{lilienthal}
 \end{figure}
-\marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success \cite{brainscales}.}
+\marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success~\cite{brainscales}.}
 
 Warren McCulloch and Walter Pitts proposed one of the earliest models of an artificial neuron.
 They aimed at simplifying models of a biological neuron at the time.
@@ -45,7 +46,7 @@ The spike then travels as a signal along the axon and its branches towards other
 Axons end in synapses that connect to other neurons' dendrites.
 Synaptic transmissions are usually mediated by chemicals and not by electrical signals.
 The chemical nature of the synapse allows it to forward either an excitatory or an inhibitory signal.
-Excitatory signals will bring the cell potential closer to the threshold, while inhibitory do the opposite \cite[p.~42]{coloratlas}.
+Excitatory signals will bring the cell potential closer to the threshold, while inhibitory do the opposite~\cite[p.~42]{coloratlas}.
 \marginnote{Cell potentials are decreases by excitatory signals, as the action threshold sits below the resting potential.}
 
 What makes the brain so powerful, though, is not the neuron itself with its arguably simple structure but the vast network of billions of these neurons.
@@ -58,7 +59,12 @@ Thus, they proposed an even simpler model of a neuron: \\
 They restricted their neuron to a binary state (on or off).
 Each neuron gathers signals from other neurons, which are either positive or negative.
 A neuron only becomes active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
+
 \todo{add equation with activation function, when neuron fires}
+\begin{align}
+    g(x_1, x_2, ...) & = \sum_i^N x_i \\
+    y = f(g(x_1, x_2, ...)) = \begin{cases} 1 \text{if} g > 0 \\ 0 \text{else} \end{cases}
+\end{align}
 McCulloch and Pitts then also changed the highly parallel and complex nature of biological neural networks to a single layer feed-forward network architecture.
 
 In a feed-forward network, neurons are grouped into layers and operate in parallel within a layer.
@@ -70,6 +76,11 @@ The activation value of each neuron then defines an output.
 As this model deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
 
 In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}.
+\begin{figure}
+    \includegraphics{otto_lilienthal}
+    \caption[]{Schmeatic of a feed-forward architecture.}
+    \labfig{ff_arch}
+\end{figure}
 Basically, input signals come from one side, and output signals go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
 This is not only done for practical reasons but also inspired by the observation of layered neuron structures in the brain.
 
@@ -136,7 +147,7 @@ For arbitrary dimensions $D$ this becomes
 \begin{align}
     z = w_1 x_1 + \hdots + w_D x_D + b = \vec{w}^T \vec{x} + b
 \end{align}
-The decision boundary can be easily derived from this, since $\vec{w}$ is the orthogonal vector to the hyperplane and $\frac{b}/\norm{\vec{w}}$ is the displacement of the plane along $\vec{w}$.
+The decision boundary can be easily derived from this, since $\vec{w}$ is the orthogonal vector to the hyperplane and $\frac{b}{\norm{\vec{w}}}$ is the displacement of the plane along $\vec{w}$.
 
 For a simpler notation, one can define an additional 'virtual' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$ (same 'bias trick' as before)
 \begin{align}
@@ -150,9 +161,9 @@ Then, $w$ can describe any function linear in $f$.
 This description also holds for perceptrons with more than one unit.
 In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matrices with multiple column vectors.
 \begin{align}
-    \vec{x} \rightarrow (\vec{x}_1, \vec{x}_2, ...) = \mat{X}
-    \vec{w} \rightarrow (\vec{w}_1, \vec{w}_2, ...) = \mat{W}
-    \rightarrow \vec{z} = \mat{\hat{W}}^T \vec{X}
+    \vec{x} & \rightarrow (\vec{x}_1, \vec{x}_2, ...) = \mat{X} \\
+    \vec{w} & \rightarrow (\vec{w}_1, \vec{w}_2, ...) = \mat{W} \\
+    & \rightarrow \vec{z} = \mat{\hat{W}}^T \vec{X} \\
 \end{align}
 
 
@@ -235,8 +246,8 @@ Hence, all weights are summed up and multiplied with a regularization constant $
 \section{Fully Connected Neural Networks}
 \subsection{Multi-Layer Perceptron}
 With the perceptron, which is capable of classification any linear separable data, at hand, the question becomes: What are the limitations to this?
-Minsky and Pappert found the limitations in 1969 with their book 'Perceptrons'.
-They oulined the limitations of perceptrons with the \lstinline|XOR| problem \cite{perceptron}.
+\citeauthor{perceptrons} found the limitations in 1969 with their book 'Perceptrons'~\cite{perceptrons}.
+They oulined the limitations of perceptrons with the \lstinline|XOR| problem.
 The problem becomes obvious when looking at the \lstinline|XOR| problem in a 2D plane (see \reffig{XOR})
 \begin{marginfigure}
     \includegraphics{otto_lilienthal}
@@ -295,7 +306,7 @@ MLPs are also called \textbf{fully connected networks} since each unit is connec
 %linear algebra shows that any linear function can approximated by just two perceptron layers for a linear activation function -> more layers do not make sense.
 These newfound capabilities for MLPs are not only restricted to binary operations but will translate into continuous space.
 In this case the hidden-layer perceptrons get stripped of their activation function.
-The activation function of a perceptron has been used, up until now, to make a class prediction $y_i$ from a score $z_i$, which is also called pre-activation~\cite[p.~6]{GrosseNotes}.
+The activation function of a perceptron has been used, up until now, to make a class prediction $y_i$ from a score $z_i$, which is also called pre-activation~\cite[p.~6]{grosse}.
 
 Replacing the step function with a linear activation function (\ie identity function), each hidden-layer's perceptron would initially seem to increase the capabilities of the MLP.
 Unfortunately, this is not the case as any subsequent perceptrons with linear activations can be reduced to a single preceptron.
@@ -446,7 +457,7 @@ Recurrent neural networks are prevalent in natural language processing as langua
 
 \section{Types of Learning}
 Neural networks are often categorized into different groups.
-One popular way of grouping is by categorizing the training according to the way the data is structured~\cite{grosse}.
+One popular way of grouping is by categorizing the training according to the way the data is structured~\cite{grosse, ommer}.
 
 \subsection{Supervised Learning}
 If data is available, which already shows the network's desired behavior, training falls into the supervised learning category.
