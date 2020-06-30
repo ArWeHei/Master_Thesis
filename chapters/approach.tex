@@ -25,83 +25,69 @@
 %Goal is twofold: extract brush strokes is first
 %see whether this stylizes normal images as well.
 
+This thesis main goal is to extract a set of brushstrokes, that collectively reconstructs the image of a given painting. \\
+The way these brushstrokes have to fit together creates dependencies between them.
+It is important where brushstrokes intersect or whether they run in parallel.
+Therefore, a brushstroke can not be placed without considering other brushstrokes in the same region.
 
-The basic approach of this work consists of two steps:
-\begin{enumerate}
-    \item A differentiable renderer which can generate images of brushstrokes from a parameter representation.
-    \item An optimization procedure that iteratively approximates an image through brushstroke representations.
-\end{enumerate}
-
-Having two separate steps can be motivated by comparing the optimization procedure to the actual process of painting an image.
-An artist will most likely not pick single color particles and then place them on canvas.
-Instead, an artist uses a brush or other utilities (see Pollock or others) to place more paint with a single action.
-
-\begin{marginfigure}
-    \includegraphics{oil_painting_tools}
-    \caption[]{A typical set of brushes and spatulas used for oil paintings.
-    %Source:Kuznetcov_Konstantin/Shutterstock}
-    }
-    \labfig{painting_tools}
-\end{marginfigure}
-Doing so limits the control over each drop of paint but maintains enough control to still create very delicate details in paintings.
-This trade-off depends on the brush's size, such that an artist must choose the brush size depending on the content.
-
-An example would be the painting of a uniformly colored sky.
-Using a large brush size, the artist can cover a lot of canvas in relatively little time as well as keep the color well distributed over the canvas because the brush spreads the color more or less evenly within the brushstroke.
-On the other hand, if one were to draw a sky with the smallest brush available, not only would it take forever to paint, it would also be hard to keep the paint evenly distributed over multiple strokes.
-
-Now, translating this onto the given problem of recreating/approximating an image through brushstrokes, it would mean to limit the process to only use what we would describe as brushstrokes. \todo{reformualte this}
-
-A comparable example is the game of Tangram.
-
+A simple yet similar example is the game of Tangram.
 \begin{marginfigure}
     \includegraphics{tangram}
     \caption[]{An Example of Tangram.}
     \labfig{tangram}
 \end{marginfigure}
+Tangram is a Chinese puzzle game that has the objective of replicating a given silhouette with a set of 7 unique shapes.
+All of these shapes have to be used and they may not overlay or be cut.
+To solve the puzzle it is necessary to consider rather all parts together than a single part at a time.
+Changing the position or rotation of one shape has consequences for all other shapes.\\
+Quite similarly, the parameters of one brushstroke affects all nearby brushstrokes as well.
+The fact that brushstrokes can overlap, have different colors and complex paths makes the matter even worse.
 
-Tangram is a Chinese puzzle game that has the objective of replicating a given silhouette only with a set of 7 unique shapes.
-The shapes may not overlay or be cut or anything.
-Quite similarly, the objective of an optimizer is to replicate an image by only using brushstrokes (which may overlap).
+Thus, existing approaches are currently not capable of solving this complex task sufficiently.
+\refch{ACV} presented many such methods which either aim at stylizing images or extracting brushstrokes.\\
+Those which extract brushstrokes, are only capable of doing so for about half of all brushstrokes in a painting.
+Such shortcomings are acceptable for further analysis, which prefers few accurate brushstrokes over many inaccurate ones.
+However, it will not suffice for reconstructing the entire image.\\
+Neural style transfer, which builds on filter-based approaches, is generally not suited for this problem.
+Since a set of pixels is directly transformed into another set of pixels, there is no brushstroke data available.\\
+Painterly renderings do not suffer from such problems.
+They are inherently based on using brushstrokes to generate an entire image.
+Most of these approaches focus on stylizing images, but few have tried to imitate paintings as well~\cite{paintbot,lpaintb}.\\
+Both approaches trained recurrent neural networks specifically to reconstruct a single image.
+The resulting approximations of paintings would resemble the original input, but not on a brushstroke level.
+Even though they claim, that the trained neural network could be reused for style transfer, the use of a prediction network is likely a burden to the approach.
+Ultimately, a set of parameters is sought and training a network to predict these parameters adds overhead in most scenarios.
+Having such a network only really makes sense if it can be reused on many images.
 
+This thesis will present an approach which is orthogonal to many recent implementations of drawings networks and painterly rendering.
+Instead of training a network to predict the brushstroke parameters, the parameters are optimized directly.
 
-Genetic algorithms already perform a similar task in order to approximate images by other geometric shapes or even smaller photos (also known as the popular photo mosaic effect).
-\paragraph{Genetic algorithms} follow a random sampling approach that 'evolves' as genomes do.
-Starting with a random set of circles that are parameterized by their position, radius, and color, it then chooses the most successful samples and resamples in a region around these.
-This process is repeated until a certain level of convergence is reached.
-
+Early painterly rendering approaches built on a similar set-up.
+They would formulate an energy function to describe how well the parameters describe the image~\cite{hertzmann_review}.
+Finding a minimum for these energy functions requires advanced searching algorithms like evolutionary algorithms~\cite{genetic_algo}.
 \begin{marginfigure}
     \includegraphics{genetic_starry_night}
-    \caption[]{Starry Night approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
+    \caption[]{'The Starry Night' approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
     \labfig{genetic}
 \end{marginfigure}
+Albeit being capable of reconstructing images using pretty much any shape (also called unit), they have a major draw-back.
+Such search algorithms are often inefficient since they are based on random sampling.
+The sampling becomes even more inefficient if the number of degrees of freedom per unit is large, as it is the case for brushstrokes.
 
-As well as this does work, it is very much computationally expensive as most samples will not fit the image, thus searching for the small set of fitting shapes requires to evaluate all the wrong shapes as well.
-Considering artworks, brushstrokes have many more degrees of freedom, and artworks usually consist of upwards of a few thousand brushstrokes.
-Consequently, it would be considerably more challenging to apply to this problem until computational resources have become a few magnitudes more powerful.
+A solution to this problem is featured in many recently published approaches that use drawing networks.
+Some reference \citeauthor*{worldmodel}'s idea of a world model~\cite{neuralpainters, learning2paint, strokenet} and present what is called a \textbf{neural renderer}.\\
+Such a neural renderer makes the process of placing a brushstroke on canvas differentiable.
+Thereby, a prediction network can learn easier compared to an approach without such a neural renderer.\\
+Combining a differentiable renderer with a direct optimization-based approach would mitigate the inefficiency which other approaches suffered from.
+Instead of randomly searching for minima, it would become possible to follow the gradient towards a minimum.
+Thus, the approach of this thesis will consist of two components. \\
+\begin{enumerate}
+    \item A differentiable renderer which can generate images of brushstrokes from a parameter representation.
+    \item An optimization procedure that iteratively approximates an image through brushstroke representations.
+\end{enumerate}
+Notably, \citeauthor*{gatys}'s approach to style transfer uses a similar set-up but optimizes pixels instead of brushstroke parameters.
 
-This premise can be overcome, though, by using a differentiable renderer.
-A \textbf{differentiable renderer} is capable of creating/rendering shapes in the pixel domain.
-In contrast to conventional renderers, it does so by solely using differentiable operations.
-Thus, the previously described task becomes feasible as random sampling can be replaced by gradient descent.
-Ordinary renderers usually do not rely on differentiable operations as faster operations with more straightforward logic render images well enough already.
-
-Nonetheless, it is theoretically possible to create a differentiable renderer \cite{worldmodel}.
-
-When talking about rendering brushstrokes, it would be even harder to think of a differentiable pipeline to draw brushstrokes of reasonable quality from a set of parameters.
-
-Neural networks turn this problem around.
-As neural networks are inherently differentiable, the question becomes rather how to make an existing neural pipeline render images from parameters.
-Previous works have shown that neural networks are capable of conditionally generating high-resolution and high-quality images.
-Conditioning the generator on brushstroke parameters as well as some noise should then output an image of the respective brushstroke with some variability to it.
-
-The basic idea was proposed by \citeauthor*{neuralpainters}~\cite{neuralpainters} as it facilitates training of reinforcement learning based networks.
-
-Inspired by this, the approach becomes more apparent.
-First, a neural network is trained as a differentiable renderer.
-Then the same renderer is used by a gradient descent-based optimization procedure to approximate an artwork as a set of renderer input parameters.
-
-Both steps require some tricks to avoid pitfalls like computational limitations, which are outlined in the following two sections.
+The following two sections will present how each component of the approach has been realized.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%% Neural Renderer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,59 +96,51 @@ Both steps require some tricks to avoid pitfalls like computational limitations,
 \section{Neural Renderer}
 \labsec{NeuralRend}
 
-\todo{move this into the related work section and shorten it further}
-The neural renderer in \citeauthor*{neuralpainters}'s~\cite{neuralpainters} work improves an architecture based on SPIRAL \cite{SPIRAL}.
-\citeauthor*{Learning2Paint}'s efforts used a differentiable renderer to facilitate deep reinforcement learning for drawing images \cite{learning2paint}.
-As mentioned, the renderer is required to be differentiable and ideally require as few resources as possible.
+Generating brushstrokes artificially is a complex task.
+There exist plenty of applications that are dedicated to this.
+It is still possible to discern real brushstrokes from application-generated ones, even though some research is bridging this gap~\cite{wetbrush}.\\
+It would be even harder to think of a differentiable way to generate brushstrokes from a set of parameters.
+
+Neural networks solve this issue by finding a differentiable pipeline through training.
+Previous works have shown that neural networks are capable of conditionally generating high-resolution and high-quality images and neural networks are inherently differentiable.
+Therefore, it requires only data of brushstrokes and their parameters to train the network.\\
+As previously stated, many already did so.
+However, these approaches do not focus on the quality of the renderer.
+Thus, they use simple painting applications like libmypaint to generate the training data.
+In this approach there shall be more emphasis on the render quality.
 
 \subsection{Data Set}
 \labsubsec{dataset}
-
-Unfortunately, there is no data set available for this task, which means that a data set must be created explicitly for this approach.
-
-There are several sources for virtual and real brushstrokes, to choose from.
-These resources will be evaluated in the following part.
-The main focus lies on three qualities for each data source:
+There is no data sets openly available for this task
+Therefore, a data set must be created explicitly for this approach, for which a painting tool (or something similar) has to be picked.\\
+Three qualities are important when is comes to creating the data set:
 \begin{enumerate}
-    \item Suitable data format: As brushstrokes usually overlap in a painting, the data should already provide information about opacity or transparency, favorably in the common RGBA format, which has a fourth alpha channel to hold opacity information.
-    \item Data set size and variability: Only with enough different data available, it will be possible to train a renderer reliably.
-    \item Image quality. Brushstrokes should be as close to real-world brushstrokes as possible to ensure high-quality renderings later on.
+    \item Suitable data format: As brushstrokes usually overlap in a painting, the data should already provide information about opacity or transparency, favorably in the common RGBA format.
+    \item Data set size and variability: Only with enough different data points available, it will be possible to train a renderer reliably.
+    \item Image quality: Brushstrokes should be as close to real-world brushstrokes as possible to ensure high-quality renderings.
 \end{enumerate}
+\marginnote{RGBA has a fourth channel besides the three color channels, which hold information about the opacity of every pixel.}
 
 \subsubsection{Brushstroke Images}
-\labsubsubsec{bsimages}
-
-There are multiple sets of hand-drawn brushstrokes available online.
-Most notably, there is a set of various well-classified colors and brush styles created by 'zolee' \todo{reference this} on the platform \url{onlygfx.com}.
-It consists of approximately 1000 brushstrokes that mostly follow rather straight horizontal paths.
-These brushstrokes are mostly grouped by color and painting technique (oil, acrylic, watercolor...).
-All images are in the PNG format with the background made transparent in a post-editing step.
-
-This data set has the advantage that it consists of real-world brushstrokes that were painted under presumably reproducible conditions.
-On the other side, brushstrokes are of mostly the same width throughout the data set and also do not come with information which path the brush took or any other non-visual information.
-Also, the data is very sparse.
-Many color shades are not represented, which means that the generator would have to interpolate them or simply would not be capable of rendering any brushstrokes in this color.
-
-It seems that this data set would be suitable to replicate single real-world brushstrokes as images.
-However, limitations to the data make it unlikely that a generator could learn a coherent representation from this.
+There are some data sets with single scanned hand-drawn brushstrokes available on the internet~\cite{zolee_on_onlygfx}.
+Some even come with the background removed on which they were drawn on.\\
+Such data has the advantage that it consists of actual real-world brushstrokes.
+On the other side, the data is very sparse.
+Brushstrokes are very similar throughout the data set considering their path and color and come without any further information.
+This would have the generator to interpolate data in the best case or not work for any unknown inputs in the worst case.\\
+These limitations to the data make it unlikely that a generator could learn a coherent representation from it.
 
 \subsubsection{Painting Libraries}
-\labsubsubsec{libmypaint}
+Painting libraries such as libmypaint are the de facto standard for neural renderer in drawing networks~\cite{neuralpainters, learning2paint, strokenet}.\\
+They allow to fully control the output through parameters and thus make training for the renderer easier.
+Still, this data falls short regarding the authenticity of rendered strokes, which are obviously computer generated.\\
+This kind of data would allow to train a renderer, though it would likely cause the final images to look a bit ``flat''.
 
-The mentioned work of SPIRAL \cite{SPIRAL} relies on synthetic data instead of real-world images.
-It used the painting library 'libmypaint' \cite{libmypaint} to generate brushstrokes from parameters in real-time during training.
+\subsubsection{Fluid Simulations}
+Fluid simulations like those by \citeauthor*{wetbrush} give a better render quality compared to painting libraries. 
+Unfortunately, only few implementations are openly available and if so are not as advanced.\\
+\citeauthor*{SPIRAL} provide a fluid simulation package based on \citetitle{fluidpaint} by \citeauthor{fluidpaint}
 
-The apparent advantage of this and other painting libraries is the fact that one can fully control the output through parameters.
-As the whole space of input parameters for the renderer can be covered, it is much easier to avoid pitfalls like they were described in \refsec{bsimages}.
-
-Still, this data set falls short regarding the authenticity of rendered strokes.
-Especially the inner area of the stroke shows a uniform color, which is far from what real brushstrokes would look like.
-
-This data set is better suited for our task than the images from which were described in the previous seciton are.
-However, the synthetic data will tend to make all rendering look a bit 'cartoonish' or flat, which could, in turn, limit convergence during the latter optimization process.
-
-\subsubsection{Fluid Simulation}
-\labsubsubsec{fluidpaint}
 
 Fluid Paint is a project by David Li \cite{fluidpaint} that uses simple
 fluid dynamics to give artificial brushstrokes a more plastic look.
