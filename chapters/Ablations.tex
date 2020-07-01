@@ -2,30 +2,242 @@
 \chapter{Evaluations \& Ablation Experiments}
 \labch{Ablations}
 
-In this chapter, the ablation experiments for to the approaches presented in \refch{approach}
-shall be presented.
-This is meant to show some weaknesses of each method as well as give a visual understanding
-of the effects of some losses and parameters.
-Together with an interpretation it should help to get a better understanding of previous
-motivations.
+In this chapter, the results and ablation experiments for to the presented approach shall be showcased.
+This is meant to show some weaknesses of each method as well as give a visual understanding of the effects of some losses and parameters.
+Together with an interpretation it should help to evaluate the approach in general.
 
+The ablation experiments for the neural renderer will be shorter than those for the optimization procedure.
+This is due to the fact that other approaches already introduced neural renderers and showed its capabilities.
+Still, some ablation experiments will performed to better evaluate the neural renderer.
+
+It is important to stretch that most evaluations are subjective and readers must judge for themselves if the images appeal to them.
 
 \section{Neural Renderer}
 \labsec{ablation_renderer}
+\subsection{Results}
+First the results of rendering with the neural renderer shall be evaluated a bit more thoroughly than in the previous chapter.
 
-The neural renderer will be evaluated with respect to a few aspects.
-First, the performance for larger resolution images will be evaluated.
-Then, the effect of the discriminator will shown by training the renderer without
-the discriminator loss.
-At last, the weakness of the renderer, which is data points outside the training space,
-will be analyzed.
+Looking at a series of brushstrokes with different parameters shows that the neural renderer is indeed capable of imitating the functionality of the fluid simulation to a certain degree.
+\begin{figure*}
+    \caption[]{A series of generated brushstrokes with different parameters.}
+\end{figure*}
+The FID score at the end of the training is $\approx 11 \pm 1$.
+
+Looking further into details, it seems that start and end points are differently rendered which reinforces the perception of an actual brushstroke.
+Especially the long tail at the start point, which also fades out is well captured.
+\begin{figure*}
+    \caption[]{A series of generated brushstrokes (top) with their rendered counter parts (bottom).}
+\end{figure*}
+
+When looking more into the details like the structure of the outline or the structure inside the brushstroke, some discrepancies surface.
+It seems that, even though there is no L2-loss in later training stages, the generated strokes are a bit more blurry.
+This could be due to the highly stochastic nature of these details.
+\begin{figure*}
+    \caption[]{Zoomed in details of generated brushstrokes (top) and rendered brushstrokes (bottom).}
+\end{figure*}
+Recreating such detailed structures without them getting repetitive, might be a hard task for the generator.
+Arguably, the discriminator would easily spot repetitive patterns and penalize them accordingly.\\
+Interestingly, this issue is more apparent for renderers which have been trained with L2-loss throughout the whole training.
+These brushstrokes show significant signs of blurring, especially in the discussed regions.\\
+\begin{figure*}
+    \caption[]{Generated brushstrokes when the renderer is trained with L2-loss}
+\end{figure*}
+The other way around, without any L2-loss in the beginning, the renderer seems to not converge to a good solution.
+Especially in early stages of training the generator would then collapse.\\
+Presumably, this is case because the behavior of brushstrokes is hard to learn from scratch.
+This makes sense, if one thinks about how hard it would be to get a set of 10 variables and find out how they influence the brushstroke without given some hints in the beginning.
+Particularly, the stroke path in form of Bézier curve would be hard to learn.
+
+Notably, as training converges, it is hard to assess the quality of brushstrokes and the FID score as evaluation metric comes in handy.
+
+\subsection{Ablation Experiments}
+The first ablation experiment that comes to mind chooses data points outside the training distribution.\\
+\reffig{outside} shows that different failure cases exist.\\
+Brushstrokes can vanish completely, especially if the start, control and end points are to close together or the brush size is smaller than it is allowed.\\
+Brushstrokes can also show artifacts for smaller deviations from original data distribution.\\
+At last for very large brush sizes or special combinations of $\vec{s}$, $\vec{e}$ and $\vec{c}$ the whole render window is filled with artifacts.\\
+
+These failure cases could potentially occur during the optimization procedure.\\
+One such case would be a large area which is approximated by a single brushstroke and failure case covers the most pixels in the render window.
+If a per pixel penalty is introduced (like accuracy) another case failure case with a vanishing brush stroke could be observed.
+\begin{figure*}
+    \caption[]{Different failure cases for the generator.}
+\end{figure*}
+
+At last, larger brush sizes have been tested as well.
+Both $128\times128 \si{\pixel}$ and $256\times256 \si{\pixel}$ have been trained.
+It could be observed that training takes exponentially when having four times the pixels in an image.
+\begin{figure*}
+    \caption[]{Rendered images for (a) $64\times64 \si{\pixel}$,  (b) $128\times128 \si{\pixel}$, and (c) $256\times256 \si{\pixel}$.}
+\end{figure*}
 
 \section{Optimization Procedure}
-\labsec{abl:Opt}
+\labsec{ablation_opt}
+\subsection{Results}
+It was possible to show that the optimization procedure is capable of approximating images by using a brushstroke representation.
 
+The actual goal was to extract accurate brushstrokes from these images and imitate paintings as well as possible.
+Looking as \reffig{ref_examples} shows that, at a first glance, the rendering gives the impression of a painting images, much like the original.\\
+\begin{figure*}
+    \caption[]{Approximated versions of (a) ``The Starry Night'' and (b) a self-portrait by van Gogh.}
+    \labfig{ref_examples}
+\end{figure*}
+However, when looking closer, is quickly becomes apparent that this is not real painting but a generated image.
+Looking into a zoomed-in part of the image (\reffig{ref_zoomed}) this becomes even more apparent.
+Hence, it was not quite possible to approximate a painting accurately.
+\begin{figure*}
+    \caption[]{Zoomed in parts of the same images as in \reffig{ref_example} with their real counter-parts).}
+    \labfig{ref_zoomed}
+\end{figure*}
+
+Considering the same approximations and comparing single brushstrokes, a similar result can be found.\\
+Some very recognizable brushstrokes seem to be roughly depicted by a single brushstroke in the approximation.
+Nonetheless this is rather rarely the case, and most predicted brushstrokes to not match an actual real-world brushstroke.
+Still, it seems as if the general ``flow'' of a region is present in the approximation.
+This gives an initial good impression for the approximation which is only debunked after a closer look.
+
+Now the brush strokes extraction capabilities will be compared to \citeauthor*{rhythmic}'s and \citeauthor*{lamberti}'s approaches.
+The image ``The Little Arlesienne'' has been approximated to compare the results to the patch of the same painting that both authors have provided in their work.
+\begin{figure*}
+    \caption[]{Comparison of the same image patch (a) for approaches by (b) \citeauthor*{rhythmic}~\cite{rhythmic}, (c) \citeauthor*{lamberti}~\cite{lamberti}, (d) this thesis and (e) manual labeling~\cite{rhythmic}.}
+    \labfig{BSE_comparison}
+\end{figure*}
+\todo{evaluate this}
+
+At last the painterly rendering capabilities of the approach shall be evaluated.\\
+It seems as if this thesis' approach is actually quite capable of generating painterly renderings of photos.
+\begin{figure*}
+    \labfig{PR_tub}
+    \labfig{PR_GGB}
+    \caption[]{Painterly rendering approximations of this approach for an image of Tübingen~\cite{tub} (a) and the Golden Gate bridge~\cite{GGB} (b) along with the original photgraphs (c)\&(d).}
+    \labfig{PR}
+\end{figure*}
+Notably, the preservation of edges that are important to the content seems to work well, as brushstrokes often align along these edges.
+The best example of this are the windows in \reffig{PR_tub}, which are composed of several single straight brushstrokes of different color.
+Along with this comes a nice level of abstraction as the tiny details of the windows are lost.\\
+The same image also shows a failure case for the painterly rendering with the tree to the left of the image.
+Because the tree consists of many thin branches, it is not captured very well.
+This is likely caused by the inability of the brushstrokes to become that thin.
+Subsequently, only the stem and thick branches are visible.\\
+Another problem might be the way the sky is composed.
+Here, the brushstrokes seem to not follow any clear pattern which wold be expected if an artist drew the same scene.\\
+At last some deviation from the original colors might are visible.
+\reffig{PR_GGB} best shows this color inaccuracy at the horizon.
+
+Ultimately, the painterly rendering results are relatively accurate and could be compared to state-of-the-art techniques like those by \citeauthor*{paintbot} or \citeauthor*{hertzmann}
+
+At last, a time-lapse through the optimization process shows very well how the patches are approximated in the early stages of training.
+\begin{figure*}
+    \caption[]{Time-lapse of the optimization procedure for ``The Starry Night''.}
+    \labfig{timelapse}
+\end{figure*}
+
+\subsection{Ablation Experiments}
 The optimization procedure gives many starting points for ablation experiments.
 At first, the effects of each loss will be visually compared.
-Then, different initializations will be shown as well as various choices for training
+Then, different initializations will be shown as well as some choices for training
 parameters.
 
+%no L2
+\begin{figure*}
+    \caption[]{Collection of reference images approximated without L2-loss}
+    \labfig{no_l2}
+\end{figure*}
+First off, removing L2-loss shows the expected behavior, as the color accuracy gets worse for all images.
+Still abstracted versions of the color are present which is likely caused by the LPIPS loss.
+Looking at the ablation experiments without LPIPS loss and just content loss, this intuition is confirmed.\\
+Besides the distorted colors the images also show some sparseness, as canvas shines through the brushstrokes.
+The is likely also a result of the LPIPS loss, which emphasizes edges over uniformly colored areas.
 
+%no Lpips
+\begin{figure*}
+    \caption[]{Collection of reference images approximated without LPIPS-loss}
+    \labfig{no_lpips}
+\end{figure*}
+Removing LPIPS loss draws a different picture.
+These images show a better color accuracy but seem very blurry as it is often the case when optimizing with L2-loss alone.
+Such behavior is expected.
+
+%no KL
+\begin{figure*}
+    \caption[]{Collection of reference images approximated without explicit brushstroke constraints.}
+    \labfig{no_KL}
+\end{figure*}
+If brushstroke constraints are removed from the collection of losses, there is, in fact, next to failure of the renderer observable.
+The only apparent difference seems to be, that brushstrokes seem to get shorter and wider compared to the reference images.
+This gives the impression of a slightly different style.
+
+%just content + KL
+\begin{figure*}
+    \caption[]{Collection of reference images approximated only with perceptual loss and brushstroke constraints.}
+    \labfig{content}
+\end{figure*}
+Minimizing only the perceptual distance to the target image as in \reffig{percep_loss} returns a relatively colorless image.
+Only edges are depicted accurately which is expected in this case.
+This behavior raises the question how style transfer would look if a style loss could be implemented.
+
+%scale of brushstroke to content
+\begin{figure*}
+    \caption[]{Two collection of reference images with a different image scale. 2x larger scale (top) and 2x smaller scale (bottom) when compared to the original scaling.}
+    \labfig{scale}
+\end{figure*}
+Changing the image scale is particularly interesting in case of painting images.
+The resulting approximations show that a different image scale worsens the impression of an actual painting image.\\
+Interestingly, the directions of brushstrokes are still similar for the downscaled image which is likely caused by the high contrast between adjacent brushstrokes that van Gogh uses.\\
+The upscaled image showcases how many small brushstrokes approximate a single real brushstroke not particularly well.
+However, smaller brush strokes like those that make up the ``star-circles'' are better depicted.
+
+%brushstroke density
+\begin{figure*}
+    \caption[]{Two collection of reference images with a different brushstroke densities. 2x the reference density (top) and 1/2x the reference density (bottom).}
+    \labfig{density}
+\end{figure*}
+Changing the brushstroke density seem to have a similar effect to scaling the image.
+At a higher density many smaller brushstrokes can be seen, at a lower density the brushstrokes become elongated and all feature the maximal width.
+Nonetheless, some differences are visible due to the range of the brush size and the parameter constraints.
+
+%high learning rate
+\begin{figure*}
+    \caption[]{Collection of reference images approximated with 10x the original learning rate.}
+    \labfig{10xlr}
+\end{figure*}
+Increasing the learning rate returns the expected sub-optimal solution as the optimizer overshoots good solutions. 
+
+%accuracy
+\begin{figure*}
+    \caption[]{Collection of reference images approximated with a random ordering.}
+    \labfig{acc}
+\end{figure*}
+Removing accuracy based ordering seems not to make much of a difference.
+The reason behind this is probably the fixed ordering that is implemented instead, which is apparently sufficient.
+
+%grid init
+\begin{figure*}
+    \caption[]{Collection of reference images approximated with grid initialization.}
+    \labfig{grid_init}
+\end{figure*}
+Using a grid based initialization also seems to have no visible effect.
+This is likely due to the high brushstroke density and the other shortcoming, that outweigh any effect that this layout has.
+
+%too small patch window
+\begin{figure*}
+    \caption[]{Early stage of training with a too-small patch window size}
+    \labfig{window_size}
+\end{figure*}
+Having a patch window size which is too small affects the optimization procedure in the early stages the most.
+Brushstrokes are driven towards the pixels which lie inside the render window of some part of the render window is cut out.
+The result are recognizable lines where the patch window's edges have been.
+These line are relatively persistent until they are slowly removed over time when theses strokes are updated again. 
+
+% other artists
+\begin{figure*}
+    \caption[]{Brushstroke approximation for paintings by other artists. (a) ``The Mona Lisa'' by Leonardo DaVinci~\cite{monalisa} (b) ``Bridge over a Pond of Water Lillies`` by Claude Monet~\cite{bridge}}
+    \labfig{artists}
+\end{figure*}
+\todo{add the evaluation}
+
+
+Ultimately, the optimization procedure behaves very predictable.
+The effects of each loss a visible though some mechanics seem to have little to no effect.\\
+It seems a bit unfortunate that the brush extraction capabilities are rather limited, but the painterly rendering performance is more promising than originally anticipated.
+Subsequently, it would still be interesting to see whether the method could be further improved.
