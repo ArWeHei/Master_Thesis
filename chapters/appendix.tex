@@ -2,7 +2,123 @@
 %\labpage{appendix}
 %\blinddocument
 \setchapterpreamble[u]{\margintoc}
-\chapter{Appendix}
-\labch{Appendix}
+\chapter{FluidPaint}
+\labch{fluidpaint}
 
+\setchapterpreamble[u]{\margintoc}
+\chapter{Vecotrizing Alpha Blending}
+\labch{alphablend}
+
+Another way of accelerating the process of alpha-blending is \textbf{vectorizing}.
+Instead of iteratively applying the computations, a vectorized operation can perform these computations in parallel.
+Vectorizing makes it necessary to construct a tensor with the following properties:
+
+For $\tensor{I} \in [0, 1]^{H \times W \times 4} $ the image target, the shape will be defined
+as $\mathcal{S}(\tensor{I}) = (H, W, 4)$.
+Each alpha channel will have the values $\alpha^{hw} \in [0, 1]$ for $h = 0, ..., H$ and $w = 0, ..., W$.
+
+The set of rendered and padded brushstrokes $\tensor{J}$ will have the shape $(N, H, W, 4)$ with $N$ depicting the number of brushstrokes that ought to be stitched simultaneously.
+
+Now, looking at each individual pixel in $\tensor{J}$, which is described by $(z^{hw}_n, \alpha^{hw}_n)$ for $n = 1, ..., N$ and $z^{hw}_n \in [0, 1]^{3}$, $z^{hw}$ describes the RGB values and $\alpha^{hw}$ the alpha-channel for a pixel at $(h, w)$.
+
+A blending operation can then be defined by
+\begin{align}
+    z'^{hw} & = \tilde{\alpha}^{hw} \cdot z^{hw} \\
+    \text{or} \\
+    z'^{hw} & = \sum_{n=1}^N \tilde{\alpha}^{hw}_n  z^{hw}_n \\
+\end{align}
+
+with $z'^{hw}$ the resulting RGB values of the blended pixel and $\tilde{\alpha}^{hw}$ a vector that holds the merged alpha values for each pixel:
+\begin{align}
+    \tilde{\alpha}^{hw} & =
+    \begin{pmatrix}
+        \alpha^{hw}_1 & &\\
+        \alpha^{hw}_2 & (1 - \alpha^{hw}_1) &\\
+        \alpha^{hw}_3 & (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        \vdots & &\\
+    \end{pmatrix}
+    \\
+    & = \alpha^{hw} \odot 
+    \begin{pmatrix}
+        1  &\\
+        (1 - \alpha^{hw}_1) &\\
+        (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        \vdots &\\
+    \end{pmatrix}
+    \\
+    \rightarrow  \tilde{\alpha}^{hw}_n & = \alpha^{hw}_n \prod^{n-1}_{i=1} (1 - \alpha^{hw}_i)
+\end{align}
+
+with $\odot$ the element-wise product
+
+What is left, is to find a way to construct $\tilde{\alpha}^{hw}$ from $\alpha^{hw}$.
+
+For this an auxiliary matrix $\beta^{hw}$ is constructed:
+\begin{align}
+    \beta^{hw} = \alpha^{hw} \times \mathbb{1}_{1 \times N} = 
+    \begin{pmatrix}
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+        \vdots & \vdots & \ddots & \vdots \\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_n\\
+    \end{pmatrix}
+\end{align}
+with
+$$
+\mathbb{1}_{1 \times N} = \begin{pmatrix}
+        1 \\
+        1 \\
+        \vdots\\
+        1 \\
+    \end{pmatrix}^T
+$$
+
+Then $\beta^{hw}$ is strictly triangulated such that:
+\begin{align}
+    \gamma^{hw} & = \beta^{hw} \odot
+    \begin{pmatrix}
+        0 & 0 & 0 &\hdots & 0\\
+        1 & 0 & 0 &\hdots & 0\\
+        1 & 1 & 0 &\hdots & 0\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        1 & 1 & \hdots & 1 & 0\\
+    \end{pmatrix}
+    \\ & = 
+    \begin{pmatrix}
+        0 & 0 & 0 & \hdots & 0\\
+        \alpha^{hw}_1 & 0 & 0 & \hdots & 0\\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & 0 & \hdots & 0\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        \alpha^{hw}_1 & \alpha^{hw}_2 & \hdots & \alpha^{hw}_{n-1} & 0\\
+    \end{pmatrix}
+    \\
+    \rightarrow \delta^{hw} = 1 - \gamma^{hw} & = 
+    \begin{pmatrix}
+        1 & 1 & 1 & \hdots & 1\\
+        (1 - \alpha^{hw}_1) & 1 & 1 & \hdots & 1\\
+        (1 - \alpha^{hw}_1) & (1 - \alpha^{hw}_2) & 1 & \hdots & 1\\
+        \vdots & \vdots & \ddots & \ddots & \vdots \\
+        (1 - \alpha^{hw}_1) & (1 - \alpha^{hw}_2) & \hdots & (1 - \alpha^{hw}_{n-1}) & 1\\
+    \end{pmatrix}
+\end{align}
+
+By multiplying the elements along each row in $\delta^{hw}$ one gets:
+
+\begin{align}
+    \epsilon^{hw}_i = \prod^N_{j=1} \delta^{hw}_{ij} & =
+    \begin{pmatrix}
+        1  &\\
+        (1 - \alpha^{hw}_1) &\\
+        \vdots &\\
+        \prod^{N-1}_{j=1} (1 - \alpha^{hw}_j)
+    \end{pmatrix}
+    \\ \rightarrow \tilde{\alpha}^{hw} = \epsilon^{hw} \odot \alpha^{hw} & =
+    \begin{pmatrix}
+        \alpha^{hw}_1 & &\\
+        \alpha^{hw}_2 & (1 - \alpha^{hw}_1) &\\
+        \alpha^{hw}_3 & (1 - \alpha^{hw}_2) & (1 - \alpha^{hw}_1)\\
+        & \vdots &\\
+        \alpha^{hw}_N & \prod^{N-1}_{j=1} (1 - \alpha^{hw}_j)
+    \end{pmatrix}
+\end{align}
 
