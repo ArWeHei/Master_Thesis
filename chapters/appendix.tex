@@ -9,6 +9,15 @@
 \chapter{Vecotrizing Alpha Blending}
 \labch{alphablend}
 
+The easiest way to accomplish this, is to first find the maximum blending-depth over all pixels, where the blending-depth $k$ is the number of layers where the alpha value is not zero.
+\begin{align}
+    k = \argmax_{p \in \text{pixels}} \sum_{i \in \# \text{layers}} \mathds{1}(\alpha_i > 0)
+\end{align}
+
+Then the top $k$ layer indices for each pixel are picked, which reduces the number of blending operations from $(n-1)$ to $(k-1)$.
+Importantly, the top $k$ indices should not be ordered by their alpha values but remain in the order that was imposed by sorting according to the accuracy value.
+Otherwise, the order will most certainly be mixed up, and the pixel with the highest alpha value will always lie on top instead of the pixel that belongs to the most accurate brushstroke.
+Especially, as brushstroke renderings fade out towards their edges, this makes a significant difference.
 Another way of accelerating the process of alpha-blending is \textbf{vectorizing}.
 Instead of iteratively applying the computations, a vectorized operation can perform these computations in parallel.
 Vectorizing makes it necessary to construct a tensor with the following properties:
@@ -122,3 +131,19 @@ By multiplying the elements along each row in $\delta^{hw}$ one gets:
     \end{pmatrix}
 \end{align}
 
+This vectorized version of alpha blending will introduce a new possible bottleneck as it is, since $\beta^{hw}$ will be a tensor of shape $(N, N, H, W)$, which will equate to
+$$
+256 \times 256 \times 256 \times 256 \times 4 \si{\byte} = 2^{36}\si{\byte} = 64\si{\gibi\byte}
+$$
+alone.
+
+This is where the previous position-aware alpha blending tricks becomes useful.
+By computing $\beta^{hw}$ only through the top $k$ values of $\alpha^{hw}$ instead of the full tensor $\alpha^{hw}$, the size will be reduced to
+$$
+k \times k \times 256 \times 256 \times 4 \si{\byte} = k^2 2^{22}\si{\byte} = k^2 \times 4\si{\mebi\byte}
+$$
+as the shape is reduced to $(k, k, H, W)$.
+
+Ultimately, this accelerates optimization by a factor of $2-3$, as it will be shown in \ref{sec:exp:vectorization}.
+
+It must be mentioned that the upper boundary for computational complexity in using this kind of alpha-blending is $\mathcal{O}(N \log k)$, since the top $k$ search is bound by this complexity.
