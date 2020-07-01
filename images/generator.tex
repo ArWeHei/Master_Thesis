@@ -1,0 +1,101 @@
+\def\InputColor{rgb:red,5;blue,2.5;white,5}
+\def\ImageColor{rgb:yellow,5;blue,5;white,5}
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\ConvNormColor{rgb:yellow,2.5;red,5;white,5}
+\def\PoolColor{rgb:red,1;black,0.3}
+\def\FcColor{rgb:blue,5;red,2.5;white,5}
+\def\FcReluColor{rgb:blue,5;red,5;white,4}
+\def\SoftmaxColor{rgb:magenta,5;black,7}
+
+\begin{tikzpicture}
+\tikzstyle{connection}=[ultra thick,every node/.style={sloped,allow upside down},draw=\edgecolor,opacity=0.7]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Layer Blocks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%input
+\pic[shift={(0,0,0)}] at (0,0,0) {Box={name=input,caption=input,%
+        xlabel={{"10",""}},ylabel=10,fill=\InputColor,%
+        height=40,width={2},depth=40}};
+
+%%%%%%%%%%
+% fc1
+\pic[shift={(3,0,0)}] at (input-east) {RightBandedBox={name=fc1,%caption=fc1,%
+        xlabel={{"256"}},zlabel=256,fill=\FcColor,bandfill=\FcReluColor,%
+        height=3,width=3,depth=50}};
+%%%%%%%%%%
+% fc2
+\pic[shift={(3,0,0)}] at (fc1-east) {RightBandedBox={name=fc2,%caption=fc2,%
+        xlabel={{"256",""}},zlabel=256,fill=\FcColor,bandfill=\FcReluColor,%
+        height=3,width=3,depth=50}};
+% conv1
+\pic[shift={(2,0,0)}] at (fc2-east) {DoubleRightBandedBox={name=conv1,%caption=conv2,%
+        xlabel={{"64",""}},zlabel=4,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=4,width={16},depth=4}};
+%pool1
+\pic[shift={(0,0,0)}] at (conv1-east) {Box={name=pool1,%
+        fill=\PoolColor,opacity=0.5,height=8,width=1,depth=8}};
+    
+% conv2
+\pic[shift={(2,0,0)}] at (pool1-east) {DoubleRightBandedBox={name=conv2,%caption=conv2,%
+        xlabel={{"64",""}},zlabel=8,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=8,width={16},depth=8}};
+%pool2
+\pic[shift={(0,0,0)}] at (conv2-east) {Box={name=pool2,%
+        fill=\PoolColor,opacity=0.5,height=16,width=1,depth=16}};
+    
+% conv3
+\pic[shift={(2,0,0)}] at (pool2-east) {DoubleRightBandedBox={name=conv3,%caption=conv2,%
+        xlabel={{"32",""}},zlabel=16,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=16,width={8},depth=16}};
+%pool3
+\pic[shift={(0,0,0)}] at (conv3-east) {Box={name=pool3,%
+        fill=\PoolColor,opacity=0.5,height=32,width=1,depth=32}};
+    
+% conv4
+\pic[shift={(2,0,0)}] at (pool3-east) {DoubleRightBandedBox={name=conv4,%caption=conv2,%
+        xlabel={{"16",""}},zlabel=32,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=32,width={4},depth=32}};
+%pool4
+\pic[shift={(0,0,0)}] at (conv4-east) {Box={name=pool4,%
+        fill=\PoolColor,opacity=0.5,height=64,width=1,depth=64}};
+    
+% conv4
+\pic[shift={(2,0,0)}] at (pool4-east) {DoubleRightBandedBox={name=conv5,%caption=conv2,%
+        xlabel={{"8",""}},zlabel=32,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=64,width={2},depth=64}};
+
+%output
+\pic[shift={(2,0,0)}] at (conv5-east) {Box={name=output,caption=output,%
+        xlabel={{"4",""}},ylabel=64,zlabel=64,fill=\ImageColor,%
+        height=64,width={1},depth=64}};
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Arrow Connections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw [connection]  (input-east)        -- node {\midarrow} (fc1-west);
+\draw [connection]  (fc1-east)          -- node {\midarrow} (fc2-west);
+\draw [connection]  (fc2-east)          -- node {\midarrow} (conv1-west);
+\draw [connection]  (pool1-east)        -- node {\midarrow} (conv2-west);
+\draw [connection]  (pool2-east)        -- node {\midarrow} (conv3-west);
+\draw [connection]  (pool3-east)        -- node {\midarrow} (conv4-west);
+\draw [connection]  (pool4-east)        -- node {\midarrow} (conv5-west);
+\draw [connection]  (conv5-east)        -- node {\midarrow} (output-west);
+\draw [connection]  (output-east)       -- node {\midarrow} ++(1.5,0,0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Dotted Edges 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw[densely dashed]
+    (conv1-nearnorthwest)++(0, 1.5*.2, 1.5*.2) coordinate(a) -- (fc2-east)
+    (conv1-nearsouthwest)++(0,-1.5*.2, 1.5*.2) coordinate(b) -- (fc2-east)
+    (conv1-farsouthwest)++(0,-1.5*.2,-1.5*.2) coordinate(c) -- (fc2-east)
+    (conv1-farnorthwest)++(0, 1.5*.2,-1.5*.2) coordinate(d) -- (fc2-east)
+    
+    (a)--(b)--(c)--(d)
+    ;
+%%%%%%%%%%
+
+
+\end{tikzpicture}

@@ -1,0 +1,92 @@
+\def\ImageColor{rgb:yellow,5;blue,5;white,5}
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\ConvNormColor{rgb:yellow,2.5;red,5;white,5}
+\def\PoolColor{rgb:blue,1;black,0.3}
+\def\FcColor{rgb:blue,5;red,2.5;white,5}
+\def\FcReluColor{rgb:blue,5;red,5;white,4}
+\def\SoftmaxColor{rgb:magenta,5;black,7}
+
+\begin{tikzpicture}
+\tikzstyle{connection}=[ultra thick,every node/.style={sloped,allow upside down},draw=\edgecolor,opacity=0.7]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Layer Blocks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%input
+\pic[shift={(0,0,0)}] at (0,0,0) {Box={name=input,caption=input,%
+        xlabel={{"4",""}},ylabel=64,zlabel=64,fill=\ImageColor,%
+        height=64,width={1},depth=64}};
+
+%%%%%%%%%%
+% conv3
+\pic[shift={(2,0,0)}] at (input-east) {DoubleRightBandedBox={name=conv1,%caption=conv3,%
+        xlabel={{"16",""}},zlabel=64,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=64,width={4},depth=64}};
+%pool3
+\pic[shift={(0,0,0)}] at (conv1-east) {Box={name=pool1,%
+        fill=\PoolColor,opacity=0.5,height=32,width=1,depth=32}};
+%%%%%%%%%%
+% conv4
+\pic[shift={(2,0,0)}] at (pool1-east) {DoubleRightBandedBox={name=conv2,%caption=conv4,%
+        xlabel={{"32",""}},zlabel=32,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=32,width={8},depth=32}};
+%pool4
+\pic[shift={(0,0,0)}] at (conv2-east) {Box={name=pool2,%
+        fill=\PoolColor,opacity=0.5,height=16,width=1,depth=16}};
+%%%%%%%%%%
+% conv5
+\pic[shift={(2,0,0)}] at (pool2-east) {DoubleRightBandedBox={name=conv3,%caption=conv5,%
+        xlabel={{"64",""}},zlabel=16,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=16,width={16},depth=16}};
+%pool5
+\pic[shift={(0,0,0)}] at (conv3-east) {Box={name=pool3,%
+        fill=\PoolColor,opacity=0.5,height=8,width=1,depth=8}};
+%%%%%%%%%%
+% conv6
+\pic[shift={(2,0,0)}] at (pool3-east) {DoubleRightBandedBox={name=conv4,%caption=conv6,%
+        xlabel={{"64",""}},zlabel=8,fill=\ConvReluColor,leftbandfill=\ConvColor, rightbandfill=\ConvNormColor,%
+        height=8,width={16},depth=8}};
+%pool5
+\pic[shift={(0,0,0)}] at (conv4-east) {Box={name=pool4,%
+        fill=\PoolColor,opacity=0.5,height=4,width=1,depth=4}};
+%%%%%%%%%%
+% fc1
+\pic[shift={(3,0,0)}] at (pool4-east) {DoubleRightBandedBox={name=fc1,%caption=fc1,%
+        xlabel={{"256","dummy"}},zlabel=256,fill=\FcColor,bandfill=\FcReluColor,%
+        height=3,width=3,depth=50}};
+%%%%%%%%%%
+% fc2
+\pic[shift={(3,0,0)}] at (fc1-east) {RightBandedBox={name=fc2,%caption=fc2,%
+        xlabel={{"256","dummy"}},zlabel=256,fill=\FcColor,bandfill=\FcReluColor,%
+        height=3,width=3,depth=50}};
+%%%%%%%%%%
+% fc3
+\pic[shift={(3,0,0)}] at (fc2-east) {RightBandedBox={name=fc3,%caption=fc3,%
+        xlabel={{"8","dummy"}},zlabel=8,fill=\FcColor,bandfill=\FcReluColor,%
+        height=3,width=3,depth=10}};
+
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Arrow Connections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw [connection]  (input-east)        -- node {\midarrow} (conv1-west);
+\draw [connection]  (pool1-east)        -- node {\midarrow} (conv2-west);
+\draw [connection]  (pool2-east)        -- node {\midarrow} (conv3-west);
+\draw [connection]  (pool3-east)        -- node {\midarrow} (conv4-west);
+\draw [connection]  (pool4-east)        -- node {\midarrow} (fc1-west);
+\draw [connection]  (fc1-east)          -- node {\midarrow} (fc2-west);
+\draw [connection]  (fc2-east)          -- node {\midarrow} (fc3-west);
+\draw [connection]  (fc3-east)          -- node {\midarrow} ++(1.5,0,0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Draw Dotted Edges 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw[densely dashed]
+    (fc1-west)++(0, 1.5*.2, 1.5*.2) coordinate(a) -- (pool4-nearnortheast)
+    (fc1-west)++(0,-1.5*.2, 1.5*.2) coordinate(b) -- (pool4-nearsoutheast)
+    (fc1-west)++(0,-1.5*.2,-1.5*.2) coordinate(c) -- (pool4-farsoutheast)
+    (fc1-west)++(0, 1.5*.2,-1.5*.2) coordinate(d) -- (pool4-farnortheast)
+    
+    (a)--(b)--(c)--(d)
+    ;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{tikzpicture}

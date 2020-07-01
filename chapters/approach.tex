@@ -106,7 +106,7 @@ Previous works have shown that neural networks are capable of conditionally gene
 Therefore, it requires only data of brushstrokes and their parameters to train the network.\\
 As previously stated, many already did so.
 However, these approaches do not focus on the quality of the renderer.
-Thus, they use simple painting applications like libmypaint to generate the training data.
+Thus, they use simple painting applications like \citetitle{libmypaint} to generate the training data.
 In this approach there shall be more emphasis on the render quality.
 
 \subsection{Data Set}
@@ -139,31 +139,18 @@ This kind of data would allow to train a renderer, though it would likely cause 
 \subsubsection{Fluid Simulations}
 Fluid simulations like those by \citeauthor*{wetbrush} give a better render quality compared to painting libraries. 
 Unfortunately, only few implementations are openly available and if so are not as advanced.\\
-\citeauthor*{SPIRAL} provide a fluid simulation package based on \citetitle{fluidpaint} by \citeauthor{fluidpaint}
+\citeauthor*{SPIRAL} provide a fluid simulation package based on \citetitle{fluidpaint}~\cite{fluidpaint}.
+It uses simple fluid dynamics to give artificial brushstrokes a more plastic look.
+One problem, that comes with all simulations is that the brushstroke path not controlled directly, but by moving a virtual paintbrush.
+Nevertheless, it is possible to partly account for this when creating the data set.\\
+Another problem is the simulation time.
+State-of-the-art approaches are just capable of rendering in real-time which is too slow for an entire data set.
+Luckily, \citetitle{fluidpaint} is not as computationally expensive and can be parallelized to generate $100,000$ samples in about two hours.
 
-
-Fluid Paint is a project by David Li \cite{fluidpaint} that uses simple
-fluid dynamics to give artificial brushstrokes a more plastic look.
-It has been implemented in JavaScript and OpenGL.
-
-There is a C++-version in the git-repository of SPIRAL along with
-Python bindings created by Yaroslav Ganin.
-
-Using these Python bindings, it possible to generate brushstrokes locally outside of a web browser environment.
-
-The quality and controllability of FluidPaint fall right in the middle of the two previously mentioned data sets.
-The generated brushstrokes look distinctively better than those generated with libmypaint, but still lack the quality of the real-world images.
-Concerning controllability, FluidPaint allows controlling the path of the paintbrush's handle rather than the path of the brushstroke itself.
-As a result, there occur some offsets to a given path as opposed to libmypaint.
-
-As a reasonable compromise between controllability, variability, and render quality, FluidPaint emerges as a sensible choice.
-Although real-time data generation is not possible with this library, data generation can be parallelized.
-Such a set-up still allows for the creation of large data sets in a reasonable time frame.
-
-Even though this data set still has some weaknesses, it is probably the best choice for training a differentiable renderer because of the noted reasons.
-
-Other 'honorable mentions' are painting programs such as \todo{these two weird software stuff things}, which allow for even more authentic brushstrokes but lack any well-documented interface in order to generate a vast number of brushstrokes.
-
+All in all, \citetitle{fluidpaint} has been chosen as the tool to generate the data set.
+The superior render quality justifies the additional work required to generate the data set.\\
+There are other applications which are capable of simulating brushstrokes reasonably well like \citetitle{artrage}~\cite{artrage} and \citetitle{krita}~\cite{krita}.
+Unfortunately, these application do not provide an interface to efficiently generate a data set.
 \begin{marginfigure}
     \subfloat[Photograph]{%
         \includegraphics[width=.8\textwidth]{images/real_red_stroke}%
@@ -173,10 +160,6 @@ Other 'honorable mentions' are painting programs such as \todo{these two weird s
         \includegraphics[width=.8\textwidth]{images/artrage_red_stroke}%
         \labfig{strokes:artrage}%
     }\qquad
-    %\subfloat[Affinity Photo]{%
-    %    \includegraphics[width=.8\textwidth]{images/affinity_red_stroke}%
-    %    \labfig{strokes:affinity}%
-    %}\qquad
     \subfloat[libmypaint]{%
         \includegraphics[width=.8\textwidth]{images/affinity_red_stroke}%
         \labfig{strokes:libmypaint}%
@@ -189,18 +172,54 @@ Other 'honorable mentions' are painting programs such as \todo{these two weird s
     \labfig{strokes}
 \end{marginfigure}
 
-\todo{talk about RGBA advantages}
-
-
 \subsubsection{Brushstroke Formalism}
-\labsubsubsec{formalism}
-With the means of data set production seized \todo{cut this joke}, what is left is to formulate the parameters that define the brushstrokes.
+The means of brushstroke production are now seized and what is left is to formulate the parameters that define a brushstrokes.
 These parameters must quantify the following three properties of brushstrokes:
 \begin{itemize}
     \item color
     \item thickness
     \item path
 \end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 The easiest of these three properties is quantifying the color.
 Naturally, computer vision relies on the RGB format, which defines color as a set of three 8-Bit integer values between 0 and 255. 
