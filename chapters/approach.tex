@@ -195,7 +195,7 @@ As more time steps mean longer simulation times and fewer steps mean edgy curves
 There are additional issues which stem from the fact that \citetitle{fluidpaint} gives only control over the brush's path.
 Due to the length of the bristles an offset is introduced.
 Also, the bristles need to be aligned such that a ``clean'' brushstroke is drawn.
-Further information on how this has been implemented can be found in the appendix (see \refch{fluidpaint}).
+Further information on how this has been implemented can be found in the appendix (see \refsec{fluidpaint}).
 \begin{marginfigure}
     \includegraphics{bezier_sample}
     \caption[]{Virtual bristles in \citetitle{fluidpaint} as they are initialized.}
@@ -632,7 +632,7 @@ Since the alpha values follow $0 < alpha < 1$ for many pixels at the border of e
 
 Additionally, it is possible to avoid iterative blending.
 By transforming the tensor which holds all alpha values for all layers, it is possible to perform alpha blending as a single matrix multiplication with the stack of image layers.
-The necessary algorithm is described in \refch{alphablend}.
+The necessary algorithm is described in \refsec{alphablend}.
 
 \subsection{Partial Updates}
 When optimizing many brushstrokes in parallel with high-resolution image targets, memory limitations become a guaranteed issue.
