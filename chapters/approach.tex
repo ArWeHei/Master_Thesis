@@ -177,139 +177,136 @@ The means of brushstroke production are now seized and what is left is to formul
 These parameters must quantify the following three properties of brushstrokes:
 \begin{itemize}
     \item color
-    \item thickness
-    \item path
+    \item thickness/brush size
+    \item path/curve
 \end{itemize}
 
+Naturally, color is approximated by three 8-bit numbers in the RGB format.\\
+Path and thickness depend on the given coordinate scaling which is $[0, 1]$ in \citetitle{fluidpaint}.
+Valid brush sizes are any value in $[0, 1]$ from an infinitely small brushstroke ($0$) to one as wide as the canvas ($1$).
+Both these edge cases do not make sense in this approach, thus the range is constrained to $[.03, .2]$.
+This range includes only brushstrokes that are visible but do not cover the whole canvas.\\
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The easiest of these three properties is quantifying the color.
-Naturally, computer vision relies on the RGB format, which defines color as a set of three 8-Bit integer values between 0 and 255. 
-As for path and thickness, these two properties depend on the given coordinate system.
-FluidPaint represents the canvas as a 2D plane in the $[0, 1]$ range.
-Thus, it makes sense to follow the same representation.
-
-Thickness can be any value in $[0, 1]$  for each brushstroke, where 0 is an infinitely small brushstroke, and 1 is a brushstroke as wide as the canvas.
-As both these edge cases do not make sense in this application, the range is constrained to $[.03, .2]$, which includes only brushstrokes that are visible and also do not cover the whole canvas.
-
-Quantifying the path now is a little more tricky.
-The fluid dynamics simulation that FluidPaint uses relies on internal time steps at which the equations are evaluated and subsequently rendered.
-At the same time, each step allows only a linear motion of the brush handle between positions $a$ and $b$.
-Subsequently, any curved paths must be split into linear/straight segments that together should resemble a curved line.
-As more steps mean longer simulation times and fewer steps mean edgy movement, a value of 20 time-steps per stroke emerged as a good compromise \todo{this is actually different as the steps depend on the length of the path. Look this up}.
-The same number of steps has been used in SPIRAL's implementation.
-
-Another problem becomes how to express a curved path in numbers.
-The most straightforward representation would be a sequence of points that make up any curved path.
-Such an approach allows for the highest versatility, but at the same time introduces a noticeable amount of parameters as each point consists of 2 coordinates totaling to 40 values.
-These values are also not independent of one another but should follow a reasonable path as otherwise, the resulting brushstroke would look somewhat like a random walk than an actual brushstroke.
-Since works such as SPIRAL or 'Learning to Paint' face a quite similar obstacle, their solution should be applicable in this case as well.
-Both used so-called 'Bezier curves' which parametrize curved paths by a limited set of numbers.
+Quantifying the path is a little more tricky.
+\citetitle{fluidpaint} is internally only able to move the brush in a straight line between $a$ and $b$ for a single time step $t \rightarrow t+1$.
+Subsequently, any curved paths must be split into linear/straight segments that together approximate a curved line.
+As more time steps mean longer simulation times and fewer steps mean edgy curves, a value of 20 time-steps per stroke emerged as a good compromise.\\
+There are additional issues which stem from the fact that \citetitle{fluidpaint} gives only control over the brush's path.
+Due to the length of the bristles an offset is introduced.
+Also, the bristles need to be aligned such that a ``clean'' brushstroke is drawn.
+Further information how this on how this has been implemented can be found in the appendix (see \refch{fluidpaint}).
 \begin{marginfigure}
     \includegraphics{bezier_sample}
-    \caption[]{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm,
-    \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
+    \caption[]{Virtual bristles in \citetitle{fluidpaint} as they are initialized.}
+\end{marginfigure}
+\todo{add figure of bristles/fluidpaint bristles}
+
+Another question is how to express a curved path in numbers for the neural renderer.
+A straightforward representation would be a sequence of points that make up the curved path.
+Such an approach allows for the highest versatility.
+\begin{marginfigure}
+    \includegraphics{bezier_sample}
+    \caption[]{(a) typical path of a brushstroke in a painting. (b) a rarely observed path~\cite{onlygfx}.}
+    \labfig{genetic}
+\end{marginfigure}
+At the same time it introduces a noticeable amount of parameters as each point consists of 2 coordinates, totaling 40 additional dimensions.
+Also, each point is not independent of the other points but should lie withing a certain range and follow a reasonable path. 
+Otherwise, the resulting brushstrokes would resemble more of a scribble than what a brushstroke is expected to look like.
+
+Drawing networks often face the same issue and many rely on Bézier curves as a parametrization~\cite{SPIRAL, neuralpainters, learning2paint}.\\
+\textbf{Bézier curves} parametrize curved paths and are often used in computer graphics.
+Instead of linear segments, they define analytical paths for curves of different orders.
+In this case, quadratic Bézier curves are already sufficient.\\
+A curve is defined by its start and end point, as well as a control point (more points for higher orders).
+These points are connected by lines such that control points have two lines connecting them, and start- and end points only one line.
+Over the time interval $[0, T]$ a virtual point moves along each of these lines linearly.
+\marginnote{The linear motion starts at the point with the lower index.
+The start point has the lowest index, the end point the highest index.
+Any control points in between get higher indices in the order they are placed.
+Thus a virtual point will always start at the start point $t=0$ and end at the end point $t = T$.}\\
+As two such points, in the quadratic case, give two paths a another line is introduced to connect these two virtual points.
+This line will now change as the virtual points move linearly in $[0, T]$.
+Another virtual point is then placed on this line and also moves linearly in $[0, T]$.
+This point will follow a more complex path as the line on which it moves, is not static anymore.
+Thus, the path of this point defines a curve as originally intended.\\
+A quadratic Bézier curve will only bend into one direction or follow a straight path.\\
+\marginnote{For higher orders, the displayed process can be applied iteratively and allows for more complex curves.}
+As brushstrokes usually follow a rather simple path and fewer parameters are preferred, quadratic Bézier curves are used as parametrization.
+This is also the case in many drawing networks~\cite{SPIRAL, neuralpainters, learning2paint}.
+\begin{marginfigure}
+    \includegraphics{bezier_sample}
+    \caption[]{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm, \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
     \labfig{genetic}
 \end{marginfigure}
 
-Bezier curves parametrize curved paths not as linear segments, but as analytical paths which can be used in computer models.
-\todo{bezier curves margin note}
-They can be of different orders, which allows them to follow more complicated paths.
-In this case, the simplest form -- the first order Bezier curve-- is already sufficient.
-It defines a curve through its start- and endpoint, as well as a control point.
-The curve is then defined as the path of a point over the time interval $[0, T]$.
-First, one connects the start- and endpoints with the control point to get two lines in return.
-On these lines, lie two points that move linearly along their lines within a virtual time interval $[0, T]$.
-Then these two points are connected in the same way as before by a third line.
-Again, this line has a point moving along its path throughout $[0, T]$.
-As the first two points that define the third line will move, the line's orientation will change as well, thus translating the linear movement of the point into a complex curved path.
-The path that this point then takes in $[0, T]$ defines the Bezier curve.
-A first-order Bezier curve will only bend into one direction or follow a straight path.
-For higher orders, the displayed process can be applied iteratively and allows for more complex curves.
-As brushstrokes usually follow a quite simple path and fewer parameters are preferred, Bezier curves of first-order are suitable as parametrization.
-
-Ultimately, this gives ten values that are sufficient to parametrize brushstrokes with certain constraints:
+Ultimately, there will be ten values that are sufficient to parametrize brushstrokes with certain constraints:
 \begin{itemize}
-    \item Three 2D coordinates that define the Bezier curves (6 values).
-    \item One thickness parameter.
+    \item Three 2D coordinates that define the Bezier curves (six values).
+    \item One brush size parameter.
     \item Three values in RGB space.
 \end{itemize}
 
-
 \subsubsection{Data Constraints}
-\labsubsubsec{constraints}
-
-Given the parameters listed in section \ref{sssec:formalism}, the data still needs further constraints to facilitate the generator's training even further.
-
-Section \ref{sssec:fluidpaint} already hinted at the impracticality of online data generation.
-A rough estimation by timing the rendering of 100.000 FluidPaint brushstrokes reveals that a dedicated CPU server is capable of generating 300 strokes per second.
-\todo{experiment in appendix}
-A neural network with batch size 32 is limited to $\approx 10$ iterations per second under these circumstances, which would mean a clear bottleneck.
-Thus, it seems advisable to generate data beforehand with enough samples to cover the data space sufficiently.
-It will allow for much faster access to data, as individual data samples are relatively small and can be stored in a binary data file such as HDF5.
-
-Besides this constraint to the amount of data available, another set of constraints will be introduced to reduce the data space to 'valid' brushstrokes only.
-'Valid' brushstrokes will be defined as brushstrokes that resemble real-world brushstrokes to a certain degree.
+This section already mentioned that data cannot be generated in real-time for the training, instead it is generated beforehand.
+A data set of $100,000$ brushstrokes is sampled in the ten-dimensional feature space that has been introduced.
+However, the data still needs further constraints to facilitate the renderer's training.\\
+Such constraints should limit the data to valid brushstrokes only.
+``Valid'' brushstrokes will be defined as brushstrokes that resemble the shape of many real-world brushstrokes.
 This primarily concerns two relations within a brushstroke:
 \begin{itemize}
     \item Its width-to-length ratio.
     \item Its curvature.
 \end{itemize}
 
-The width-to-length ratio will be restricted to brushstrokes that are at least two times as long as they are wide.
-\begin{equation}
-\norm{\vec{s} - \vec{e}} \overset{!}{\leq}  2 \times (\text{brush size}) \labeq{bs}
-\end{equation}
-Due to the simulation background of FluidPaint shorter brushstrokes will show some artifacts due to the bristles' length in the simulation which depends on the width of the stroke.
-Another reason for this is the intended use-case, which will focus on van Gogh paintings.
-As van Gogh did not practice pointillism, most of his strokes have a length to them, which brings such a constraint in line with some characteristics of van Gogh's style.
+Brushstrokes should be at least two times as long as they are wide.
+\begin{align}
+    \norm{\vec{s} - \vec{e}} \overset{!}{\leq}  2 \times (\text{brush size}) \labeq{bs}
+\end{align}
+Due to the simulation in \citetitle{fluidpaint}, shorter brushstrokes will show artifacts caused by the bristles' length.
+The length of these bristles directly correlates to the brush size/width.\\
+Another motivation is the intended use-case, which will focus on van Gogh paintings.
+As van Gogh did not practice pointillism, most of his strokes have a length to them, which brings such a constraint in line with some characteristics of van Gogh's style.\\
+Subsequently, $\vec{s}$, $\vec{e}$ and the brush size are sampled together such that $\vec{s}$ and $\vec{e}$ are further apart than two-times the brush size.\\
+The brush size is sampled from a uniform distribution in $[.03, .2]$ and $\vec{s}$ and $\vec{e}$ are sampled in a uniform distribution in $[0, 1]^2$.
+If the relation
+\begin{align}
+    \norm{\vec{s} - \vec{e}} \geq 2 \times \text{brush size}
+\end{align}
+does hold this set of parameters is included in the data set, otherwise the whole set is re-sampled.
 
-The same argumentation applies to the curvature:
-Most brushstrokes (especially those by van Gogh) have a certain 'flow' or 'smoothness' to them, which can be described by using strokes with large curvature radii and without any corners in the strokes' path.
-Thus, the data set will also be restricted to strokes that follow these descriptions.
-In order to achieve this with random sampling in mind, a multivariate Gaussian distribution is placed between start ($\vec{s}$) and end point ($\vec{e}$).
-The two axes are rotated such that the short axis is in line with the vector
-$\vec{a} = \vec{s} - \vec{e}$ while the other sits orthogonal.
-Then both axes are scaled with $\norm{a}_2$ and also the handpicked values $\frac{1}{200}$ and $\frac{1}{25}$ for along $a$ and orthogonal to it, respectively.
-Figure \ref{fig:datageneration} shows samples from this distribution for an exemplary brushstroke.
+Similar constriants apply to the curvature:
+Most brushstrokes (especially those by van Gogh) have a certain ``flow'' or ``smoothness'' to them.
+``Smooth'' brushstrokes do not follow a kinky path but feature curvatures with large radii.\\
+\begin{marginfigure}
+    %\includegraphics{patch_starrynight}
+    \caption[]{Brushstrokes by van Gogh in a painting (The Starry Night).}
+\end{marginfigure}
+Thus, the data set will be restricted to brushstrokes that follow these descriptions.
+To achieve this with random sampling in place, a multivariate Gaussian distribution is placed between start ($\vec{s}$) and end point ($\vec{e}$).
+The Gaussian is parametrized by an offset $\vec{mu}$ and a covariance matrix $\mat{\Sigma}$.
+$\vec{mu}$ is picked such that the distribution is centered between $\vec{s}$ and $\vec{e}$.
+\begin{align}
+    \vec{\mu} = \frac{\vec{s} + \vec{e}}{2}
+\end{align}
+One of the principal axes of $\mat{\Sigma}$ shall align with the directional vector between $\vec{s}$ and $\vec{e}$.
+\begin{align}
+    \vec{q}_1 & = \vec{s} - \vec{e} \\
+    \hat{\vec{q}}_1 & = \frac{\vec{q}_1}{\norm{\vec{q}_1}} \\
+    \hat{\vec{q}}_2 & = \mat{R} \hat{\vec{q}}_1 \text{ s.t. } \hat{\vec{q}}_2 \perp \hat{\vec{q}}_1 \\
+    \mat{Q} = (\hat{\vec{q}}_1, \hat{\vec{q}}_2)
+\end{align}
+$\hat{\vec{q}}_1$ and $\hat{\vec{q}}_2$ build an orthonormal 2D basis which are the eigenvectors of the eigendecomposition of $\mat{\Sigma}$ .
+The respective eigenvalues $\lambda_1$ and $\lambda_2$ are handpicked such that the distribution is narrow along $\hat{\vec{q}}_1$ but broad along $\hat{\vec{q}}_2$.
+\begin{align}
+    \lambda_1 & = \frac{1}{200} \\
+    \lambda_2 & = \frac{1}{25} \\
+    \mat{\Lambda} & = \begin{pmatrix} \lambda_1 & \\ & \lambda_2 \end{pmatrix}
+\end{align}
+Thus, the eigendecomposition of $\mat{\Sigma}$ is known and $\mat{\Sigma}$ can be constructed from it.
+\begin{align}
+    \mat{\Sigma} = \mat{Q} \mat{\Lambda} \mat{Q}^T
+\end{align}
+Figure \ref{fig:datageneration} shows samples from this distribution for an exemplary set of start and end point.
 \begin{marginfigure}
     \resizebox{\textwidth}{!}{
         \input{images/scatter.pgf}
@@ -317,66 +314,65 @@ Figure \ref{fig:datageneration} shows samples from this distribution for an exem
     \caption[]{Exemplary scatter plot for given start and end point to visualize the covariance matrix}
     \labfig{scatter}
 \end{marginfigure}
-This distribution is intended to follow that of brushstrokes as they would appear in the real world.
-The majority of brushstrokes will be straight or just slightly bent due to the maximum of the PDF being at the center of $s$ and $e$.
-Bent brushstrokes will mostly be symmetric as the long axis of the multivariate Gaussian is orthogonal to $a$.
-Still, there will be strokes that have their bent towards either end of the brushstroke as well as some strokes with a high curvature.
-The area of interest, though, will be densely populated as intended.
+
+This distribution is intended to follow the expected distribution of brushstrokes as they appear in the real world.
+The majority of brushstrokes will be straight or just slightly bent due to the maximum of the PDF of the Multivariate Gaussian being at the center $\vec{\mu}$.
+Bent brushstrokes will mostly be symmetric as $\hat{\vec{q}}_2$ is the long axis of the multivariate Gaussian.
+Thus, the region which is of most interest will be densely populated.\\
+Still, some brushstrokes will have their bent slightly towards either end of the brushstroke and others will feature tight curvature.
 \begin{align}
-    p(\vec{c}| \vec{s}, \vec{e}) & = \mathcal{N}(\mu, \Sigma) \labeq{checkpoint} \\
-    \mu & = \frac{\vec{s} + \vec{e}}{2} \\
-    \Sigma & =
-        \begin{pmatrix}
-            a_x & 0 \\
-            0 & a_y
-        \end{pmatrix} \labeq{Sigma}\\
-    \vec{a} & = \vec{s} - \vec{e}
+    p(\vec{c}| \vec{s}, \vec{e}) & = \mathcal{N}(\vec{\mu}, \mat{\Sigma}) \labeq{checkpoint} \\
 \end{align}
+If $\vec{c}$ lies outside $[0, 1]^2$ it is re-sampled.\\
+$\vec{s}$, $\vec{e}$ and $\vec{c}$ are also scaled with the handpicked factor of $0.7$ to ensure the brushstrokes are rendered completely within the window and not cut by an edge of the render window.
 
-The color of the brushstrokes is not constrained as the color distribution of the target data set is not known at this point. \todo{why not van Gogh color distribution?}
+The color of the brushstrokes is not constrained as it should be possible to fit any color distribution equally well.
+Each RGB value is sampled from a uniform distribution as a color.
 
-
-%is this number of parameters enough, too much?
-
-\subsubsection{Data Set Creation}
-\labsubsubsec{creation}
-
-The data set will be created with 100.000 samples that follow the constraints that were presented in section \ref{sssec:constraints}.
-As an underlying distribution, the uniform distribution is chosen as it allows a more evenly coverage of the data space.
-
-First, a set of start and end points, as well as brush size, is drawn and checked against \eqref{eq:bs}.
-If the constraint is not met, the set will be redrawn entirely.
-In case the constraint is satisfied, a checkpoint is sampled according to \eqref{eq:checkpoint}.
-If $\vec{c}$ lies outside the render window, the checkpoint will be resampled.
-At last, an RGB set is sampled from a uniform distribution as a color.
-
-The resulting tuple of start, end and control point, brush size, and RGB color is then added to the data set.
-Before rendering starts, the values of $\vec{s}$, $\vec{e}$ and $\vec{c}$ are scaled with the handpicked factor of $0.7$ to ensure the brushstrokes are rendered completely within the window and not cut by an edge of the render window.
-At last, the brushstrokes are rendered according to the data set and added as well.
+The resulting tuple of start, end and control point, brush size, and RGB color is then rendered.
 
 The render canvas size was chosen to be 64x64 pixels for several reasons:
-First, even with such a small canvas size, training for the renderer takes about one day.
-Secondly, the larger the render canvas size becomes, the deeper the renderer needs to be, which results in more computational overhead in the optimization routine as well as more layer through which the gradient has to be propagated.
-Lastly, as there will be upwards of a thousand brushstrokes in a single image, increasing the canvas size to 128x128 would require four times as much memory per rendered image. As 1000 brushstrokes would already account for $1000 x 64 x 64 x 4 \si{\byte} \approx 16.4 \si{\gibi \byte}$ a fourfold increase would be significant.
+First, even with such a small canvas size, training of the renderer takes about one day.
+Secondly, the larger the render canvas size becomes, the deeper the renderer needs to be, which results in more computational overhead not only in training but in the optimization procedure as well.
+Lastly, there will be upwards of a thousand brushstrokes in a single image and increasing the canvas size to 128x128 would require four times as much memory per rendered image.
+As 1000 brushstrokes would already account for $1000 x 64 x 64 x 4 \si{\byte} \approx 16.4 \si{\gibi \byte}$ a four-fold increase is significant.
 
+After rendering, the data set is renormalized to the range $[-1, 1]$ for convenience and to facilitate training as well.
 
-As the last step, the data set is renormalized to the range $[-1, 1]$ for convenience and to facilitate training as well.
-\todo{explain why zero-centered data is good}
-
+$100,000$ samples that follow these constraints make up the training data set.
+The constraints helped in fact to train the renderer.
 
 \subsection{Architecture}
-\labsubsec{arch}
 The architecture of the brushstroke generator follows that of an inverse VGG network.
-It is widely used and has shown in previous works that it should be capable of handling this task.
-\todo{check the details} The architecture consists of three dense layers at the beginning, followed by a two-times upsampling layer as well as three convolutional layers.
-The same pipeline with a two-times upsampling layer, and three convolutional layers is repeated until the target size is reached.
-After the last convolutional layer, a hyperbolic tangent function is applied to restrict the output to the $[-1, 1]$ range.
-As part of the hyper-parameter search, different tweaks to the architecture have been tested:
-\begin{itemize}
-    \item An additional noise input at every layer with a size equal to that of the existing signal.
-    \item Additional information about the position in the pixel grid in every layer, so-called CoordConv \cite{coordconv}.
-    \item Various combinations of activation and normalization functions.
-\end{itemize}
+It is widely used and has shown that it should be capable of handling this task.\\
+The architecture consists of three dense layers with 256 dimensions, leaky ReLU activation and instance normalization at the beginning.
+The output is then spatially arranged in a 4x4 grid which is the base for the following convolutional blocks.\\
+Each blocks applies a convolution with kernel size 3x3 and stride 1x1 followed by a leaky ReLU activation and instance normalization.
+At the end of the block the activations are bilinearly upsampled.
+The number of kernels decreases logarithmically with every layer.
+Notably every convolution has two additional input channels with coordinates along each axis as values.
+This is called CoordConv~\cite{coordconv}.
+Two other additions to the convolutional block have been inspired by StyleGAN~\cite{stylegan}.
+First, the activations are augmented with weighted noise inputs.
+The scale of the additional noise is a trainable parameter in the network.
+Secondly, a style modulation is applied to the normalized activations.
+This means that an additional fully connected pipeline with four layers is implemented to give a set of activations.
+These activations are then the inputs to single independent fully connected layers at every scale.
+These FC layers predict the affine parameters of every instance normalization.\\
+The last convolutional block has neither normalization nor upsampling but a hyperbolic tangent function to restrict the output to $[-1, 1]$.\\
+
+The discriminator is similarly built.\\
+It employs the same convolutional blocks with a few changes.
+There is no style modulation or noise augmentation.
+Instead, there are multi-scale inputs like in MS-GAN~\cite{MSG-GAN}.
+Thus, the input image is downscaled to the resolution of each layer and then concatenated to the existing activations of that layer.
+Also, instead of upscaling there is max-pool downscaling after each block.
+The convolutions have the same kernel size, kernel number and stride in each layer as the generator.\\
+When the activation reach a resolution of $4\times4$, they are flattened and serve as an input to a three-layer fully connected network.
+These FC layers are again symmetrically configured to the generator.
+The last FC layer consists of only eight unit, which act are predictors.
+
+\reffig{architecture} shows a visual depiction of the architectures.
 
 \todo{reinsert these figures}
 %\begin{figure*}
@@ -387,25 +383,46 @@ As part of the hyper-parameter search, different tweaks to the architecture have
 %        \input{images/discriminator.tex}
 %    }
 %        \caption{Visualization of the generator and discriminator architectures}\labfig{genarch}
+%        \labfig{architecture}
 %\end{figure*}
 
-The discriminator is designed after the same principles and resembles a VGG encoder network.
-First, three convolutional layers are applied, followed by a downsampling /pooling layer.
-This structure is repeated until a target resolution of 4x4 pixels is reached.
-Then a set of three dense layers is applied to give one final prediction per sample.
-
 \subsection{Training}
-\labsubsec{train}
-During training, the L2 distance and the FID score serve as evaluation metrics.
-The FID score becomes necessary as the visual comparison of the generated samples has proven difficult between different experimental runs.
-The L2 distance does not qualify as a sufficient metric for later training stages as the stochastic nature of the brushstrokes puts a lowerbound on the L2-distance.
+Training is set up in an adversarial fashion.
+Thus, the generator predicts a brush stroke form parameters and the discriminator tries to tell is apart from a given sample from the data set.
+RaGAN defines the adversarial objective during training.\\
+Also the L2 distance is used in the first phase of training until it falls under a threshold of $0.2$.
+This way e meaningful decoding is learned in the beginning but the is no blurring in later training stages.
+L2 distance and the FID score serve as evaluation metrics during training.
+The L2 distance does not qualify as a sufficient metric for later training stages due to the stochastic nature of the brushstrokes.
+The FID score serves as a metric for the visual similarity to the data set as the visual comparison of the generated samples has proven difficult between different experimental runs.
+\marginnote{The Frechet inception distance (FID) is calculated by comparing the statistics of InceptionNet~\cite{inception}-activations for two batches of samples from the dataset and generated samples~\cite{FID}.
+This is somewhat similar to perceptual distance.}
 
 A two-time-step update rule was implemented to stabilize training further.
-\todo{write this down and look at the tricks that were used}
+This way, the discriminator and generator are updated at different frequencies.
+If, for instance, the discriminator becomes too strong and the generator's loss increases, the generator is update more often than the discriminator to balance both networks again.
 
 \subsection{Results}
-\labsubsec{results}
-\todo{pick some results and present whether they are any good}
+\reffig{brushstroke} shows a generated sample compared to a rendered sample with the same parameters.
+The images are split into their RGB channels and the alpha channel to allow evaluating the two independently.
+\reffig{single_brushstroke} shows all four channels merged for a generated brushstroke.
+It becomes immediately clear that the neural renderer is capable of imitating \citetitle{fluidpaint}.
+\begin{marginfigure}
+    \resizebox{\textwidth}{!}{
+        \input{images/scatter.pgf}
+    }
+    \caption[]{Generated sample and the corresponding data set sample compared.}
+    \labfig{scatter}
+\end{marginfigure}
+\begin{marginfigure}
+    \resizebox{\textwidth}{!}{
+        \input{images/scatter.pgf}
+    }
+    \caption[]{Generated brushstroke.}
+    \labfig{scatter}
+\end{marginfigure}
+
+Further analysis of the results will be presented in the next chapter.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%% Stroke Approximation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
