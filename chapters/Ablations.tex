@@ -145,7 +145,23 @@ Then, different initializations will be shown as well as some choices for traini
 parameters.
 
 %no L2
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/starry}
+        \labfig{no_l2:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/portrait}
+        \labfig{no_l2:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/tub}
+        \labfig{no_l2:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/GGB}
+        \labfig{no_l2:GGB}%
+    }
     \caption[]{Collection of reference images approximated without L2-loss}
     \labfig{no_l2}
 \end{figure*}
@@ -156,7 +172,23 @@ Besides the distorted colors the images also show some sparseness, as canvas shi
 The is likely also a result of the LPIPS loss, which emphasizes edges over uniformly colored areas.
 
 %no Lpips
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_LPIPS/starry}
+        \labfig{no_LPIPS:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_LPIPS/portrait}
+        \labfig{no_LPIPS:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_LPIPS/tub}
+        \labfig{no_LPIPS:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_LPIPS/GGB}
+        \labfig{no_LPIPS:GGB}%
+    }
     \caption[]{Collection of reference images approximated without LPIPS-loss}
     \labfig{no_lpips}
 \end{figure*}
@@ -165,7 +197,23 @@ These images show a better color accuracy but seem very blurry as it is often th
 Such behavior is expected.
 
 %no KL
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_KL/starry}
+        \labfig{no_KL:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_KL/portrait}
+        \labfig{no_KL:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_KL/tub}
+        \labfig{no_KL:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_KL/GGB}
+        \labfig{no_KL:GGB}%
+    }
     \caption[]{Collection of reference images approximated without explicit brushstroke constraints.}
     \labfig{no_KL}
 \end{figure*}
@@ -174,7 +222,23 @@ The only apparent difference seems to be, that brushstrokes seem to get shorter 
 This gives the impression of a slightly different style.
 
 %just content + KL
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/content/starry}
+        \labfig{content:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/content/portrait}
+        \labfig{content:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/content/tub}
+        \labfig{content:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/content/GGB}
+        \labfig{content:GGB}%
+    }
     \caption[]{Collection of reference images approximated only with perceptual loss and brushstroke constraints.}
     \labfig{content}
 \end{figure*}
@@ -183,7 +247,35 @@ Only edges are depicted accurately which is expected in this case.
 This behavior raises the question how style transfer would look if a style loss could be implemented.
 
 %scale of brushstroke to content
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/upscaled/starry}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/downscaled/starry}
+        \end{tabular}
+        \labfig{downscaled:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/upscaled/portrait}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/downscaled/portrait}
+        \end{tabular}
+        \labfig{downscaled:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/upscaled/tub}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/downscaled/tub}
+        \end{tabular}
+        \labfig{downscaled:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/upscaled/GGB}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/downscaled/GGB}
+        \end{tabular}
+        \labfig{downscaled:GGB}%
+    }
     \caption[]{Two collection of reference images with a different image scale. 2x larger scale (top) and 2x smaller scale (bottom) when compared to the original scaling.}
     \labfig{scale}
 \end{figure*}
@@ -194,7 +286,35 @@ The upscaled image showcases how many small brushstrokes approximate a single re
 However, smaller brush strokes like those that make up the ``star-circles'' are better depicted.
 
 %brushstroke density
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/high_dense/starry}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/low_dense/starry}
+        \end{tabular}
+        \labfig{dense:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/high_dense/portrait}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/low_dense/portrait}
+        \end{tabular}
+        \labfig{dense:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/high_dense/tub}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/low_dense/tub}
+        \end{tabular}
+        \labfig{dense:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \begin{tabular}[b]{c}
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/high_dense/GGB}\\
+        \adjincludegraphics[height=3.2cm, trim={0 0 0 {.5\height}},clip]{ablations/low_dense/GGB}
+        \end{tabular}
+        \labfig{dense:GGB}%
+    }
     \caption[]{Two collection of reference images with a different brushstroke densities. 2x the reference density (top) and 1/2x the reference density (bottom).}
     \labfig{density}
 \end{figure*}
@@ -203,14 +323,46 @@ At a higher density many smaller brushstrokes can be seen, at a lower density th
 Nonetheless, some differences are visible due to the range of the brush size and the parameter constraints.
 
 %high learning rate
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/lr/starry}
+        \labfig{lr:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/lr/portrait}
+        \labfig{lr:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/lr/tub}
+        \labfig{lr:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/lr/GGB}
+        \labfig{lr:GGB}%
+    }
     \caption[]{Collection of reference images approximated with 10x the original learning rate.}
     \labfig{10xlr}
 \end{figure*}
 Increasing the learning rate returns the expected sub-optimal solution as the optimizer overshoots good solutions. 
 
 %accuracy
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_acc/starry}
+        \labfig{no_acc:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_acc/portrait}
+        \labfig{no_acc:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_acc/tub}
+        \labfig{no_acc:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_acc/GGB}
+        \labfig{no_acc:GGB}%
+    }
     \caption[]{Collection of reference images approximated with a random ordering.}
     \labfig{acc}
 \end{figure*}
@@ -218,7 +370,23 @@ Removing accuracy based ordering seems not to make much of a difference.
 The reason behind this is probably the fixed ordering that is implemented instead, which is apparently sufficient.
 
 %grid init
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/grid/starry}
+        \labfig{grid:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/grid/portrait}
+        \labfig{grid:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/grid/tub}
+        \labfig{grid:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/grid/GGB}
+        \labfig{grid:GGB}%
+    }
     \caption[]{Collection of reference images approximated with grid initialization.}
     \labfig{grid_init}
 \end{figure*}
@@ -226,7 +394,23 @@ Using a grid based initialization also seems to have no visible effect.
 This is likely due to the high brushstroke density and the other shortcoming, that outweigh any effect that this layout has.
 
 %too small patch window
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/starry}
+        \labfig{no_l2:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/portrait}
+        \labfig{no_l2:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/tub}
+        \labfig{no_l2:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/GGB}
+        \labfig{no_l2:GGB}%
+    }
     \caption[]{Early stage of training with a too-small patch window size}
     \labfig{window_size}
 \end{figure*}
@@ -236,7 +420,23 @@ The result are recognizable lines where the patch window's edges have been.
 These line are relatively persistent until they are slowly removed over time when theses strokes are updated again. 
 
 % other artists
-\begin{figure*}
+\begin{figure*}[!htb]
+    \subfloat[The Starry Night]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/starry}
+        \labfig{no_l2:starry}%
+    }
+    \subfloat[Self-Portrait]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/portrait}
+        \labfig{no_l2:portrait}%
+    }
+    \subfloat[Tübingen]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/tub}
+        \labfig{no_l2:tub}%
+    }
+    \subfloat[Golden Gate Bridge]{%
+        \adjincludegraphics[height=3.5cm, trim={0 0 0 {.5\height}},clip]{ablations/no_l2/GGB}
+        \labfig{no_l2:GGB}%
+    }
     \caption[]{Brushstroke approximation for paintings by other artists. (a) ``The Mona Lisa'' by Leonardo DaVinci~\cite{monalisa} (b) ``Bridge over a Pond of Water Lillies`` by Claude Monet~\cite{bridge}}
     \labfig{artists}
 \end{figure*}

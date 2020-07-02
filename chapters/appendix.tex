@@ -7,7 +7,36 @@
 \labsec{fluidpaint}
 This section shall explain some of the tricks that were employed to generate a nice-looking data set with \citetitle{fluidpaint}.
 
-Like many 
+The main issue when dealing with this simulation environment is the fact, that control is given over a virtual brush.
+This brush has virtual bristles which are necessary to for the simulation.
+These bristles introduce an offset between the desired path and the actual path which is colored.\\
+Furthermore, these bristles have a momentum and move even when the brush does not paint.
+Thus, when moving the brush towards the start point, the bristles will follow the brush.
+If the path points into a different direction than the direction the brush just moved in, the bristles will take some time to align along this path.
+The result is a kink at the beginning of every brushstroke.
+Similarly, if the brushstroke is not followed through afterwards but the brush just stops, then the bristles will move a little further with their momentum and spread out as the brush does not move.\\
+Additionally, the brush is reinitialized for every data sample.
+Each time the brush is initialized, the bristles can point in random directions which is why the bristles have to be aligned beforehand as well.
+\begin{marginfigure}
+    \includegraphics{bristles}
+    \caption[]{Image which shows the bristles in \citetitle{fluidpaint}~\cite{fluidpaint}}
+    \labfig{linear_class}
+\end{marginfigure}
+
+In order to cope with these issues a special ``routine'' is performed with the brush beforehand.
+First, the direction at the beginning and at the end of the path are computed.
+Then, the brush is moved to the starting point.
+There the brush is moved in a circle such that the bristles align.
+Thereafter, the brush is moved a bit along the path before it starts painting such that the offset by bristles is compensated.
+Now, the brush follows the actual path.
+When it reaches the end of the path, it moves a bit longer along the same direction, again to compensate for the length of the bristles.
+Finally the brush is moved further along this direction since taking the brush off the canvas takes a few time steps.\\
+In the end such a procedure gives brushstrokes that match relatively well with the defined Bézier curve.
+
+It is valid question to ask, why all of this is necessary, as the same offset everywhere would matter much for the parametrization if it is reproducible.\\
+Indeed, this is case, although the routine before and after the actual brushstroke would still be necessary to align the bristles.
+Thus, is only a little more effort to compensate for the offset that these bristles cause.
+Additionally, it helps later on to draw the brushstrokes with other visualization techniques, since the Bézier curves can then be predicted.
 
 \section{Vecotrizing Alpha Blending}
 \labsec{alphablend}

@@ -23,7 +23,7 @@ In the same way, that humans studied birds to understand flying, researchers are
 In the earliest stages of this research, they would try to imitate the brain, as people have tried imitating birds at first; and they failed similarly.
 \begin{figure}
     \includegraphics{otto_lilienthal}
-    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. \url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
+    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. Source:\url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
     \labfig{lilienthal}
 \end{figure}
 \marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success~\cite{brainscales}.}
@@ -59,6 +59,11 @@ Thus, they proposed an even simpler model of a neuron: \\
 They restricted their neuron to a binary state (on or off).
 Each neuron gathers signals from other neurons, which are either positive or negative.
 A neuron only becomes active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
+\begin{marginfigure}
+    \includegraphics{neuron}
+    \caption[]{Schematics of a neuron and a simple unit. Source:\url{https://appliedgo.net/media/perceptron/neuron.png}}
+    \labfig{linear_class}
+\end{marginfigure}
 
 \todo{add equation with activation function, when neuron fires}
 \begin{align}
@@ -76,11 +81,16 @@ The activation value of each neuron then defines an output.
 As this model deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
 
 In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}.
-\begin{figure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{Schmeatic of a feed-forward architecture.}
+%\begin{marginfigure}
+%    \includegraphics{feedforward}
+%    \caption[]{Schmeatic of a feed-forward architecture.Source: \url{https://learning.oreilly.com/library/view/r-deep-learning/9781787121089/assets/32d89685-4e2b-4811-81e8-4654d0d98f91.png}}
+%    \labfig{ff_arch}
+%\end{marginfigure}
+\begin{marginfigure}
+    \includegraphics{ffnn}
+    \caption[]{Schmeatic of a feed-forward architecture.Source:\url{https://appliedgo.net/media/perceptron/ffnn.png}}
     \labfig{ff_arch}
-\end{figure}
+\end{marginfigure}
 Basically, input signals come from one side, and output signals go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
 This is not only done for practical reasons but also inspired by the observation of layered neuron structures in the brain.
 
