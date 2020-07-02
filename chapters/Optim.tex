@@ -34,7 +34,7 @@ A learning rate too high will often results in uncontrolled behaviour as the opt
 A too-low learning rate results in slow convergence and thus wasted time.
 Also, an optimizer with a low learning rate can more easily get stuck in local minima (more on that later).
 
-Even though the conformity of Hebb's rule with nature has been shown~\cite{Lomo}, it is rather obvious that it does not factor in the loss function.
+Even though the conformity of Hebb's rule with nature has been shown~\cite{lomo}, it is rather obvious that it does not factor in the loss function.
 Other approaches have tried to improve Hebb's learning rule and also address problems like instability~\cite{ojas_rule}.
 Still, Hebb's rule is clearly not well suited for finding suitable weights.
 
@@ -60,7 +60,7 @@ The weight update also scales with $x^k_j$ since the amplitude and the sign of t
 If the optimization algorithm comes to a stop, since all classifications are correct, then the classification error has been minimized as well.
 
 \section{Gradient Descent}
-The idea of the perceptron algorithms can now be generalized further such that it uses the previously defined loss or cost functions (see \refsec{losses}).
+The idea of the perceptron algorithms can now be generalized further such that it uses the previously defined loss or cost functions (see \refch{MLandCV}).
 Instead of updating each neuron at a time, update everything!
 
 Thus, the term $\frac{1}{2}(\tilde{y}^k_i - y^k_i)$ in \refeq{perceptron_algo} must change.
@@ -70,10 +70,11 @@ Now the question is how to determine this direction for an arbitrary loss functi
 By looking at a single weight at a time, the scalar output of the loss function depends on the scalar value of each single weight.
 Thus, $L^k$ can be visualized in a 2D graph.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{Example depiction of loss function $L^k$ against $w$. At point $w'$ the slop point into the other direction but still towards the minimum.}
+    \includegraphics{grad}
+    \caption[]{Example depiction of loss function $L^k$ against $w$. At point $w'$ the slop point into the other direction but still towards the minimum.Source:~\cite{grad}}
     \labfig{loss_function}
 \end{marginfigure}
+\todo{draw this}
 Looking at such a depiction (see \reffig{loss_function}) the weight should change such that the loss function is minimized.
 This can be achieved by following the slope at position $w$, as it points towards the minimum.
 The slope in this graph is equivalent to the negative gradient of the function at point $w$, which can be easily calculated, if the dependence between $L(w)$ and $w$ is known.
@@ -95,8 +96,8 @@ with $\frac{\partial L^k}{\partial w_{ij}}$ the partial derivative of $L^k$ with
 
 The same principle can be applied to many weights at the same time, where each gradient is calculated with respect to the respective weight.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{3D plot of loss function for two  weights $w_1$ and $w_2$.}
+    \includegraphics{3Dgrad}
+    \caption[]{3D plot of loss function for two  weights $w_1$ and $w_2$. Source:{https://reconsider.news/2018/05/09/ai-researchers-allege-machine-learning-alchemy/}}
     \labfig{3dloss_function}
 \end{marginfigure}
 Also, the gradient can easily be evaluated over the whole data set now $k = 1, 2,...$
@@ -145,8 +146,8 @@ On the other hand rarely updates weights should receive larger updates.
 The result is "elementwise scaling of the gradient based on the historical sum of squares in each dim" \cite{ommer}
 \begin{align}
     \Delta \mat{w}_t & = - \frac{\eta}{\sqrt{\epsilon \mat{I} + \text{diag}(\mat{G}_t)}} \cdot \frac{1}{N} \frac{\partial L^k}{\partial \mat{w}_t} \cdot \vec{x}^k \\
-    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t
-    \text{with} \: \mat{G} = \sum_{\tau}^{t} g_\tau g_\tau^T \text{ and } g_\tau = \Delta \mat{w}
+    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t \\
+    \text{with} \: \mat{G} & = \sum_{\tau}^{t} g_\tau g_\tau^T \text{ and } g_\tau = \Delta \mat{w}
 \end{align}
 
 AdaM is a more advanced version of AdaGrad and adds a version of momentum.
@@ -158,7 +159,7 @@ Both $m_t$ and $v_t$ are corrected ($\hat{m}_t, \hat{v}_t$) for biases at early 
     \hat{m}_t & = \frac{m_t}{1 - \beta_1^t} \\
     \hat{v}_t & = \frac{v_t}{1 - \beta_2^t} \\
     \Delta \mat{w}_t & = - \frac{\eta}{\sqrt{\epsilon \mat{I} + \text{diag}(v_t)}} \cdot \frac{1}{N} \frac{\partial L^k}{\partial \mat{w}_t} \cdot \vec{x}^k + m_t \\
-    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t \\
+    \mat{w}_{t+1} & \rightarrow \mat{w}_t + \Delta \mat{w}_t
 \end{align}
 
 AdaM along with SGD has in recent years become the de facto standard for training neural network in computer vision.
@@ -176,6 +177,7 @@ Other optimization algorithms such as L-BFGS (Quasi-Newtonian second order optim
 %hwo does gradient descent work?
 
 \section{Backpropagation}
+\labsec{backprop}
 Backpropagation (or just backprop) was the major invention by \citeauthor{backprop} in the 1980's which ended the first AI winter caused by the \lstinline|XOR| problem. \\
 It allows to efficiently and accurately calculate gradients and thus train networks with many layers, which in turn 'solved' the \lstinline|XOR| problem.
 
@@ -188,7 +190,7 @@ The way it works, backprop splits a large equation with many operations into its
 Then the chain rule is employed which states that
 \begin{align}
     (f \circ g (x))' & = f' \circ g(x) \cdot g'(x) \\
-    \text{or} \\
+    \text{or} \nonumber\\
     \frac{\partial f}{\partial x} & = \frac{\partial f}{\partial g} \frac{\partial g}{\partial x}
     \labeq{chain}
 \end{align}
@@ -196,6 +198,7 @@ Then the chain rule is employed which states that
 By leveraging \refeq{chain} a function like 
 \begin{align}
     f(x_1, x_2) = x_1^2 \cdot (x_1 + x_2)
+    \labeq{example}
 \end{align}
 can be split into smaller pieces
 \begin{equation*}
@@ -203,13 +206,13 @@ can be split into smaller pieces
     f(x_1, x_2) & = z_0(x_1, x_2) \\
     z_0(x_1, x_2) & = z_1(x_1, x_2) \cdot z_2(x_1, x_2) \\
     z_1(x_1, x_2) & = (z_3(x_1, x_2))^2 \\
-    z_2(x_1, x_2) & = z_4(x_1, x_2) + z_5(x_1, x_2) \\
+    z_2(x_1, x_2) & = z_4(x_1, x_2) + z_5(x_1, x_2)
 \end{aligned}
 \qquad
 \begin{aligned}[c]
     z_3(x_1, x_2) & = x_1 \\
     z_4(x_1, x_2) & = x_1 \\
-    z_5(x_1, x_2) & = x_2 \\
+    z_5(x_1, x_2) & = x_2
 \end{aligned}
 \end{equation*}
 Each function $z_i$ now involves only a single operation with either one or two inputs.
@@ -217,7 +220,7 @@ This makes differentiating $z_i$ with respect to its child node(s) very easy.
 \marginnote{The term child node is used since each node $z_i$ (rectangluar shape) is made up of lower level child nodes which are connected via an operation (circular shape).}
 \eg
 \begin{align}
-    \frac{\partial z_1}{\partial z_3} & = 2 z_3 \\
+    \frac{\partial z_1}{\partial z_3} & = 2 z_3
 \end{align}
 The result of $f$ can now be calculated by inserting some values for the end nodes $x_1$ and $x_2$ and then moving through the tree, from the bottom to the top.
 This is called a \textbf{forward pass} as this is also how such equations are solved normally.
@@ -229,7 +232,7 @@ Thus,  $\frac{\partial f}{\partial z_0} = 1$, can be easily obtained.
 Calculating the gradient for $z_0$'s child nodes is almost equally easy as the chain rule is applied.
 \begin{align}
     \frac{\partial f}{\partial z_1} & = \frac{\partial f}{\partial z_0} \cdot \frac{\partial z_0}{\partial z_1} = 1 \cdot z_2 = z_2 \\
-    \frac{\partial f}{\partial z_2} & = \frac{\partial f}{\partial z_0} \cdot \frac{\partial z_0}{\partial z_2} = 1 \cdot z_1 = z_1 \\
+    \frac{\partial f}{\partial z_2} & = \frac{\partial f}{\partial z_0} \cdot \frac{\partial z_0}{\partial z_2} = 1 \cdot z_1 = z_1
 \end{align}
 So now the gradient for nodes $z_1$ and $z_2$ is known as well.
 Notably, the gradients of $z_1$ depends on $z_2$ and vice versa.

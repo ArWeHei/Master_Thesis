@@ -53,7 +53,7 @@ Neural style transfer, which builds on filter-based approaches, is generally not
 Since a set of pixels is directly transformed into another set of pixels, there is no brushstroke data available.\\
 Painterly renderings do not suffer from such problems.
 They are inherently based on using brushstrokes to generate an entire image.
-Most of these approaches focus on stylizing images, but few have tried to imitate paintings as well~\cite{paintbot,lpaintb}.\\
+Most of these approaches focus on stylizing images, but few have tried to imitate paintings as well~\cite{paintbot,LpaintB}.\\
 Both approaches trained recurrent neural networks specifically to reconstruct a single image.
 The resulting approximations of paintings would resemble the original input, but not on a brushstroke level.
 Even though they claim, that the trained neural network could be reused for style transfer, the use of a prediction network is likely a burden to the approach.
@@ -64,7 +64,7 @@ This thesis will present an approach which is orthogonal to many recent implemen
 Instead of training a network to predict the brushstroke parameters, the parameters are optimized directly.
 
 Early painterly rendering approaches built on a similar set-up.
-They would formulate an energy function to describe how well the parameters describe the image~\cite{hertzmann_review}.
+They would formulate an energy function to describe how well the parameters describe the image~\cite{hertzmannreview}.
 Finding a minimum for these energy functions requires advanced searching algorithms like evolutionary algorithms~\cite{genetic_algo}.
 \begin{marginfigure}
     \includegraphics{genetic_starry_night}
@@ -123,7 +123,7 @@ Three qualities are important when is comes to creating the data set:
 \marginnote{RGBA has a fourth channel besides the three color channels, which hold information about the opacity of every pixel.}
 
 \subsubsection{Brushstroke Images}
-There are some data sets with single scanned hand-drawn brushstrokes available on the internet~\cite{zolee_on_onlygfx}.
+There are some data sets with single scanned hand-drawn brushstrokes available on the internet~\cite{zolee}.
 Some even come with the background removed on which they were drawn on.\\
 Such data has the advantage that it consists of actual real-world brushstrokes.
 On the other side, the data is very sparse.
@@ -185,7 +185,7 @@ These parameters must quantify the following three properties of brushstrokes:
 Naturally, color is approximated by three 8-bit numbers in the RGB format.\\
 Path and thickness depend on the given coordinate scaling which is $[0, 1]$ in \citetitle{fluidpaint}.
 Valid brush sizes are any value in $[0, 1]$ from an infinitely small brushstroke ($0$) to one as wide as the canvas ($1$).
-Both these edge cases do not make sense in this approach, thus the range is constrained to $[.03, .2]$.
+Both these edge cases do not make sense in this approach, thus the range is constrained to $[0.03, 0.2]$.
 This range includes only brushstrokes that are visible but do not cover the whole canvas.\\
 
 Quantifying the path is a little more tricky.
@@ -197,7 +197,7 @@ Due to the length of the bristles an offset is introduced.
 Also, the bristles need to be aligned such that a ``clean'' brushstroke is drawn.
 Further information on how this has been implemented can be found in the appendix (see \refsec{fluidpaint}).
 \begin{marginfigure}
-    \includegraphics{bezier_sample}
+    \includegraphics{bristles}
     \caption[]{Virtual bristles in \citetitle{fluidpaint} as they are initialized.}
 \end{marginfigure}
 \todo{add figure of bristles/fluidpaint bristles}
@@ -206,32 +206,36 @@ Another question is how to express a curved path in numbers for the neural rende
 A straightforward representation would be a sequence of points that make up the curved path.
 Such an approach allows for the highest versatility.
 \begin{marginfigure}
-    \includegraphics{bezier_sample}
-    \caption[]{(a) typical path of a brushstroke in a painting. (b) a rarely observed path~\cite{onlygfx}.}
+    \subfloat[Original Brushstrokes]{%
+        \includegraphics{brushstrokes_vg}
+    }\qquad
+    \subfloat[Sample Brushstroke]{%
+        \includegraphics{zolee}
+    }\qquad
+    \caption[]{(a) typical paths of a brushstroke in a painting. (b) a rarely observed path. Sources:\url{https://www.vangoghmuseum.nl/en/collection/s0164V1962}~\cite{zolee}.}
     \labfig{genetic}
 \end{marginfigure}
 At the same time it introduces a noticeable amount of parameters as each point consists of 2 coordinates, totaling 40 additional dimensions.
 Also, each point is not independent of the other points but should lie withing a certain range and follow a reasonable path. 
 Otherwise, the resulting brushstrokes would resemble more of a scribble than what a brushstroke is expected to look like.
 
-Drawing networks often face the same issue and many rely on Bézier curves as a parametrization~\cite{SPIRAL, neuralpainters, learning2paint}.\\
 \textbf{Bézier curves} parametrize curved paths and are often used in computer graphics.
 Instead of linear segments, they define analytical paths for curves of different orders.
 In this case, quadratic Bézier curves are already sufficient.\\
 A curve is defined by its start and end point, as well as a control point (more points for higher orders).
 These points are connected by lines such that control points have two lines connecting them, and start- and end points only one line.
-Over the time interval $[0, T]$ a virtual point moves along each of these lines linearly.
-\marginnote{The linear motion starts at the point with the lower index.
-The start point has the lowest index, the end point the highest index.
-Any control points in between get higher indices in the order they are placed.
-Thus a virtual point will always start at the start point $t=0$ and end at the end point $t = T$.}\\
+Over the time interval $[0, T]$ a virtual point moves along each of these lines linearly.\\
 As two such points, in the quadratic case, give two paths a another line is introduced to connect these two virtual points.
 This line will now change as the virtual points move linearly in $[0, T]$.
 Another virtual point is then placed on this line and also moves linearly in $[0, T]$.
 This point will follow a more complex path as the line on which it moves, is not static anymore.
 Thus, the path of this point defines a curve as originally intended.\\
+\marginnote{The linear motion starts at the point with the lower index.
+The start point has the lowest index, the end point the highest index.
+Any control points in between get higher indices in the order they are placed.
+Thus a virtual point will always start at the start point $t=0$ and end at the end point $t = T$.}
+Drawing networks often face the same issue and many rely on Bézier curves as a parametrization~\cite{SPIRAL, neuralpainters, learning2paint}.\\
 A quadratic Bézier curve will only bend into one direction or follow a straight path.\\
-\marginnote{For higher orders, the displayed process can be applied iteratively and allows for more complex curves.}
 As brushstrokes usually follow a rather simple path and fewer parameters are preferred, quadratic Bézier curves are used as parametrization.
 This is also the case in many drawing networks~\cite{SPIRAL, neuralpainters, learning2paint}.
 \begin{marginfigure}
@@ -239,6 +243,7 @@ This is also the case in many drawing networks~\cite{SPIRAL, neuralpainters, lea
     \caption[]{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm, \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
     \labfig{genetic}
 \end{marginfigure}
+\marginnote{For higher orders, the displayed process can be applied iteratively and allows for more complex curves.}
 
 Ultimately, there will be ten values that are sufficient to parametrize brushstrokes with certain constraints:
 \begin{itemize}
@@ -268,7 +273,7 @@ The length of these bristles directly correlates to the brush size/width.\\
 Another motivation is the intended use-case, which will focus on van Gogh paintings.
 As van Gogh did not practice pointillism, most of his strokes have a length to them, which brings such a constraint in line with some characteristics of van Gogh's style.\\
 Subsequently, $\vec{s}$, $\vec{e}$ and the brush size are sampled together such that $\vec{s}$ and $\vec{e}$ are further apart than two-times the brush size.\\
-The brush size is sampled from a uniform distribution in $[.03, .2]$ and $\vec{s}$ and $\vec{e}$ are sampled in a uniform distribution in $[0, 1]^2$.
+The brush size is sampled from a uniform distribution in $[0.03, 0.2]$ and $\vec{s}$ and $\vec{e}$ are sampled in a uniform distribution in $[0, 1]^2$.
 If the relation
 \begin{align}
     \norm{\vec{s} - \vec{e}} \geq 2 \times \text{brush size}
@@ -279,13 +284,13 @@ Similar constriants apply to the curvature:
 Most brushstrokes (especially those by van Gogh) have a certain ``flow'' or ``smoothness'' to them.
 ``Smooth'' brushstrokes do not follow a kinky path but feature curvatures with large radii.\\
 \begin{marginfigure}
-    %\includegraphics{patch_starrynight}
+    \includegraphics{starry_strokes}
     \caption[]{Brushstrokes by van Gogh in a painting (The Starry Night).}
 \end{marginfigure}
 Thus, the data set will be restricted to brushstrokes that follow these descriptions.
 To achieve this with random sampling in place, a multivariate Gaussian distribution is placed between start ($\vec{s}$) and end point ($\vec{e}$).
-The Gaussian is parametrized by an offset $\vec{mu}$ and a covariance matrix $\mat{\Sigma}$.
-$\vec{mu}$ is picked such that the distribution is centered between $\vec{s}$ and $\vec{e}$.
+The Gaussian is parametrized by an offset $\vec{\mu}$ and a covariance matrix $\mat{\Sigma}$.
+$\vec{\mu}$ is picked such that the distribution is centered between $\vec{s}$ and $\vec{e}$.
 \begin{align}
     \vec{\mu} = \frac{\vec{s} + \vec{e}}{2}
 \end{align}
@@ -294,9 +299,9 @@ One of the principal axes of $\mat{\Sigma}$ shall align with the directional vec
     \vec{q}_1 & = \vec{s} - \vec{e} \\
     \hat{\vec{q}}_1 & = \frac{\vec{q}_1}{\norm{\vec{q}_1}} \\
     \hat{\vec{q}}_2 & = \mat{R} \hat{\vec{q}}_1 \text{ s.t. } \hat{\vec{q}}_2 \perp \hat{\vec{q}}_1 \\
-    \mat{Q} = (\hat{\vec{q}}_1, \hat{\vec{q}}_2)
+    \mat{Q} & = (\hat{\vec{q}}_1, \hat{\vec{q}}_2)
 \end{align}
-$\hat{\vec{q}}_1$ and $\hat{\vec{q}}_2$ build an orthonormal 2D basis which are the eigenvectors of the eigendecomposition of $\mat{\Sigma}$ .
+$\hat{\vec{q}}_1$ and $\hat{\vec{q}}_2$ build an orthonormal 2D basis which are the eigenvectors of the eigendecomposition of $\mat{\Sigma}$.
 The respective eigenvalues $\lambda_1$ and $\lambda_2$ are handpicked such that the distribution is narrow along $\hat{\vec{q}}_1$ but broad along $\hat{\vec{q}}_2$.
 \begin{align}
     \lambda_1 & = \frac{1}{200} \\
@@ -307,7 +312,7 @@ Thus, the eigendecomposition of $\mat{\Sigma}$ is known and $\mat{\Sigma}$ can b
 \begin{align}
     \mat{\Sigma} = \mat{Q} \mat{\Lambda} \mat{Q}^T
 \end{align}
-Figure \ref{fig:datageneration} shows samples from this distribution for an exemplary set of start and end point.
+\reffig{scatter} shows samples from this distribution for an exemplary set of start and end point.
 \begin{marginfigure}
     \resizebox{\textwidth}{!}{
         \input{images/scatter.pgf}
@@ -322,7 +327,7 @@ Bent brushstrokes will mostly be symmetric as $\hat{\vec{q}}_2$ is the long axis
 Thus, the region which is of most interest will be densely populated.\\
 Still, some brushstrokes will have their bent slightly towards either end of the brushstroke and others will feature tight curvature.
 \begin{align}
-    p(\vec{c}| \vec{s}, \vec{e}) & = \mathcal{N}(\vec{\mu}, \mat{\Sigma}) \labeq{checkpoint} \\
+    p(\vec{c}| \vec{s}, \vec{e}) & = \mathcal{N}(\vec{\mu}, \mat{\Sigma}) \labeq{checkpoint}
 \end{align}
 If $\vec{c}$ lies outside $[0, 1]^2$ it is re-sampled.\\
 $\vec{s}$, $\vec{e}$ and $\vec{c}$ are also scaled with the handpicked factor of $0.7$ to ensure the brushstrokes are rendered completely within the window and not cut by an edge of the render window.
@@ -332,7 +337,7 @@ Each RGB value is sampled from a uniform distribution as a color.
 
 The resulting tuple of start, end and control point, brush size, and RGB color is then rendered.
 
-The render canvas size was chosen to be 64x64 pixels for several reasons:
+The render canvas size was chosen to be $64\times64 \si{\pixel}$ for several reasons:
 First, even with such a small canvas size, training of the renderer takes about one day.
 Secondly, the larger the render canvas size becomes, the deeper the renderer needs to be, which results in more computational overhead not only in training but in the optimization procedure as well.
 Lastly, there will be upwards of a thousand brushstrokes in a single image and increasing the canvas size to 128x128 would require four times as much memory per rendered image.
@@ -353,14 +358,14 @@ At the end of the block the activations are bilinearly upsampled.
 The number of kernels decreases logarithmically with every layer.
 Notably every convolution has two additional input channels with coordinates along each axis as values.
 This is called CoordConv~\cite{coordconv}.
-Two other additions to the convolutional block have been inspired by StyleGAN~\cite{stylegan}.
+Two other additions to the convolutional block have been inspired by StyleGAN~\cite{StyleGAN}.
 First, the activations are augmented with weighted noise inputs.
 The scale of the additional noise is a trainable parameter in the network.
 Secondly, a style modulation is applied to the normalized activations.
 This means that an additional fully connected pipeline with four layers is implemented to give a set of activations.
 These activations are then the inputs to single independent fully connected layers at every scale.
 These FC layers predict the affine parameters of every instance normalization.\\
-The last convolutional block has neither normalization nor upsampling but a hyperbolic tangent function to restrict the output to $[-1, 1]$.\\
+The last convolutional block has neither normalization nor upsampling but a hyperbolic tangent function to restrict the output to $[-1, 1]$.
 
 The discriminator is similarly built.\\
 It employs the same convolutional blocks with a few changes.
@@ -388,6 +393,8 @@ The last FC layer consists of only eight unit, which act are predictors.
 %\end{figure*}
 
 \subsection{Training}
+\marginnote{The Frechet inception distance (FID) is calculated by comparing the statistics of InceptionNet~\cite{inception}-activations for two batches of samples from the dataset and generated samples~\cite{FID}.
+This is somewhat similar to perceptual distance.}
 Training is set up in an adversarial fashion.
 Thus, the generator predicts a brush stroke form parameters and the discriminator tries to tell is apart from a given sample from the data set.
 RaGAN defines the adversarial objective during training.\\
@@ -396,31 +403,25 @@ This way e meaningful decoding is learned in the beginning but the is no blurrin
 L2 distance and the FID score serve as evaluation metrics during training.
 The L2 distance does not qualify as a sufficient metric for later training stages due to the stochastic nature of the brushstrokes.
 The FID score serves as a metric for the visual similarity to the data set as the visual comparison of the generated samples has proven difficult between different experimental runs.
-\marginnote{The Frechet inception distance (FID) is calculated by comparing the statistics of InceptionNet~\cite{inception}-activations for two batches of samples from the dataset and generated samples~\cite{FID}.
-This is somewhat similar to perceptual distance.}
 
 A two-time-step update rule was implemented to stabilize training further.
 This way, the discriminator and generator are updated at different frequencies.
 If, for instance, the discriminator becomes too strong and the generator's loss increases, the generator is update more often than the discriminator to balance both networks again.
 
 \subsection{Results}
-\reffig{brushstroke} shows a generated sample compared to a rendered sample with the same parameters.
+\reffig{singlestrokes} shows a generated sample compared to a rendered sample with the same parameters.
 The images are split into their RGB channels and the alpha channel to allow evaluating the two independently.
-\reffig{single_brushstroke} shows all four channels merged for a generated brushstroke.
+\reffig{singlestroke_rgba} shows all four channels merged for a generated brushstroke.
 It becomes immediately clear that the neural renderer is capable of imitating \citetitle{fluidpaint}.
 \begin{marginfigure}
-    \resizebox{\textwidth}{!}{
-        \input{images/scatter.pgf}
-    }
+    \includegraphics{singlestroke}
     \caption[]{Generated sample and the corresponding data set sample compared.}
-    \labfig{scatter}
+    \labfig{singlestrokes}
 \end{marginfigure}
 \begin{marginfigure}
-    \resizebox{\textwidth}{!}{
-        \input{images/scatter.pgf}
-    }
+    \includegraphics{singlestroke_rgba}
     \caption[]{Generated brushstroke.}
-    \labfig{scatter}
+    \labfig{singlestroke_rgba}
 \end{marginfigure}
 
 Further analysis of the results will be presented in the next chapter.
@@ -449,6 +450,7 @@ They often argue that artists place brushstrokes in the same sequential manner.
 This is true as artists rarely use multiple brushes at the same time.
 However, this leads to an issue when placing the first few brushstrokes in an image.\\
 \begin{marginfigure}
+    \includegraphics{sequence}
     \caption{Series of brushstroke predictions with a sequential approach.}
 \end{marginfigure}
 It can be observed that these early brushstrokes are all very large and fill up the entire canvas.
@@ -462,7 +464,8 @@ Nevertheless, artists usually do not cover the whole canvas in a single color bu
 Also, few artists use giant brushes for this but sensible brush sizes which still give a lot of control over the paint.
 %artists iterate over the image spatially, draw some lines here, they are all realted to each other.
 \begin{marginfigure}
-    \caption{Canvas in the middle of the painting process.}
+    \includegraphics{inthemiddle}
+    \caption{Canvas in the middle of the painting process with a parallel approach.}
 \end{marginfigure}
 
 Ultimately, all sequential approaches suffer from this shortcoming as planing this well ahead is really difficult for neural networks.
@@ -490,8 +493,9 @@ Therefore, more information per image is required, than just the resolution.
 The scale of the image is, hence, necessary information.
 All images of paintings should then be rescaled such that the pixel density is equal among all images.
 Previous brushstroke extraction approaches did the same and therefore requested high resolution images from galleries~\cite{rhythmic, lamberti}.\\
-Through visual examination and experimental evaluation a pixel density of $13 \frac{\text{pixels}}{\si{\centi\meter}} \approx 33 \text{dpi}$ has been determined ideal.
+Through visual examination and experimental evaluation a pixel density of $13 \frac{\si{pixel}}{\si{\centi\meter}} \approx 33 \text{dpi}$ has been determined ideal.
 \begin{marginfigure}
+    \includegraphics{patch_size}
     \caption{Size comparison of an image patch and the render window size (taken from ``The Little Arlesienne'').}
 \end{marginfigure}
 
@@ -505,7 +509,7 @@ Whenever it was possible the preferred source was the webpage of the Van Gogh Mu
 The optimization approach has already been compared to the style transfer approach by \citeauthor*~{gatys} \cite{gatys}, with parameters optimized instead of pixels.
 However, by going from pixels to brushstrokes, a major problem arises with the loss of apparent structure.
 The grid-structure of pixels is already defined and well-known, but usually parameters come without any structure to them.
-Especially, since a painting image ($1000\times1000$) is several times larger than the render window ($64\times64$).\\
+Especially, since a painting image ($1000\times1000 \si{\pixel}$) is several times larger than the render window ($64\times64$).\\
 If both had the same size, this would be easier, since render window and canvas would co-align.
 In order to fill the canvas, several render windows can be stacked on top of each other.
 
@@ -516,9 +520,9 @@ Since brushstrokes are confined in their render window the giant pixel structure
 Also, the variability of a brushstroke is significantly limited, since the control point has to lie withing the render window.
 Additionally, such a grid structure would cut brushstrokes that cross the edges between the grid cells in half.
 All of this is undesirable behavior when the focus lies on approximating brushstrokes.
-\begin{marginfigure}
-    \caption{The result of testing a non-overlapping grid layout for render windows. }
-\end{marginfigure}
+%\begin{marginfigure}
+%    \caption{The result of testing a non-overlapping grid layout for render windows. }
+%\end{marginfigure}
 
 An easy solution to this problem is a grid of render windows with a smaller lattice constant.
 If the lattice constant is smaller than the render window size (\eg half the window size), then the render windows start to overlap.
@@ -527,7 +531,8 @@ This principle can be taken further by reducing the lattice constant even more.
 At the same time one can go from stacking render windows in the same place to placing just a single render window at every position.
 This way, the edges of the render windows are well-hidden.
 \begin{marginfigure}
-    \caption{Two different layout patterns illustrated.}
+    \includegraphics{the_layers}
+    \caption{Various layout patterns illustrated.}
 \end{marginfigure}
 
 Nevertheless, this kind of initialization requires a very even distribution of brushstrokes.
@@ -548,7 +553,7 @@ The core of this problem is the imposed lattice structure that could propagate l
 
 One possible solution is getting rid of the lattice structure and replacing it with a non-symmetric structure.
 Superpixels are an easy way of evenly spacing brushstrokes without a regular structure.
-\marginnote{Superpixels were popular in the 'pre-neural network era' of computer vision and were used in image segmentation tasks \cite{superpixel_segmentation}.
+\marginnote{Superpixels were popular in the 'pre-neural network era' of computer vision and were used in image segmentation tasks \cite{superpixel}.
 Each superpixel defines a groupd of pixels that is pairwise disjoint to all other superpixel \ie they do not overlap.
 Superpixels-like algorithms are also a valid starting point for brushstroke extraction algorithms \cite{lamberti}.}
 
@@ -572,7 +577,7 @@ By using this information the optimization procedure can be accelerated as the c
 If it is not correct, it is still not worse than randomly initializing a color.\\
 The brush size will be initialized with the minimum possible value.
 This way, brushstrokes do not overlap at the beginning of optimization.\\
-Other patch parameters, namely $\vec{s}$, $\vec{e}$ and $\vec{c}$, will be initialized using a narrow Gaussian distribution with $\sigma = .1$ and values clipped to $[-1, 1]$.
+Other patch parameters, namely $\vec{s}$, $\vec{e}$ and $\vec{c}$, will be initialized using a narrow Gaussian distribution with $\sigma = 0.1$ and values clipped to $[-1, 1]$.
 There is no prior information available on how the brushstrokes should be oriented, thus they should also not overlap, as it has been argued for the brush size.
 
 \subsection{Rendering Order}
@@ -628,7 +633,7 @@ It is only important to maintain the order which has been imposed before for eve
 Before there were many layers that represented one single brush stroke each, in the new representation the layers just correspond to the overall position in the hierarchy.
 Each pixel of the top layer will thus be the first non-zero alpha value with its corresponding RGB values when searching through the layers from the top.
 \marginnote{If alpha values would be one everywhere in the top-layer this would mean that the top layers is equal to resulting blended image.
-Since the alpha values follow $0 < alpha < 1$ for many pixels at the border of each brushstroke, it requires more than one layer.}
+Since the alpha values follow $0 < \alpha < 1$ for many pixels at the border of each brushstroke, it requires more than one layer.}
 
 Additionally, it is possible to avoid iterative blending.
 By transforming the tensor which holds all alpha values for all layers, it is possible to perform alpha blending as a single matrix multiplication with the stack of image layers.
@@ -646,7 +651,7 @@ If each brushstroke is placed on the virtual canvas individually, a couple thous
 As a single 1MP image carries roughly $1000 \times 1000 \times 4 \text{channels} \times 8 \frac{\si{\bit}}{channel} = 32 \times 10^{6} \si{\bit} = 4 \times 10^{6} Byte = 4 MB$ of information, a few thousand of these will easily exceed the memory of most graphics cards.\\
 \marginnote{Images are typically saved as unsigned 8-Bit integers, thus $8 \si{\bit} = 1 \si{\byte}$ per channel.}
 Still, there is a way around this bottleneck, by optimizing the image not as a whole but as smaller patches consisting of 256 brushstrokes at a time.
-%reference the spatial predicitons of lpaintb and paintbot
+%reference the spatial predicitons of LpaintB and paintbot
 %is not as easy since layout is not stacked.
 \citeauthor*{paintbot} already introduced a similar approach as their network predict brushstrokes for a small window size.
 This window then slides over the image and brushstrokes are spatially predicted.\\
@@ -697,7 +702,7 @@ Perceptual loss has been presented together with \citetitle{gatys} in \refsec{ST
 The perceptual distance captures whether content in both images is the same, which includes how well edges between the two input images are preserved.
 Together with MSE loss, a perceptual loss is often used to get better reconstructions than with MSE loss alone
 
-As an extension to perceptual loss, \citeauthor*{lpips} introduced perceptual similarity or \textbf{LPIPS loss}, which specifically weighs many different layers of the pre-trained VGG-network in order to increase the effectiveness of perceptual distance between two images \cite{lpips}.
+As an extension to perceptual loss, \citeauthor*{LPIPS} introduced perceptual similarity or \textbf{LPIPS loss}, which specifically weighs many different layers of the pre-trained VGG-network in order to increase the effectiveness of perceptual distance between two images \cite{LPIPS}.
 LPIPS loss is meant to preserve edges even better than perceptual loss does with a similar computational overhead.
 
 Besides losses that operate in pixel space, it is also necessary to restrict the action space for each brushstroke.
@@ -736,17 +741,17 @@ As $\vec{c}$ was originally sampled from a multivariate Gaussian with fixed para
 This requires to account for the position of  $\vec{s}_b$ and $\vec{e}_b$ in relation to $\vec{c}_b$.\\
 First, the orthonormal basis $(\hat{\vec{q}}^b_1, \hat{\vec{q}}^b_2)$ with respect to $\vec{s}_b$ and $\vec{e}_b$ must be calculated.
 \begin{align}
-    \hat{\vec{q}^b_1} & = \frac{\vec{s}_b - \vec{e}_b}{\norm{\vec{s}_b - \vec{e}_b}_2} \\
-    \hat{\vec{q}^b_2} & = R_{\pi/2} \hat{\vec{q}^b_1} \\
+    \hat{\vec{q}}^b_1 & = \frac{\vec{s}_b - \vec{e}_b}{\norm{\vec{s}_b - \vec{e}_b}_2} \\
+    \hat{\vec{q}}^b_2 & = R_{\pi/2} \hat{\vec{q}}^b_1 \\
     \text{with } R_{\pi/2} & =
     \begin{pmatrix}
         \cos \pi/2 & -\sin \pi/2 \\
         \sin \pi/2 & \cos \pi/2
-    \end{pmatrix} \text{ s.t. } \hat{\vec{q}^b}_2 \perp \hat{\vec{q}^b}_1
+    \end{pmatrix} \text{ s.t. } \hat{\vec{q}}^b_2 \perp \hat{\vec{q}}^b_1
 \end{align}
 Then $\vec{c}_b$ can be projected into the coordinate system spanned by  $\mat{Q} = (\hat{\vec{q}}^b_1, \hat{\vec{q}}^b_2)$:
 \begin{align}
-    \vec{c}'_b & = (\vec{c}_b - \vec{a}_b) \mat{Q}
+    \vec{c}'_b & = (\vec{c}_b - \vec{a}_b) \mat{Q} \\
     \vec{a}_b & = \frac{\vec{s}_b + \vec{e}_b}{2}
 \end{align}
 Now, the mean and the covariance matrix can be calculated for $b \in B$
@@ -761,14 +766,14 @@ Since the axes of $\Sigma_B[\vec{c}']$ co-align with the eigenvectors that were 
 \begin{align}
     \L_{\text{KL}} = \frac{1}{2}\left[\log\frac{|\Sigma|}{|\tilde{\Sigma}|} - d + \text{tr} ( \Sigma^{-1}\tilde{\Sigma} ) + (\mu - \tilde{\mu})^T \Sigma^{-1}(\mu - \tilde{\mu})\right]
 \end{align}
-with 
+for $d$ dimensions with 
 \begin{align}
     \tilde{\mu} & = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \\
     \tilde{\Sigma} & = \begin{pmatrix} \frac{1}{200} & 0 \\ 0 & \frac{1}{25} \end{pmatrix}
 \end{align}
 with the previously chosen eigenvalues already inserted into the equation.
 \marginnote{Kullback-Leibler (KL) divergence is a function that allows to measure how well a distribution $q$ matches a given distribution $p$.
-For Gaussian distributions the KL divergence is well defined~\cite{KLdiv}}
+For Gaussian distributions the KL divergence is well defined~\cite[p.~76]{deeplearning}}
 
 In theory, $L_{\text{KL}}$ and $L_{\text{bs}}$ should be able to ensure that the optimized parameters fit the distribution of the data set.
 Subsequently, parameters tend to stay within the training space of the renderer.\\
@@ -780,12 +785,13 @@ Thus it will be favorable to include as many strokes as possible when calculatin
 \subsection{Optimization Details}
 \labsubsec{opt:details}
 
-The optimization procedure is based on standard backpropagation and an AdaM optimzier, although others (most notably \citeauthor*{gatys} use L-BGFS-B).
+The optimization procedure is based on standard backpropagation and an AdaM optimzier, although others (most notably \citeauthor*{gatys} use L-BFGS).
 
 As it has been explained, it is not possible to optimize brushstrokes for the whole image in parallel.
 This is partly due to the neural renderer's memory requirements, which scales with the number of rendered patches.
 The memory requirement of placing and blending, on the other hand, scales with the number of rendered brushstrokes as well as the number of surrounding brushstrokes and the patch window size.\\
-Experiments have shown that a combination of 256 rendered brushstrokes with 128 surrounding brushstrokes paired with a patch window size of 320x320 pixels occupies around $9.5 \si{\gibi \byte}$ of memory which leaves enough space for more advanced losses and tweaks to the network architecture.
+Experiments have shown that a combination of 256 rendered brushstrokes with 128 surrounding brushstrokes paired with a patch window size of $320
+\times320 \si{\pixel}$ occupies around $9.5 \si{\gibi \byte}$ of memory which leaves enough space for more advanced losses and tweaks to the network architecture.
 It is important to choose a large-enough patch window size, because with too-small window size, the rendered brushstrokes will not fully fit into the patch window and stay without a gradient.
 
 The learning rate for the optimization procedure can be significantly larger than for training the neural renderer.
@@ -794,7 +800,7 @@ With a learning rate of $0.02$, the optimization procedure will converge signifi
 One choice, which has to be made individually per target image is how many brushstrokes will cover the image.
 As larger images require more brushstrokes than smaller images, what should remain the same is the \textbf{brushstrokes density}.
 The inverse brushstroke density will decide how many pixels on average should be covered by each brushstroke.
-A number of $100 \text{pixels}/\text{brushstroke}$ has produced the best results during the experiments.
+A number of $100 \si{\pixel}/\text{brushstroke}$ has produced the best results during the experiments.
 
 Another important choice that goes along the choice of how dense the brushstrokes should be distributed is that of how many optimization steps each brushstroke will be object to.
 As for too few steps, the training will not have converged, and for too many, optimization will take an unnecessary amount of time.\\

@@ -20,13 +20,13 @@ However, planes are not birds, as they are not flapping their wings (yet?), but 
 Similarly, the brain features a lot of insights, how intelligence or something that seems like it can be modeled.
 In the same way, that humans studied birds to understand flying, researchers are now studying the brain to create better artificial intelligence.
 
+\marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success~\cite{brainscales}.}
 In the earliest stages of this research, they would try to imitate the brain, as people have tried imitating birds at first; and they failed similarly.
 \begin{figure}
     \includegraphics{otto_lilienthal}
-    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. Source:\url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
+    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. Source:\url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei -wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
     \labfig{lilienthal}
 \end{figure}
-\marginnote{There is current research on replicating the brains structure to the neuron level on hardware with more success~\cite{brainscales}.}
 
 Warren McCulloch and Walter Pitts proposed one of the earliest models of an artificial neuron.
 They aimed at simplifying models of a biological neuron at the time.
@@ -43,11 +43,11 @@ A neuron receives signals through its dendrites, which all lead to the cell body
 The cell body accumulates these signals.
 If the summed value of the signals' potentials reaches a certain threshold, an action potential (spike) is generated.
 The spike then travels as a signal along the axon and its branches towards other neurons.
+\marginnote{Cell potentials are decreased by excitatory signals, as the action threshold sits below the resting potential.}
 Axons end in synapses that connect to other neurons' dendrites.
 Synaptic transmissions are usually mediated by chemicals and not by electrical signals.
 The chemical nature of the synapse allows it to forward either an excitatory or an inhibitory signal.
 Excitatory signals will bring the cell potential closer to the threshold, while inhibitory do the opposite~\cite[p.~42]{coloratlas}.
-\marginnote{Cell potentials are decreases by excitatory signals, as the action threshold sits below the resting potential.}
 
 What makes the brain so powerful, though, is not the neuron itself with its arguably simple structure but the vast network of billions of these neurons.
 Each neuron is connected to thousands of other neurons with which it communicates.
@@ -64,11 +64,10 @@ A neuron only becomes active if the number of incoming positive signals minus th
     \caption[]{Schematics of a neuron and a simple unit. Source:\url{https://appliedgo.net/media/perceptron/neuron.png}}
     \labfig{linear_class}
 \end{marginfigure}
-
-\todo{add equation with activation function, when neuron fires}
 \begin{align}
+    \labeq{mcculloch}
     g(x_1, x_2, ...) & = \sum_i^N x_i \\
-    y = f(g(x_1, x_2, ...)) = \begin{cases} 1 \text{if} g > 0 \\ 0 \text{else} \end{cases}
+    y = f(g(x_1, x_2, ...)) = \begin{cases} 1 \text{ if } g > 0 \\ 0 \text{else} \end{cases}
 \end{align}
 McCulloch and Pitts then also changed the highly parallel and complex nature of biological neural networks to a single layer feed-forward network architecture.
 
@@ -80,7 +79,7 @@ The activation value of each neuron then defines an output.
 
 As this model deviates from nature quite a bit, these structures a better referred to as \textbf{units} instead of neurons.
 
-In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}.
+In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}).
 %\begin{marginfigure}
 %    \includegraphics{feedforward}
 %    \caption[]{Schmeatic of a feed-forward architecture.Source: \url{https://learning.oreilly.com/library/view/r-deep-learning/9781787121089/assets/32d89685-4e2b-4811-81e8-4654d0d98f91.png}}
@@ -101,16 +100,24 @@ This McCulloch's and Pitts' is very much simplified yet comes with some weakness
 Thus, the \textbf{perceptron} has been introduced by Frank Rosenblatt in 1957.
 Instead of having a binary unit, he came up with a linear threshold unit (LTU).
 The LTU allows for numeric instead of binary signals, which can be weighted with independent factors.
-Also, a unit's threshold/bias is parameterized as another weight with a constant input using the 'bias trick'.
+Also, a unit's threshold/bias is parameterized as another weight with a constant input ($W_{i0} = 1$) using the ``bias trick''.
 The resulting equation for each LTU then reads:
-\todo{equation for LTU with bias trick}
+\begin{align}
+    a_i = \begin{cases}
+        1 & \text{ if } \sum_{i=0}^n W_{ij} x_j \leq 0 \\
+        -1 & \text{ if } \sum_{i=0}^n W_{ij} x_j > 0
+    \end{cases}
+\end{align}
 Equation \refeq{LTU} can then be formulated in a vectorized form such that:
-\todo{vectorized LTU}
+\begin{align}
+    \vec{a} & = f(\mat{W}\vec{x}^T) \\
+    f(x) & = \begin{cases} 1 & \text{ if } x \leq 0 \\  -1 & \text{ if } x > 0 \end{cases}
+\end{align}
 
 In this form, the calculations for each unit become mathematically and computationally relatively easy.
 Each layer can be expressed as a vector of activations $\vec{x}$.
 Multiplying this vector with the weight matrix $\mat{W}$ and applying the element-wise activation function returns the activations for the subsequent layer.\\
-\marginnote{The word perceptron describes the whole function $f$ in equation \refeq{perceptron} which can consist of many LTUs}
+\marginnote{The word perceptron describes the whole function $f$ in \refeq{perceptron} which can consist of many LTUs}
 %simplified computational model of how biological neurons might work together
 This capable yet straightforward description of a unit built the base for the first surge of interest in neural networks (connectionism).
 
@@ -122,17 +129,19 @@ A binary linear classifier categorizes inputs into two classes, hence binary.
 It does so by drawing a virtual hyperplane in input space and predicts the class for each input.
 The decision depends on whether a point lies above or below this hyperplane.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{As a simple example, this binary classifier has data on how often the words 'weight loss' and 'invest' appear in an email.
-Any time these two words appear too often, the data point is above the decision boundary. An email is then classified as 'spam'}
+    \resizebox{\textwidth}{!}{
+        \input{images/scatter_percep.pgf}
+    }
+    \caption[]{As a simple example, this binary classifier has data on how often the words ``weight loss'' and ``invest'' appear in an email.
+Any time these two words appear too often, the data point is above the decision boundary. An email is then classified as ``spam''}
     \labfig{linear_class}
 \end{marginfigure}
 As the hyperplane (or decision boundary) is quantified by a linear function, the classifier is described as linear.
 
 A classic problem would be classifying email as spam.
-Given two data inputs (\ie frequency of the words 'weight loss' and 'invest'), the classifier has to make a decision.
+Given two data inputs (\ie frequency of the words ``weight loss'' and ``invest''), the classifier has to make a decision.
 For this reason, the binary classifier defines a \textbf{decision boundary}.
-Any data point that lies above this decision boundary is classified as 'spam', any point beneath is classified as 'not spam'
+Any data point that lies above this decision boundary is classified as ``spam'', any point beneath is classified as ``not spam''
 Since regular emails rarely use the two words, they do not classify as spam.\\
 Other people \ie nutritionists, on the other hand, will have the word weight loss come up more frequently.
 This means the decision boundary must differ for different users and their mail.
@@ -142,11 +151,12 @@ The result is checked whether it is above or below a threshold $t$.
 \begin{align}
     z = w_1 x_1 + w_2 x_2 + b
 \end{align}
-With the classification 'spam' if $z > r$ and 'not-spam' $z \leq r$ (\textit{in dubio pro reo}).
+With the classification ``spam'' if $z > r$ and ``not-spam'' if $z \leq r$ (\textit{in dubio pro reo}).
 Equally $z - r > 0$ holds for spam as well such that the threshold can be brought into the equation and $z$ is checked against $0$.
 $r$ can then be absorbed into the bias.
 \begin{align}
-    \rightarrow z = w_1 x_1 + \hdots + w_D x_D + b - r = w_1 x_1 + \hdots + w_D x_D + b'
+    \Rightarrow z & = w_1 x_1 + \hdots + w_D x_D + b - r \\
+    & = w_1 x_1 + \hdots + w_D x_D + b'
 \end{align}
 
 For arbitrary dimensions $D$ this becomes
@@ -159,7 +169,7 @@ For arbitrary dimensions $D$ this becomes
 \end{align}
 The decision boundary can be easily derived from this, since $\vec{w}$ is the orthogonal vector to the hyperplane and $\frac{b}{\norm{\vec{w}}}$ is the displacement of the plane along $\vec{w}$.
 
-For a simpler notation, one can define an additional 'virtual' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$ (same 'bias trick' as before)
+For a simpler notation, one can define an additional ``virtual'' input which has a constant value of $1$ as $x_0$, the bias $b$ can then be elegantly included into $\vec{w}$ (same ``bias trick'' as before)
 \begin{align}
     z = w_0 b + \vec{w}^T \vec{x} = w_0 b + w_1 x_1 + \hdots + w_D x_D = \vec{\hat{w}}^T \vec{x}
 \end{align}
@@ -173,7 +183,7 @@ In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matric
 \begin{align}
     \vec{x} & \rightarrow (\vec{x}_1, \vec{x}_2, ...) = \mat{X} \\
     \vec{w} & \rightarrow (\vec{w}_1, \vec{w}_2, ...) = \mat{W} \\
-    & \rightarrow \vec{z} = \mat{\hat{W}}^T \vec{X} \\
+    & \Rightarrow \vec{z} = \mat{\hat{W}}^T \vec{X}
 \end{align}
 
 
@@ -181,7 +191,7 @@ In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matric
 With a mathematical definition at hand, the next step is to quantify the output.
 In order to train a classifier, an objective has to be formulated through a \textbf{loss function}.
 Usually, there is already a data set for the network to train on.\\
-In the given example this would be mails which were read beforehand and then declared either 'spam' $\tilde{y}_i = 1$ or 'not-spam' $\tilde{y}_i = -1$
+In the given example this would be mails which were read beforehand and then declared either ``spam'' ($\tilde{y}_i = 1$) or ``not-spam'' ($\tilde{y}_i = -1$).
 $\tilde{y}_i$ is called the \textbf{label} for a sample $x_i$ with index $i$.
 
 With the binary linear classifier, the decision boundary has been introduced (check $z_i > 0$) to predict a label for any given sample.
@@ -203,6 +213,12 @@ Yet, this score function is especially susceptible to outliers which will cause 
 
 For this reason \textbf{support vector machines (SVM)} employ a \textbf{maximum margin} classifier.\\
 A maximum margin classifier seeks to find a decision boundary which is as far from the closest representatives of each class as possible (see \reffig{SVM}).
+\begin{marginfigure}
+    \includegraphics{SVM}
+    \caption[]{The maximum margin in an SVM splits the classes with a boundary such that the distance to the closest sample of each class is maximized. Source: \url{https://cdn-images-1.medium.com/max/2000/1*nUpw5agP-Vefm4Uinteq-A.png}}
+    \labfig{SVM}
+\end{marginfigure}
+
 The maximum margin is defined as
 \begin{align}
     \text{margin} = d_+ + d_-
@@ -242,7 +258,7 @@ under the constraints
     \tilde{y}_i z_i = \tilde{y}_i (\vec{w}_i^T \vec{x} + b) \geq 1 \forall i
     \labeq{constraint}
 \end{align}
-How to solve this optimization problem shall be explained in \refssec{svmopt}.
+One way to solve this problem shall be explained in \refch{Optim}.
 
 \subsection{Regularization}
 Regularizations, combined with loss functions, penalize possible solutions deemed wrong for any particular reason.
@@ -256,11 +272,13 @@ Hence, all weights are summed up and multiplied with a regularization constant $
 \section{Fully Connected Neural Networks}
 \subsection{Multi-Layer Perceptron}
 With the perceptron, which is capable of classification any linear separable data, at hand, the question becomes: What are the limitations to this?
-\citeauthor{perceptrons} found the limitations in 1969 with their book 'Perceptrons'~\cite{perceptrons}.
+\citeauthor{perceptrons} found the limitations in 1969 with their book ``Perceptrons''~\cite{perceptrons}.
 They oulined the limitations of perceptrons with the \lstinline|XOR| problem.
 The problem becomes obvious when looking at the \lstinline|XOR| problem in a 2D plane (see \reffig{XOR})
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
+    \resizebox{\textwidth}{!}{
+        \input{images/scatter_XOR.pgf}
+    }
     \caption[]{\lstinline|OR| and \lstinline|XOR| operations visualized. The \lstinline|XOR| problem cannot be solved by drawing a single line.}
     \labfig{XOR}
 \end{marginfigure}
@@ -282,7 +300,7 @@ By using one perceptron with two units to compute \lstinline|AND| and \lstinline
 
 Thus, DNNs solve the \lstinline|XOR| problem.
 
-\marginnote{The ability to stack \textit{and train} multiple layers in ANNs stems from the discovery of backpropagation which shall be explained in \refssec{backprop}.}
+\marginnote{The ability to stack \textit{and train} multiple layers in ANNs stems from the discovery of backpropagation which shall be explained in \refsec{backprop}.}
 
 Perceptrons, until then, could approximate only linear functions.
 Multiple layers of perceptrons now promise to approximate any higher degree function just as well.
@@ -290,13 +308,13 @@ Thus, \textbf{Multi-Layer Perceptrons (MLP)} sparked new interest in the field o
 
 This interest also originated in the similarly layered structure that has been found in the brain.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{The brains structure under a microscope}
+    \includegraphics{brain}
+    \caption[]{The brains structure under a microscope (cortex). Source:\cite{NN_book}}
     \labfig{brain}
 \end{marginfigure}
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{Layers of an MLP}
+    \includegraphics{MLP}
+    \caption[]{Layers of an MLP. Source:\url{https://deepai.org/machine-learning-glossary-and-terms/multilayer-perceptron}}
     \labfig{MLP}
 \end{marginfigure}
 Ultimately, MLPs really start to show the connected structure in a network that is typically expected.
@@ -336,7 +354,9 @@ Especially the logistic function is popular due to its similarity to the step-fu
     \sigma(z) = \frac{1}{1 + e^{-z}}
 \end{align}
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
+    \resizebox{\textwidth}{!}{
+        \input{images/sigma.pgf}
+    }
     \caption[]{A sigmoid function. It saturates to $1$ for very large inputs and $0$ for very small inputs, similar to the step function.}
     \labfig{sigmoid}
 \end{marginfigure}
@@ -344,14 +364,18 @@ Especially the logistic function is popular due to its similarity to the step-fu
 Another popular choice are rectified linear units (ReLU) which are identical to a linear activation for $z > 0$ but mimic the step function for $z < 0$.
 Basically, a ReLU suppresses the signal of a perceptron until it reaches the threshold of $0$ and then forwards the signal unaltered.
 
-Another activation function 'leaky ReLU' attenuates the signal below the threshold with a factor $\alpha$ instead of fully suppressing it.
+Another activation function ``leaky ReLU'' attenuates the signal below the threshold with a factor $\alpha$ instead of fully suppressing it.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
+    \resizebox{\textwidth}{!}{
+        \input{images/relu.pgf}
+    }
     \caption[]{ReLu activation function}
     \labfig{relu}
 \end{marginfigure}
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
+    \resizebox{\textwidth}{!}{
+        \input{images/lrelu.pgf}
+    }
     \caption[]{leaky ReLu activation function with $\alpha = 0.2$}
     \labfig{lrelu}
 \end{marginfigure}
@@ -391,22 +415,32 @@ Yet, it is possible to avoid this problem by padding an image with values such t
 
 These filters may seem very simple but they are able to capture very interesting properties in an image and transform them as well.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{A convolution in 1D space}
+    \includegraphics{1Dconv}
+    \caption[]{A convolution in 1D space. Source:\url{https://peltarion.com/knowledge-center/documentation/modeling-view/build-an-ai-model/blocks/1d-convolution-block}}
     \labfig{conv}
 \end{marginfigure}
 The easiest example would be a 3x3 filter which blurs the image it is applied to.
 The filter given in \reffig{conv_blur} results in such blurring since the signal of the pixel at the center is dominant but mixed with the signal of its surrounding pixels.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{3x3 filter for blurring.}
+    \setlength{\extrarowheight}{2pt}
+    \begin{TAB}(2, 1cm, 1cm){|c|c|c|}{|c|c|c|}
+        $\frac{1}{16}$ & $\frac{1}{8}$ & $\frac{1}{16}$ \\
+        $\frac{1}{8}$ & $\frac{1}{4}$ & $\frac{1}{8}$ \\
+        $\frac{1}{16}$ & $\frac{1}{8}$ & $\frac{1}{16}$ \\
+    \end{TAB}
+    \caption[]{3x3 filter for blurring (Gaussian Blur).}
     \labfig{conv_blur}
 \end{marginfigure}
 
 Another filter like \reffig{conv_sharp} will sharpen edges in an image since the signal of the surrounding pixels is subtracted from at the center pixel signal. 
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{3x3 filter for sharpening edges.}
+    \setlength{\extrarowheight}{2pt}
+    \begin{TAB}(2, 1cm, 1cm){|c|c|c|}{|c|c|c|}
+        $1$ & $0$ & $-1$ \\
+        $2$ & $0$ & $-2$ \\
+        $1$ & $0$ & $-1$ \\
+    \end{TAB}
+    \caption[]{3x3 filter for detecting edges in the y direction (Sobel filter).}
     \labfig{conv_sharp}
 \end{marginfigure}
 
@@ -421,7 +455,7 @@ The weights of such an FC layer would be sparse, though, which means there are m
 This property makes it clear that convolutions are more efficient than fully connected layers by imposing some simple restrictions.
 
 Similar behavior also occurs when comparing convolutional layers with different kernel sizes.
-By using a larger kernel, the 'field of view' (the area that each pixel in the result layer 'sees') increases as well.
+By using a larger kernel, the ``field of view'' (the area that each pixel in the result layer ``sees'') increases as well.
 At the same time, a larger kernel increases the number of parameters significantly.
 \marginnote{A convolutional kernel with the size of the input would be equivalent to a fully connected layer.}
 The same field of view can also be obtained, though, when using two convolutions in series.\\
@@ -471,7 +505,7 @@ One popular way of grouping is by categorizing the training according to the way
 
 \subsection{Supervised Learning}
 If data is available, which already shows the network's desired behavior, training falls into the supervised learning category.
-Referencing the previous example, this would mean that there are emails available that are already labeled as 'spam' or 'not-spam'.
+Referencing the previous example, this would mean that there are emails available that are already labeled as ``spam'' or ``not-spam''.
 The network can then imitate this behavior from the data. \\
 Most problems fall into the supervised category as they are also the easiest to solve~\cite{grosse}.
 
@@ -487,5 +521,5 @@ Unsupervised learning has to deal with data that has no labels.
 Usually, this means finding patterns in the data on its own~\cite{grosse}.
 Considering the email-spam problem: A network is given all the email data without labels spam or not-spam.
 Ideally, the network is then able to find patterns in emails which allow grouping these emails.
-These groups are then evaluated, and hopefully, one group coincides with the 'spam' label or any other desired label.
+These groups are then evaluated, and hopefully, one group coincides with the ``spam'' label or any other desired label.
 

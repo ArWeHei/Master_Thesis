@@ -100,7 +100,7 @@ To further reinforce such a behavior, and additional constraint is put on the sa
 The sampling parameters should be as close to a standard Gaussian ($\mu = 0, \sigma = 1$) as possible.
 This is enforced by calculating the Kulback-Leibler Divergence between the encoder output and a standard Gaussian.
 \marginnote{The Kulback-Leibler divergence is a measure for two distributions how much they differ.
-For two Gaussian distributions, the Kulback-Leibler divergence takes a well-defined form entirely depending on $\mu_1, \sigma_1$ and $\mu_2, \sigma_2$~\cite{KLdiv}.}
+For two Gaussian distributions, the Kulback-Leibler divergence takes a well-defined form entirely depending on $\mu_1, \sigma_1$ and $\mu_2, \sigma_2$~\cite[p.~74]{deeplearning}.}
 The resulting network then allows to generate samples with the decoder and explore the feature space more easily.
 
 \section{Generative Adversarial Networks}
@@ -150,7 +150,7 @@ A relativistic loss function avoids this by measuring the distance between real 
     \labeq{RSGAN_G}
     G & = \argmin_G - \E_{X, Z}[\log(\sigma(D(G(z)) - D(x))] \\
     \labeq{RSGAN_D}
-    D & = \argmin_D - \E_{X, Z}[\log(\sigma(D(x) - D(G(z)))] \\
+    D & = \argmin_D - \E_{X, Z}[\log(\sigma(D(x) - D(G(z)))]
 \end{align}
 This more symmetric formulation is meant to push the generator closer to generating samples the follow the data distribution.
 
@@ -161,7 +161,7 @@ Instead, the mean of real samples and generated samples is calculated across the
     G & = \argmin_G - \E_Z[\log(\sigma(D(G(z)) - \E_X[D(x)])] \\
     & - \E_X[\log(1 - \sigma(D(x) - \E_Z[D(G(z))])]\\
     \labeq{RAGAN_D}
-    D & = \argmin_D - \E_Z[\log(1 - \sigma(D(G(z)) - \E_X[D(x)])] \\
+    D & = \argmin_D - \E_Z[\log(1 - \sigma(D(G(z)) - \E_X[D(x)])]
     & - \E_X[\log(\sigma(D(x) - \E_Z[D(G(z))])]\\
 \end{align}
 This further improves the quality of generated samples in adversarial training.

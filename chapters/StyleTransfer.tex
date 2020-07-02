@@ -121,7 +121,7 @@ Notably, \citeauthor*{lamberti} seems to be the only publication solely aimed at
         \includegraphics[width=.90\textwidth]{images/cutout_lamberti}%
         \labfig{cutout_lamberti}%
     }
-    \caption[]{Comparison of techniques on a cut out patch from van Gogh's \textit{The Little Arsienne} (a). Manually labeled brushstrokes (b) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{rhythmic} (c) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{lamberti} (d) \cite{lamberti}}
+    \caption[]{Comparison of techniques on a cut out patch from van Gogh's \textit{The Little Arsienne} (a). Manually labeled brushstrokes (b) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{rhythmic} (c) \cite{rhythmic}, extracted brushstrokes by \citeauthor*{lamberti} (d) \cite{lamberti}. Source:~\cite{lamberti}}
     \labfig{cutout_strokes}
 \end{marginfigure}
 
@@ -162,7 +162,7 @@ This flow is then also matched against the style image.
     \def\svgwidth{\textwidth}
     \import{./images/}{texturetransfer.pdf_tex}
     \end{tiny}
-    \caption[]{Target image $T$ is combined with a dictional map specially obtained from $T$ and a style image  $S$. The result maintains the direction's flow while presenting the texture from $S$.}
+    \caption[]{Target image $T$ is combined with a dictional map specially obtained from $T$ and a style image  $S$. The result maintains the direction's flow while presenting the texture from $S$. Source:~\cite{texturetransfer}}
     \labfig{texturetransfer}
 \end{figure}
 They are able to transfer texture (but only texture) from a given painting to a content image reasonably well.
@@ -215,13 +215,11 @@ The perceptual distance is then defined as
 \begin{align}
     \L_{\text{content}} = \frac{1}{2} \sum_{i, j} (F(\vec{x})_{ij}^l - F(\vec{y})_{ij}^l)^2 = \frac{1}{2} \norm{\tensor{F(\vec{x})}^l - \tensor{F(\vec{y})}^l}_2^2
 \end{align}
-
 \marginnote{The factor $\frac{1}{2}$ will cancel out when deriving $\L_{\text{content}}$ with respect to $F(\vec{x})_{ij}^l$.}
-
 Minimizing the content loss between two images by using gradient descent restores the content of an image (see \reffig{content_style_loss}).
 \begin{figure*}
     \includegraphics{content_style_loss}
-    \caption[]{Reconstructions of content(bottom) and style(top) using different layers. \cite{gatys}}
+    \caption[]{Reconstructions of content(bottom) and style(top) using different layers. Source:\cite{gatys}}
     \labfig{content_style_loss}
 \end{figure*}
 
@@ -247,15 +245,11 @@ Then they use the L2 distance metric to measure the discrepancy between them.
     G(\vec{y})^l & = \frac{1}{(2 N_y^l M_y^l)^2} F(\vec{y})^l{}^T F(\vec{y})^l \\
     d_{\text{style}}^l(\vec{x}, \vec{y}) & = \norm{G(\vec{x})^l - G(\vec{y})^l}^2_2 \\
 \end{align}
-
 \marginnote{The denominator of $\frac{1}{4 N_x^l{}^2 M_x^l{}^2}$ is squared since the Gram matrix is the product of a matrix with its transposed self.}
-
 The style distances at each layer are then weighted and summed up to make up the style loss:
-
 \begin{align}
     \L_{\text{style}} = \sum_{l} w_l d_{\text{style}}^l(\vec{x}, \vec{y})
 \end{align}
-
 %again one can visualize the style/texture that is perceived
 This style loss can again by used together with gradient descent in order to check whether it is possible to reconstruct the texture of an image much like the content of an image.
 \reffig{content_style_loss} shows that it is in fact possible to reconstruct the texture of the image at various scales.
@@ -263,17 +257,14 @@ Specifically the local consistency of each texture becomes larger, the deeper th
 
 %mix content and style
 \citeauthor*{gatys} now combine the losses for a content image $\vec{c}$ with a style image $\vec{s}$ and optimize $\vec{x}$ in the same way previous reconstructions have been obtained.
-
 \begin{align}
     \L_{\text{total}} = \lambda_{\text{content}} \L_{\text{content}}(\vec{x}, \vec{c}) + \lambda_{\text{style}} \L_{\text{style}}(\vec{x}, \vec{s})
 \end{align}
-
-
 The result of this can be seen in \reffig{gatys_ST}
 \begin{marginfigure}
     \includegraphics{gatys_ST}
-    \caption[]{Style transfer examples by \citeauthor*{gatys}. \cite{gatys}}
-    \labfig{content_style_loss}
+    \caption[]{Style transfer examples by \citeauthor*{gatys}. Source:~\cite{gatys}}
+    \labfig{gatys_ST}
 \end{marginfigure}
 
 \subsubsection{Follow-Up Research}
@@ -287,7 +278,6 @@ It can be used as a difference measure and vanishes only if $p=q$.
     & + \frac{1}{m^2} \sum^m_{j=1} \sum^m_{j'=1} k(\vec{y}_j, \vec{y}_{j'}) \\
     & - \frac{2}{nm} \sum^n_{i=1} \sum^m_{j=1} k(\vec{x}_i, \vec{y}_{j})
 \end{align}
-
 MMD can be based on different kernel functions $k$ and \citeauthor*{MMD} have shown that the style loss is equivalent to the squared MMD with a polynomial kernel.
 Consequently they were able to show, that style transfer works with different kernel functions as well and even by explicitly matching the batch statistics (see \reffig{MMD}):
 \begin{align}
@@ -348,13 +338,11 @@ such that
 \begin{align}
     F^l(\vec{c}) F^l(\vec{c})^T = E_c D_c E_c^T
 \end{align}
-
 Then coloring is performed by rescaling the whitened representation $\hat{F}^l$ into $\tilde{F}^l$
 \begin{align}
     \tilde{F}^l = E_s D_s^{\frac{1}{2}} E_s^T \hat{F}^l + \mu_s \\
     F^l(\vec{s}) F^l(\vec{s})^T = E_s D_s E_s^T
 \end{align}
-
 The resulting $\tilde{F}^l$ is then decoded with a pre-trained decoder to render the final stylized result.
 \citeauthor*{WCT} use pre-train the decoder solely on natural images and perceptual loss and reconstruction loss as objective.
 Additionally, they introduce a pipeline that performs style transfer on multiple scales sequentially.
@@ -363,20 +351,16 @@ They achieve good results in real-time with just training the decoder once.
 \subsubsection{Bidirectional Style Transfer}
 %cyclegan
 \citeauthor*{CycleGAN} went a different way on style transfer and rely on a generative adversarial objective to identify style in an image.
-Specifically, they transform images between any two domains $x \in \mathcal{X}$ and $y \in mathcal{Y}$, not just photos and artworks.
+Specifically, they transform images between any two domains $x \in \mathcal{X}$ and $y \in \mathcal{Y}$, not just photos and artworks.
 For this, they use two discriminators ($D_X$ and $D_Y$, one for each domain) as well as two transformation networks ($G: X \rightarrow Y$ and $H: Y \rightarrow X$).
 Each translation network then transforms a given sample from one domain into the other and the discriminator assesses the result.
-
 \begin{align}
     \L_{\text{adv}} = \log D_Y(y) + \log(1 - D_Y(G(x)))
 \end{align}
-
 Additionally, the transformed image is then transformed \textit{again} and compared to the original input, in what they call \textbf{cycle loss}.
-
 \begin{align}
     \L_{\text{cycle}} = \norm{F(G(x)) - x}^2_2
 \end{align}
-
 In the end, \citeauthor*{CycleGAN} are able to stylize and de-stylize images with their networks $G$ and $H$.
 The main novelty here though is the good stylization quality they achieve without any of the previously introduces style losses.
 They have also shown one way, in which GANs are also capable of performing style transfer reasonably well.
@@ -487,7 +471,7 @@ For large uniform areas with little to no gradient, the orientation could become
 Also, \citeauthor*{apple} introduced temporal coherence to brush strokes, which meant that brush strokes move with the optical flow between frame in a video.
 
 %hertzmann
-\citeauthor*{hertzmann} reformulated the problem as an energy minimization problem in two publications \cite{hertzmanreview, Hertzmann}.
+\citeauthor*{hertzmann} reformulated the problem as an energy minimization problem in two publications \cite{hertzmannreview, Hertzmann}.
 \begin{align}
     E(R) & = E_{\text{recon}}(R) + E_{\text{area}}(R) + E_{\text{nstr}}(R) + E_{\text{cov}}(R) \\
     E_{\text{recon}}(R) & = \sum_{x \in W, y \in H} w_{\text{recon}}{}_{x, y} \norm{I_{x, y}(R) - I_{x, y}}^2_2 \\
@@ -566,13 +550,13 @@ THeir method works notably better for predicting single brush strokes on empty c
 
 %neural painters
 \citeauthor*{neuralpainters} chose a different approach to differentiable rendering.
+\marginnote{Long short-term memory (LSTM) is a basic building block in recurrent neural networks which allows to store information for many steps.
+It specifically learns which inputs to look at, when to forget something and which outputs to generate from the current state of the network.}
 He first trained a generator to decode action space input to brush stroke images in adversarial fashion.
 Then he used an LSTM-based agent to predict a sequence of brush stroke parameters which are rendered by the generator.
 As the whole pipeline is differentiable, \citeauthor{neuralpainters} was able to avoid the use of reinforcement learning.
 Results show better image reconstruction than SPIRAL when using the generator, but slightly worse results when combining the obtained action with the original renderer.
 \citeauthor{neuralpainters} also presents the capability of reconstructing content similar to \citeauthor{gatys} by minimizing the perceptual loss directly in action space with his network.
-\marginnote{Long short-term memory (LSTM) is a basic building block in recurrent neural networks which allows to store information for many steps.
-It specifically learns which inputs to look at, when to forget something and which outputs to generate from the current state of the network.}
 
 %learning2Paint
 \citeauthor*{learning2paint} also employ a pre-trained decoder and use more advanced reinforcement learning techniques \cite{learning2paint}.
