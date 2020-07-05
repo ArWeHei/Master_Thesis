@@ -139,6 +139,10 @@
 \usepackage[export]{adjustbox}
 \usepackage{easytable}
 %\usepackage[allfiguresdraft]{draftfigure}
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
 
 \begin{document}
 
@@ -289,6 +293,7 @@
 \include{chapters/Discussion}
 \include{chapters/Outlook}
 
+\backmatter % Denotes the end of the main document content
 
 \appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
 
@@ -297,6 +302,17 @@
 \pagelayout{margin} % Restore margins
 
 \include{chapters/Appendix}
+%----------------------------------------------------------------------------------------
+%	LISTS
+%----------------------------------------------------------------------------------------
+\listoffigures % Output the list of figures
+\newpage
+
+% Comment both of the following lines to have the LOF and the LOT on different pages
+\let\cleardoublepage\bigskip
+\let\clearpage\bigskip
+
+%\listoftables % Output the list of tables
 %----------------------------------------------------------------------------------------
 
 %\setchapterstyle{plain} % Output plain chapters from this point onwards
@@ -307,24 +323,12 @@
 
 % The bibliography needs to be compiled with biber using your LaTeX editor, or on the command line with 'biber main' from the template directory
 
-\chapter{Bibliography}
 \defbibnote{bibnote}{Here are the references in citation order.\par\bigskip} % Prepend this text to the bibliography
 \printbibliography[heading=bibintoc, title=Bibliography, prenote=bibnote] % Add the bibliography heading to the ToC, set the title of the bibliography and output the bibliography note
 
-%----------------------------------------------------------------------------------------
-%	LISTS
-%----------------------------------------------------------------------------------------
-\chapter{List of Figures}
-\listoffigures % Output the list of figures
 
-% Comment both of the following lines to have the LOF and the LOT on different pages
-\let\cleardoublepage\bigskip
-\let\clearpage\bigskip
-
-%\listoftables % Output the list of tables
-
+\newpage
 \include{chapters/deposition}
-\backmatter % Denotes the end of the main document content
 %----------------------------------------------------------------------------------------
 %	NOMENCLATURE
 %----------------------------------------------------------------------------------------

@@ -1,0 +1,20 @@
+\dictdef[caption=\textbf{painting}]{painting}{CAD}
+{a picture created by putting paint on a surface, or the activity or skill of creating pictures by using paint.}
+
+\dictdef[caption=\textbf{drawing}]{drawing}{CAD}
+{the art or process of making pictures with a pencil, pen, etc., or a picture made in this way.}
+
+\dictdef[caption=\textbf{picture}]{picture}{CAD}
+{a drawing, painting, photograph, etc.}
+
+
+\dictdef[caption=\textbf{painting}]{painting}{MW}
+{
+}
+
+\dictdef[caption=\textbf{drawing}]{drawing}{MW}
+{
+1 : an act or instance of drawing; especially : the process of deciding something by drawing lots \\
+2 : the art or technique of representing an object or outlining a figure, plan, or sketch by means of lines \\
+3 : something drawn or subject to drawing
+}

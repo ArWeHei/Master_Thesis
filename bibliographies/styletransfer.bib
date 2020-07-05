@@ -1,10 +1,10 @@
-@article{Art2Real, 
-author = {Tomei, Matteo and Cornia, Marcella and Baraldi, Lorenzo and Cucchiara, Rita}, 
-title = {{Art2Real: Unfolding the Reality of Artworks via Semantically-Aware Image-to-Image Translation}}, 
-eprint = {1811.10666}, 
-abstract = {{The applicability of computer vision to real paintings and artworks has been rarely investigated, even though a vast heritage would greatly benefit from techniques which can understand and process data from the artistic domain. This is partially due to the small amount of annotated artistic data, which is not even comparable to that of natural images captured by cameras. In this paper, we propose a semantic-aware architecture which can translate artworks to photo-realistic visualizations, thus reducing the gap between visual features of artistic and realistic data. Our architecture can generate natural images by retrieving and learning details from real photos through a similarity matching strategy which leverages a weakly-supervised semantic understanding of the scene. Experimental results show that the proposed technique leads to increased realism and to a reduction in domain shift, which improves the performance of pre-trained architectures for classification, detection, and segmentation. Code is publicly available at: https://github.com/aimagelab/art2real.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_Art2Real-%20Unfolding%20the%20Reality%20of%20Artworks%20via%20Semantically-Aware%20Image-to-Image%20Translation_Tomei_Cucchiara.pdf}, 
-year = {2018}
+@article{AdaIN, 
+author = {Huang, Xun and Belongie, Serge}, 
+title = {{Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization}}, 
+eprint = {1703.06868}, 
+abstract = {{Gatys et al. recently introduced a neural algorithm that renders a content image in the style of another image, achieving so-called style transfer. However, their framework requires a slow iterative optimization process, which limits its practical application. Fast approximations with feed-forward neural networks have been proposed to speed up neural style transfer. Unfortunately, the speed improvement comes at a cost: the network is usually tied to a fixed set of styles and cannot adapt to arbitrary new styles. In this paper, we present a simple yet effective approach that for the first time enables arbitrary style transfer in real-time. At the heart of our method is a novel adaptive instance normalization (AdaIN) layer that aligns the mean and variance of the content features with those of the style features. Our method achieves speed comparable to the fastest existing approach, without the restriction to a pre-defined set of styles. In addition, our approach allows flexible user controls such as content-style trade-off, style interpolation, color \& spatial controls, all using a single feed-forward neural network.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Arbitrary%20Style%20Transfer%20in%20Real-time%20with%20Adaptive%20Instance%20Normalization_Huang_Belongie.pdf}, 
+year = {2017}
 }
 @article{lendu, 
 author = {Du, Len}, 
@@ -26,7 +26,7 @@ journal = {arXiv},
 local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_1802.06474.pdf_Unknown_Unknown.pdf}, 
 year = {2018}
 }
-@article{dima, 
+@inproceedings{dima, 
 author = {Kotovenko, Dmytro and Sanakoyeu, Artsiom and Ma, Pingchuan and Lang, Sabine and Ommer, Bjorn}, 
 title = {{A Content Transformation Block for Image Style Transfer}}, 
 doi = {10.1109/cvpr.2019.01027}, 
@@ -96,6 +96,14 @@ local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_A%20S
 year = {2018}, 
 rating = {5}
 }
+@article{Art2Real, 
+author = {Tomei, Matteo and Cornia, Marcella and Baraldi, Lorenzo and Cucchiara, Rita}, 
+title = {{Art2Real: Unfolding the Reality of Artworks via Semantically-Aware Image-to-Image Translation}}, 
+eprint = {1811.10666}, 
+abstract = {{The applicability of computer vision to real paintings and artworks has been rarely investigated, even though a vast heritage would greatly benefit from techniques which can understand and process data from the artistic domain. This is partially due to the small amount of annotated artistic data, which is not even comparable to that of natural images captured by cameras. In this paper, we propose a semantic-aware architecture which can translate artworks to photo-realistic visualizations, thus reducing the gap between visual features of artistic and realistic data. Our architecture can generate natural images by retrieving and learning details from real photos through a similarity matching strategy which leverages a weakly-supervised semantic understanding of the scene. Experimental results show that the proposed technique leads to increased realism and to a reduction in domain shift, which improves the performance of pre-trained architectures for classification, detection, and segmentation. Code is publicly available at: https://github.com/aimagelab/art2real.}}, 
+local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_Art2Real-%20Unfolding%20the%20Reality%20of%20Artworks%20via%20Semantically-Aware%20Image-to-Image%20Translation_Tomei_Cucchiara.pdf}, 
+year = {2018}
+}
 @article{10.1007/978-1-4471-4519-6_1, 
 author = {Vanderhaeghe, David and Collomosse, John}, 
 title = {{Image and Video-Based Artistic Stylisation}}, 
@@ -112,14 +120,6 @@ title = {{StarGAN: Unified Generative Adversarial Networks for Multi-Domain Imag
 eprint = {1711.09020}, 
 abstract = {{Recent studies have shown remarkable success in image-to-image translation for two domains. However, existing approaches have limited scalability and robustness in handling more than two domains, since different models should be built independently for every pair of image domains. To address this limitation, we propose StarGAN, a novel and scalable approach that can perform image-to-image translations for multiple domains using only a single model. Such a unified model architecture of StarGAN allows simultaneous training of multiple datasets with different domains within a single network. This leads to StarGAN's superior quality of translated images compared to existing models as well as the novel capability of flexibly translating an input image to any desired target domain. We empirically demonstrate the effectiveness of our approach on a facial attribute transfer and a facial expression synthesis tasks.}}, 
 local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_StarGAN-%20Unified%20Generative%20Adversarial%20Networks%20for%20Multi-Domain%20Image-to-Image%20Translation_Choi_Choo.pdf}, 
-year = {2017}
-}
-@article{AdaIN, 
-author = {Huang, Xun and Belongie, Serge}, 
-title = {{Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization}}, 
-eprint = {1703.06868}, 
-abstract = {{Gatys et al. recently introduced a neural algorithm that renders a content image in the style of another image, achieving so-called style transfer. However, their framework requires a slow iterative optimization process, which limits its practical application. Fast approximations with feed-forward neural networks have been proposed to speed up neural style transfer. Unfortunately, the speed improvement comes at a cost: the network is usually tied to a fixed set of styles and cannot adapt to arbitrary new styles. In this paper, we present a simple yet effective approach that for the first time enables arbitrary style transfer in real-time. At the heart of our method is a novel adaptive instance normalization (AdaIN) layer that aligns the mean and variance of the content features with those of the style features. Our method achieves speed comparable to the fastest existing approach, without the restriction to a pre-defined set of styles. In addition, our approach allows flexible user controls such as content-style trade-off, style interpolation, color \& spatial controls, all using a single feed-forward neural network.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Arbitrary%20Style%20Transfer%20in%20Real-time%20with%20Adaptive%20Instance%20Normalization_Huang_Belongie.pdf}, 
 year = {2017}
 }
 @article{CycleGAN, 

@@ -24,20 +24,21 @@ In the same way, that humans studied birds to understand flying, researchers are
 In the earliest stages of this research, they would try to imitate the brain, as people have tried imitating birds at first; and they failed similarly.
 \begin{figure}
     \includegraphics{otto_lilienthal}
-    \caption[]{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. Source:\url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei -wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
+    \caption{Otto Lilienthal with his flying apparatus. One example of how people failed in trying to imitate nature too closely. Source:\url{https://www.deutschlandfunkkultur.de/geschichte-der-fliegerei-wie-der-mensch-die-voegel.976.de.html?dram:article_id=308043}}
     \labfig{lilienthal}
 \end{figure}
 
 Warren McCulloch and Walter Pitts proposed one of the earliest models of an artificial neuron.
 They aimed at simplifying models of a biological neuron at the time.
-\marginnote{Notably McCulloch and Pitts (1943) even preceded Hodkins and Huxley's (1952) Nobel price winning description of a neuron.}
+\marginnote{Notably McCulloch and Pitts (1943) even preceded Hodkin's and Huxley's (1952) Nobel price winning description of a neuron.}
 
 \subsubsection{Biological Neuron}
 For this reason, the functioning of a neuron shall be described shortly.
 
 Human cells that make up the brain are called \textbf{neurons}.
 They connected through dendrites, synapses, and axons.
-These connections allow neurons to exchange signals with other neurons.
+These connections allow neurons to exchange signals with other neurons~\cite{grosse}.
+This is a very simplified description, yet is gives a good how neurons work. 
 
 A neuron receives signals through its dendrites, which all lead to the cell body (soma).
 The cell body accumulates these signals.
@@ -61,7 +62,7 @@ Each neuron gathers signals from other neurons, which are either positive or neg
 A neuron only becomes active if the number of incoming positive signals minus the number of negative signals exceeds the neuron's threshold.
 \begin{marginfigure}
     \includegraphics{neuron}
-    \caption[]{Schematics of a neuron and a simple unit. Source:\url{https://appliedgo.net/media/perceptron/neuron.png}}
+    \caption{Schematics of a neuron and a simple unit. Source:\url{https://appliedgo.net/media/perceptron/neuron.png}}
     \labfig{linear_class}
 \end{marginfigure}
 \begin{align}
@@ -82,27 +83,28 @@ As this model deviates from nature quite a bit, these structures a better referr
 In a single layer architecture, a layer often consists of a single unit (see \reffig{ff_arch}).
 %\begin{marginfigure}
 %    \includegraphics{feedforward}
-%    \caption[]{Schmeatic of a feed-forward architecture.Source: \url{https://learning.oreilly.com/library/view/r-deep-learning/9781787121089/assets/32d89685-4e2b-4811-81e8-4654d0d98f91.png}}
+%    \caption{Schmeatic of a feed-forward architecture.Source: \url{https://learning.oreilly.com/library/view/r-deep-learning/9781787121089/assets/32d89685-4e2b-4811-81e8-4654d0d98f91.png}}
 %    \labfig{ff_arch}
 %\end{marginfigure}
 \begin{marginfigure}
     \includegraphics{ffnn}
-    \caption[]{Schmeatic of a feed-forward architecture.Source:\url{https://appliedgo.net/media/perceptron/ffnn.png}}
+    \caption{Schmeatic of a feed-forward architecture.Source:\url{https://appliedgo.net/media/perceptron/ffnn.png}}
     \labfig{ff_arch}
 \end{marginfigure}
 Basically, input signals come from one side, and output signals go out the other side, which can be expressed in a simple equation like \refeq{mcculloch}.
 This is not only done for practical reasons but also inspired by the observation of layered neuron structures in the brain.
 
-The McCulloch-Pitts model is capable of emulating simple logical relations (\lstinline|AND|, \lstinline|OR|, \lstinline|NOT|) but nor \lstinline|XOR| which will be explained later.
+The McCulloch-Pitts model is capable of emulating simple logical relations (\lstinline|AND|, \lstinline|OR|, \lstinline|NOT|) but not \lstinline|XOR| which will be explained later.
 
 \subsubsection{Perceptron}
-This McCulloch's and Pitts' is very much simplified yet comes with some weaknesses.
+As McCulloch's and Pitts' model is very much simplified yet comes with some weaknesses.
 Thus, the \textbf{perceptron} has been introduced by Frank Rosenblatt in 1957.
 Instead of having a binary unit, he came up with a linear threshold unit (LTU).
 The LTU allows for numeric instead of binary signals, which can be weighted with independent factors.
 Also, a unit's threshold/bias is parameterized as another weight with a constant input ($W_{i0} = 1$) using the ``bias trick''.
 The resulting equation for each LTU then reads:
 \begin{align}
+    \labeq{LTU}
     a_i = \begin{cases}
         1 & \text{ if } \sum_{i=0}^n W_{ij} x_j \leq 0 \\
         -1 & \text{ if } \sum_{i=0}^n W_{ij} x_j > 0
@@ -110,6 +112,7 @@ The resulting equation for each LTU then reads:
 \end{align}
 Equation \refeq{LTU} can then be formulated in a vectorized form such that:
 \begin{align}
+    \labeq{perceptron}
     \vec{a} & = f(\mat{W}\vec{x}^T) \\
     f(x) & = \begin{cases} 1 & \text{ if } x \leq 0 \\  -1 & \text{ if } x > 0 \end{cases}
 \end{align}
@@ -132,18 +135,18 @@ The decision depends on whether a point lies above or below this hyperplane.
     \resizebox{\textwidth}{!}{
         \input{images/scatter_percep.pgf}
     }
-    \caption[]{As a simple example, this binary classifier has data on how often the words ``weight loss'' and ``invest'' appear in an email.
+    \caption{As a simple example, this binary classifier has data on how often the words ``weight loss'' and ``invest'' appear in an email.
 Any time these two words appear too often, the data point is above the decision boundary. An email is then classified as ``spam''}
     \labfig{linear_class}
 \end{marginfigure}
 As the hyperplane (or decision boundary) is quantified by a linear function, the classifier is described as linear.
 
 A classic problem would be classifying email as spam.
-Given two data inputs (\ie frequency of the words ``weight loss'' and ``invest''), the classifier has to make a decision.
+Given two data inputs (\eg frequency of the words ``weight loss'' and ``invest''), the classifier has to make a decision.
 For this reason, the binary classifier defines a \textbf{decision boundary}.
 Any data point that lies above this decision boundary is classified as ``spam'', any point beneath is classified as ``not spam''
 Since regular emails rarely use the two words, they do not classify as spam.\\
-Other people \ie nutritionists, on the other hand, will have the word weight loss come up more frequently.
+Other people \eg nutritionists, on the other hand, will have the word weight loss come up more frequently.
 This means the decision boundary must differ for different users and their mail.
 
 To compute where a point lies relative to the decision boundary, a data point's value along each axis $x_1, x_2$ is weighted individually $w_1, w_2$, and summed with a bias $b$.
@@ -158,7 +161,6 @@ $r$ can then be absorbed into the bias.
     \Rightarrow z & = w_1 x_1 + \hdots + w_D x_D + b - r \\
     & = w_1 x_1 + \hdots + w_D x_D + b'
 \end{align}
-
 For arbitrary dimensions $D$ this becomes
 \begin{align}
     z = w_1 x_1 + \hdots + w_D x_D + b
@@ -176,7 +178,6 @@ For a simpler notation, one can define an additional ``virtual'' input which has
 with $x_0 = 1$ and $w_0 = b$.
 The output $z$ can also be seen as a function of $x$.
 Then, $w$ can describe any function linear in $f$.
-%\todo{explain ability to imitate any linear function.}
 
 This description also holds for perceptrons with more than one unit.
 In that case, the input vector $\vec{x}$ and the weights $\vec{w}$ become matrices with multiple column vectors.
@@ -215,7 +216,7 @@ For this reason \textbf{support vector machines (SVM)} employ a \textbf{maximum 
 A maximum margin classifier seeks to find a decision boundary which is as far from the closest representatives of each class as possible (see \reffig{SVM}).
 \begin{marginfigure}
     \includegraphics{SVM}
-    \caption[]{The maximum margin in an SVM splits the classes with a boundary such that the distance to the closest sample of each class is maximized. Source: \url{https://cdn-images-1.medium.com/max/2000/1*nUpw5agP-Vefm4Uinteq-A.png}}
+    \caption{The maximum margin in an SVM splits the classes with a boundary such that the distance to the closest sample of each class is maximized. Source: \url{https://cdn-images-1.medium.com/max/2000/1*nUpw5agP-Vefm4Uinteq-A.png}}
     \labfig{SVM}
 \end{marginfigure}
 
@@ -279,7 +280,7 @@ The problem becomes obvious when looking at the \lstinline|XOR| problem in a 2D 
     \resizebox{\textwidth}{!}{
         \input{images/scatter_XOR.pgf}
     }
-    \caption[]{\lstinline|OR| and \lstinline|XOR| operations visualized. The \lstinline|XOR| problem cannot be solved by drawing a single line.}
+    \caption{\lstinline|OR| and \lstinline|XOR| operations visualized. The \lstinline|XOR| problem cannot be solved by drawing a single line.}
     \labfig{XOR}
 \end{marginfigure}
 
@@ -309,12 +310,12 @@ Thus, \textbf{Multi-Layer Perceptrons (MLP)} sparked new interest in the field o
 This interest also originated in the similarly layered structure that has been found in the brain.
 \begin{marginfigure}
     \includegraphics{brain}
-    \caption[]{The brains structure under a microscope (cortex). Source:\cite{NN_book}}
+    \caption{The brains structure under a microscope (cortex). Source:\cite{NN_book}}
     \labfig{brain}
 \end{marginfigure}
 \begin{marginfigure}
     \includegraphics{MLP}
-    \caption[]{Layers of an MLP. Source:\url{https://deepai.org/machine-learning-glossary-and-terms/multilayer-perceptron}}
+    \caption{Layers of an MLP.}
     \labfig{MLP}
 \end{marginfigure}
 Ultimately, MLPs really start to show the connected structure in a network that is typically expected.
@@ -336,7 +337,7 @@ These newfound capabilities for MLPs are not only restricted to binary operation
 In this case the hidden-layer perceptrons get stripped of their activation function.
 The activation function of a perceptron has been used, up until now, to make a class prediction $y_i$ from a score $z_i$, which is also called pre-activation~\cite[p.~6]{grosse}.
 
-Replacing the step function with a linear activation function (\ie identity function), each hidden-layer's perceptron would initially seem to increase the capabilities of the MLP.
+Replacing the step function with a linear activation function (\eg identity function), each hidden-layer's perceptron would initially seem to increase the capabilities of the MLP.
 Unfortunately, this is not the case as any subsequent perceptrons with linear activations can be reduced to a single preceptron.
 \begin{align}
     \vec{z}_2 = \mat{W}^T_2 \vec{z}_1(\vec{x}) = \mat{W}^T_2 \mat{W}^T_1 \vec{x} = \mat{W}' \vec{x}
@@ -357,7 +358,7 @@ Especially the logistic function is popular due to its similarity to the step-fu
     \resizebox{\textwidth}{!}{
         \input{images/sigma.pgf}
     }
-    \caption[]{A sigmoid function. It saturates to $1$ for very large inputs and $0$ for very small inputs, similar to the step function.}
+    \caption{A sigmoid function. It saturates to $1$ for very large inputs and $0$ for very small inputs, similar to the step function.}
     \labfig{sigmoid}
 \end{marginfigure}
 
@@ -369,14 +370,14 @@ Another activation function ``leaky ReLU'' attenuates the signal below the thres
     \resizebox{\textwidth}{!}{
         \input{images/relu.pgf}
     }
-    \caption[]{ReLu activation function}
+    \caption{ReLu activation function}
     \labfig{relu}
 \end{marginfigure}
 \begin{marginfigure}
     \resizebox{\textwidth}{!}{
         \input{images/lrelu.pgf}
     }
-    \caption[]{leaky ReLu activation function with $\alpha = 0.2$}
+    \caption{leaky ReLu activation function with $\alpha = 0.2$}
     \labfig{lrelu}
 \end{marginfigure}
 
@@ -416,7 +417,7 @@ Yet, it is possible to avoid this problem by padding an image with values such t
 These filters may seem very simple but they are able to capture very interesting properties in an image and transform them as well.
 \begin{marginfigure}
     \includegraphics{1Dconv}
-    \caption[]{A convolution in 1D space. Source:\url{https://peltarion.com/knowledge-center/documentation/modeling-view/build-an-ai-model/blocks/1d-convolution-block}}
+    \caption{A convolution in 1D space. Source:\url{https://peltarion.com/knowledge-center/documentation/modeling-view/build-an-ai-model/blocks/1d-convolution-block}}
     \labfig{conv}
 \end{marginfigure}
 The easiest example would be a 3x3 filter which blurs the image it is applied to.
@@ -428,7 +429,7 @@ The filter given in \reffig{conv_blur} results in such blurring since the signal
         $\frac{1}{8}$ & $\frac{1}{4}$ & $\frac{1}{8}$ \\
         $\frac{1}{16}$ & $\frac{1}{8}$ & $\frac{1}{16}$ \\
     \end{TAB}
-    \caption[]{3x3 filter for blurring (Gaussian Blur).}
+    \caption{3x3 filter for blurring (Gaussian Blur).}
     \labfig{conv_blur}
 \end{marginfigure}
 
@@ -440,7 +441,7 @@ Another filter like \reffig{conv_sharp} will sharpen edges in an image since the
         $2$ & $0$ & $-2$ \\
         $1$ & $0$ & $-1$ \\
     \end{TAB}
-    \caption[]{3x3 filter for detecting edges in the y direction (Sobel filter).}
+    \caption{3x3 filter for detecting edges in the y direction (Sobel filter).}
     \labfig{conv_sharp}
 \end{marginfigure}
 

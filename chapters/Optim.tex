@@ -71,10 +71,9 @@ By looking at a single weight at a time, the scalar output of the loss function 
 Thus, $L^k$ can be visualized in a 2D graph.
 \begin{marginfigure}
     \includegraphics{grad}
-    \caption[]{Example depiction of loss function $L^k$ against $w$. At point $w'$ the slop point into the other direction but still towards the minimum.Source:~\cite{grad}}
+    \caption{Example depiction of loss function $L^k$ against $w$. At point $w'$ the slope points the minimum.}
     \labfig{loss_function}
 \end{marginfigure}
-\todo{draw this}
 Looking at such a depiction (see \reffig{loss_function}) the weight should change such that the loss function is minimized.
 This can be achieved by following the slope at position $w$, as it points towards the minimum.
 The slope in this graph is equivalent to the negative gradient of the function at point $w$, which can be easily calculated, if the dependence between $L(w)$ and $w$ is known.
@@ -97,11 +96,11 @@ with $\frac{\partial L^k}{\partial w_{ij}}$ the partial derivative of $L^k$ with
 The same principle can be applied to many weights at the same time, where each gradient is calculated with respect to the respective weight.
 \begin{marginfigure}
     \includegraphics{3Dgrad}
-    \caption[]{3D plot of loss function for two  weights $w_1$ and $w_2$. Source:{https://reconsider.news/2018/05/09/ai-researchers-allege-machine-learning-alchemy/}}
+    \caption{3D plot of loss function for two  weights $w_1$ and $w_2$.}
     \labfig{3dloss_function}
 \end{marginfigure}
 Also, the gradient can easily be evaluated over the whole data set now $k = 1, 2,...$
-Thus, \labeq{gradientrule} can be rewritten in vectorized notation:
+Thus, \refeq{gradientrule} can be rewritten in vectorized notation:
 \begin{align}
     \Delta \mat{w} & = - \eta \cdot \frac{1}{N} \sum_{k=1}^{N} \frac{\partial L^k}{\partial \mat{w}} \cdot \vec{x}^k \\
     \mat{w} & \rightarrow \mat{w} + \Delta \mat{w}
@@ -134,7 +133,7 @@ Another solution is adding momentum to SGD.\\
 By saving the direction of the previous SGD update and including it into its current step, the 'momentum' from the previous step is carried over \cite{ommer}.
 \begin{align}
     \mat{w}_t & = \mat{w}_{t-1} + \Delta \mat{w}_{t-1}
-    \Delta \mat{w}_t & = - \eta \cdot \frac{1}{N} \frac{\partial L^k}{\partial \mat{w}_t} \cdot \vec{x}^k + \gamma \Delta \mat{w}_{t-1}\\
+    \Delta \mat{w}_t & = - \eta \cdot \frac{1}{N} \frac{\partial L^k}{\partial \mat{w}_t} \cdot \vec{x}^k + \gamma \Delta \mat{w}_{t-1}
 \end{align}
 
 There are notable improvements to this method such as the Nesterov momentum update \cite{ommer}
@@ -178,13 +177,13 @@ Other optimization algorithms such as L-BFGS (Quasi-Newtonian second order optim
 
 \section{Backpropagation}
 \labsec{backprop}
-Backpropagation (or just backprop) was the major invention by \citeauthor{backprop} in the 1980's which ended the first AI winter caused by the \lstinline|XOR| problem. \\
+Backpropagation (or just backprop) was the major invention in the 1980's which ended the first AI winter caused by the \lstinline|XOR| problem~\cite{ommer}. \\
 It allows to efficiently and accurately calculate gradients and thus train networks with many layers, which in turn 'solved' the \lstinline|XOR| problem.
 
 The way it works, backprop splits a large equation with many operations into its individual parts such that a tree structure emerges.
 \begin{marginfigure}
-    \includegraphics{otto_lilienthal}
-    \caption[]{Tree graph for function $f$ in \refeq{example}.}
+    \includegraphics{graph}
+    \caption{Tree graph for function $f$ in \refeq{example}.}
     \labfig{tree_graph}
 \end{marginfigure}
 Then the chain rule is employed which states that

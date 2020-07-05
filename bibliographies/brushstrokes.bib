@@ -1,18 +1,12 @@
-@article{wetbrush, 
-author = {Chen, Zhili and Kim, Byungmoon and Ito, Daichi and Wang, Huamin}, 
-title = {{Wetbrush: GPU-based 3D painting simulation at the bristle level}}, 
-issn = {0730-0301}, 
-doi = {10.1145/2816795.2818066}, 
-abstract = {{We present a real-time painting system that simulates the interactions among brush, paint, and canvas at the bristle level. The key challenge is how to model and simulate sub-pixel paint details, given the limited computational resource in each time step. To achieve this goal, we propose to define paint liquid in a hybrid fashion: the liquid close to the brush is modeled by particles, and the liquid away from the brush is modeled by a density field. Based on this representation, we develop a variety of techniques to ensure the performance and robustness of our simulator under large time steps, including brush and particle simulations in non-inertial frames, a fixed-point method for accelerating Jacobi iterations, and a new Eulerian-Lagrangian approach for simulating detailed liquid effects. The resulting system can realistically simulate not only the motions of brush bristles and paint liquid, but also the liquid transfer processes among different representations. We implement the whole system on GPU by CUDA. Our experiment shows that artists can use the system to draw realistic and vivid digital paintings, by applying the painting techniques that they are familiar with but not offered by many existing systems.}}, 
-pages = {200}, 
-number = {6}, 
-volume = {34}, 
-journal = {ACM Transactions on Graphics (TOG)}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2015_Wetbrush-%20GPU-based%203D%20painting%20simulation%20at%20the%20bristle%20level_Chen_Wang.pdf}, 
-year = {2015}, 
-rating = {2}
+@article{Hertzmann, 
+author = {Hertzmann, Aaron}, 
+title = {{Painterly rendering with curved brush strokes of multiple sizes}}, 
+doi = {10.1145/280814.280951}, 
+abstract = {{An abstract is not available.}}, 
+pages = {453--460}, 
+year = {1998}
 }
-@article{fasttexturetransfer, 
+@inproceedings{fasttexturetransfer, 
 author = {Ashikhmin, N.}, 
 title = {{Fast texture transfer}}, 
 doi = {10.1109/mcg.2003.1210863}, 
@@ -37,7 +31,6 @@ pages = {1--9},
 number = {1}, 
 volume = {20}, 
 journal = {Machine Vision and Applications}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2009_Automatic%20extraction%20of%20brushstroke%20orientation%20from%20paintings_Berezhnoy_Herik.pdf}, 
 year = {2009}
 }
 @article{baxter, 
@@ -46,7 +39,6 @@ title = {{DAB: interactive haptic painting with 3D virtual brushes}},
 doi = {10.1145/383259.383313}, 
 abstract = {{We present a novel painting system with an intuitive haptic interface, which serves as an expressive vehicle for interactively creating painterly works. We introduce a deformable, 3D brush model, which gives the user natural control of complex brush strokes. The force feedback enhances the sense of realism and provides tactile cues that enable the user to better manipulate the paint brush. We have also developed a bidirectional, two-layer paint model that, combined with a palette interface, enables easy loading of complex blends onto our 3D virtual brushes to generate interesting paint effects on the canvas. The resulting system, DAB, provides the user with an artistic setting, which is conceptually equivalent to a real-world painting environment. Several users have tested DAB and were able to start creating original art work within minutes.}}, 
 pages = {461--468}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2001_DAB-%20interactive%20haptic%20painting%20with%203D%20virtual%20brushes_Baxter_Manocha.pdf}, 
 year = {2001}
 }
 @article{texturetransfer, 
@@ -55,7 +47,6 @@ title = {{Directional texture transfer}},
 doi = {10.1145/1809939.1809945}, 
 abstract = {{A texture transfer algorithm modifies the target image replacing the high frequency information with the example source image. Previous texture transfer techniques normally use such factors as color distance and standard deviation for selecting the best texture from the candidate sets. These factors are useful for expressing a texture effect of the example source in the target image, but are less than optimal for considering the object shape of the target image. In this paper, we propose a novel texture transfer algorithm to express the directional effect based on the flow of the target image. For this, we use a directional factor that considers the gradient direction of the target image. We add an additional energy term that respects the image gradient to the previous fast texture transfer algorithm. Additionally, we propose a method for estimating the directional factor weight value from the target image. We have tested our algorithm with various target images. Our algorithm can express a result image with the feature of the example source texture and the flow of the target image.}}, 
 pages = {43--48}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2010_Directional%20texture%20transfer_Lee_Yoon.pdf}, 
 year = {2010}
 }
 @article{imageanalogies, 
@@ -64,17 +55,15 @@ title = {{Image analogies}},
 doi = {10.1145/383259.383295}, 
 abstract = {{This paper describes a new framework for processing images by example, called “image analogies.” The framework involves two stages: a design phase, in which a pair of images, with one image purported to be a “filtered” version of the other, is presented as “training data”; and an application phase, in which the learned filter is applied to some new target image in order to create an “analogous” filtered result. Image analogies are based on a simple multi-scale autoregression, inspired primarily by recent results in texture synthesis. By choosing different types of source image pairs as input, the framework supports a wide variety of “image filter” effects, including traditional image filters, such as blurring or embossing; improved texture synthesis, in which some textures are synthesized with higher quality than by previous approaches; super-resolution, in which a higher-resolution image is inferred from a low-resolution source; texture transfer, in which images are “texturized” with some arbitrary source texture; artistic filters, in which various drawing and painting styles are synthesized based on scanned real-world examples; and texture-by-numbers, in which realistic scenes, composed of a variety of textures, are created using a simple painting interface.}}, 
 pages = {327--340}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2001_Image%20analogies_Hertzmann_Salesin.pdf}, 
 year = {2001}
 }
-@article{hertzmann, 
+@inproceedings{hertzmann, 
 author = {Hertzmann, A}, 
 title = {{Paint by relaxation}}, 
 doi = {10.1109/cgi.2001.934657}, 
 abstract = {{Weuse relaxation to produce painted imagery from images and video. An energy function is first specified; we then search for a painting with minimal energy. The appeal of this strategy is that, ideally, we need only specify what we want, not how to directly compute it. Because the energy function is very difficult to optimize, we use a relaxation algorithm combined with search heuristics. This formulation allows us to specify painting style by varying the relative weights of energy terms. The basic energy function yields an economical style that conveys an image with few strokes. This style produces greater temporal coherence for video than previous techniques. The system allows as fine user control as desired: the user may interactively change the painting style, specify variations of style over an image, and/or add specific strokes to the painting.}}, 
 pages = {47--54}, 
 journal = {Proceedings. Computer Graphics International 2001}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2001_Paint%20by%20relaxation_Hertzmann_Hertzmann.pdf}, 
 year = {2001}
 }
 @article{apple, 
@@ -83,7 +72,6 @@ title = {{Processing images and video for an impressionist effect}},
 doi = {10.1145/258734.258893}, 
 abstract = {{An abstract is not available.}}, 
 pages = {407--414}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/1997_Processing%20images%20and%20video%20for%20an%20impressionist%20effect_Litwinowicz_Litwinowicz.pdf}, 
 year = {1997}
 }
 @article{paintbynumbers, 
@@ -96,19 +84,22 @@ pages = {207--214},
 number = {4}, 
 volume = {24}, 
 journal = {ACM SIGGRAPH Computer Graphics}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/1990_Paint%20by%20numbers-%20abstract%20image%20representations_Haeberli_Haeberli.pdf}, 
 year = {1990}
 }
-@article{Hertzmann, 
-author = {Hertzmann, Aaron}, 
-title = {{Painterly rendering with curved brush strokes of multiple sizes}}, 
-doi = {10.1145/280814.280951}, 
-abstract = {{An abstract is not available.}}, 
-pages = {453--460}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/Unknown_280814.280951.pdf_Unknown_Unknown.pdf}, 
-year = {1998}
+@inproceedings{wetbrush, 
+author = {Chen, Zhili and Kim, Byungmoon and Ito, Daichi and Wang, Huamin}, 
+title = {{Wetbrush: GPU-based 3D painting simulation at the bristle level}}, 
+issn = {0730-0301}, 
+doi = {10.1145/2816795.2818066}, 
+abstract = {{We present a real-time painting system that simulates the interactions among brush, paint, and canvas at the bristle level. The key challenge is how to model and simulate sub-pixel paint details, given the limited computational resource in each time step. To achieve this goal, we propose to define paint liquid in a hybrid fashion: the liquid close to the brush is modeled by particles, and the liquid away from the brush is modeled by a density field. Based on this representation, we develop a variety of techniques to ensure the performance and robustness of our simulator under large time steps, including brush and particle simulations in non-inertial frames, a fixed-point method for accelerating Jacobi iterations, and a new Eulerian-Lagrangian approach for simulating detailed liquid effects. The resulting system can realistically simulate not only the motions of brush bristles and paint liquid, but also the liquid transfer processes among different representations. We implement the whole system on GPU by CUDA. Our experiment shows that artists can use the system to draw realistic and vivid digital paintings, by applying the painting techniques that they are familiar with but not offered by many existing systems.}}, 
+pages = {200}, 
+number = {6}, 
+volume = {34}, 
+journal = {ACM Transactions on Graphics (TOG)}, 
+year = {2015}, 
+rating = {2}
 }
-@article{PRreview, 
+@inproceedings{PRreview, 
 author = {Hegde, Siddharth and Gatzidis, Christos and Tian, Feng}, 
 title = {{Painterly rendering techniques: a state‐of‐the‐art review of current approaches}}, 
 issn = {1546-427X}, 
@@ -118,7 +109,6 @@ pages = {43--64},
 number = {1}, 
 volume = {24}, 
 journal = {Computer Animation and Virtual Worlds}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2013_Painterly%20rendering%20techniques-%20a%20state‐of‐the‐art%20review%20of%20current%20approaches_Hegde_Tian.pdf}, 
 year = {2013}, 
 rating = {4}
 }
@@ -127,7 +117,6 @@ author = {Elgammal, Ahmed and Kang, Yan and Leeuw, Milko Den},
 title = {{Picasso, Matisse, or a Fake? Automated Analysis of Drawings at the Stroke Level for Attribution and Authentication}}, 
 eprint = {1711.03536}, 
 abstract = {{This paper proposes a computational approach for analysis of strokes in line drawings by artists. We aim at developing an AI methodology that facilitates attribution of drawings of unknown authors in a way that is not easy to be deceived by forged art. The methodology used is based on quantifying the characteristics of individual strokes in drawings. We propose a novel algorithm for segmenting individual strokes. We designed and compared different hand-crafted and learned features for the task of quantifying stroke characteristics. We also propose and compare different classification methods at the drawing level. We experimented with a dataset of 300 digitized drawings with over 80 thousands strokes. The collection mainly consisted of drawings of Pablo Picasso, Henry Matisse, and Egon Schiele, besides a small number of representative works of other artists. The experiments shows that the proposed methodology can classify individual strokes with accuracy 70\%-90\%, and aggregate over drawings with accuracy above 80\%, while being robust to be deceived by fakes (with accuracy 100\% for detecting fakes in most settings).}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Picasso,%20Matisse,%20or%20a%20Fake-%20Automated%20Analysis%20of%20Drawings%20at%20the%20Stroke%20Level%20for%20Attribution%20and%20Authentication_Elgammal_Leeuw.pdf}, 
 year = {2017}
 }
 @article{10.1109/tvcg.2018.2860004, 
@@ -141,7 +130,6 @@ pages = {2763--2776},
 number = {9}, 
 volume = {25}, 
 journal = {IEEE Transactions on Visualization and Computer Graphics}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_High%20Relief%20from%20Brush%20Painting_Fu_Lee.pdf}, 
 year = {2018}
 }
 @article{lamberti, 
@@ -153,7 +141,6 @@ pages = {53},
 number = {1}, 
 volume = {2014}, 
 journal = {EURASIP Journal on Image and Video Processing}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2014_Computer-assisted%20analysis%20of%20painting%20brushstrokes-%20digital%20image%20processing%20for%20unsupervised%20extraction%20of%20visible%20features%20from%20van%20Gogh’s%20works_Lamberti_Paravati.pdf}, 
 year = {2014}
 }
 @article{undefined, 
@@ -161,7 +148,6 @@ author = {Li, Yijun and Fang, Chen and Hertzmann, Aaron and Shechtman, Eli and Y
 title = {{Im2Pencil: Controllable Pencil Illustration from Photographs}}, 
 eprint = {1903.08682}, 
 abstract = {{We propose a high-quality photo-to-pencil translation method with fine-grained control over the drawing style. This is a challenging task due to multiple stroke types (e.g., outline and shading), structural complexity of pencil shading (e.g., hatching), and the lack of aligned training data pairs. To address these challenges, we develop a two-branch model that learns separate filters for generating sketchy outlines and tonal shading from a collection of pencil drawings. We create training data pairs by extracting clean outlines and tonal illustrations from original pencil drawings using image filtering techniques, and we manually label the drawing styles. In addition, our model creates different pencil styles (e.g., line sketchiness and shading style) in a user-controllable manner. Experimental results on different types of pencil drawings show that the proposed algorithm performs favorably against existing methods in terms of quality, diversity and user evaluations.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2019_Im2Pencil-%20Controllable%20Pencil%20Illustration%20from%20Photographs_Li_Yang.pdf}, 
 year = {2019}
 }
 @article{10.5220/0006188303780385, 
@@ -169,7 +155,6 @@ author = {Putri, Tieta and Mukundan, Ramakrishnan and Neshatian, Kourosh},
 title = {{Artistic Style Characterization of Vincent Van Gogh’s Paintings using Extracted Features from Visible Brush Strokes}}, 
 doi = {10.5220/0006188303780385}, 
 pages = {378--385}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2017_Artistic%20Style%20Characterization%20of%20Vincent%20Van%20Gogh’s%20Paintings%20using%20Extracted%20Features%20from%20Visible%20Brush%20Strokes_Putri_Neshatian.pdf}, 
 year = {2017}
 }
 @article{10.1007/s11390-013-1375-8, 
@@ -182,7 +167,6 @@ pages = {762--775},
 number = {5}, 
 volume = {28}, 
 journal = {Journal of Computer Science and Technology}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2013_Stroke%20Style%20Analysis%20for%20Painterly%20Rendering_Zang_Li.pdf}, 
 year = {2013}
 }
 @article{adobe, 
@@ -191,7 +175,6 @@ title = {{Brush stroke synthesis with a generative adversarial network driven by
 doi = {10.1145/3229147.3229150}, 
 abstract = {{We introduce a novel approach that uses a generative adversarial network (GAN) to synthesize realistic oil painting brush strokes, where the network is trained with data generated by a high-fidelity simulator. Among approaches to digitally synthesizing natural media painting strokes, physically based simulation produces by far the most realistic visual results and allows the most intuitive control of stroke variations. However, accurate physics simulations are known to be computationally expensive and often cannot meet the performance requirements of painting applications. In our work, we propose to replace the expensive fluid simulation with a neural network. The network takes the existing canvas and a new stroke trajectory as input and produces the height and color of the new stroke as output. We train the network with a dataset generated with a high quality offline simulator. The network is able to produce visual quality comparable to the offline simulator with better performance than the existing real-time oil painting simulator. Finally, we implement a real-time painting system using the trained network.}}, 
 pages = {12}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2018_Brush%20stroke%20synthesis%20with%20a%20generative%20adversarial%20network%20driven%20by%20physically%20based%20simulation_Wu_Marschner.pdf}, 
 year = {2018}, 
 rating = {4}
 }
@@ -205,7 +188,6 @@ pages = {1--9},
 number = {1}, 
 volume = {20}, 
 journal = {Machine Vision and Applications}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2009_Automatic%20extraction%20of%20brushstroke%20orientation%20from%20paintings_Berezhnoy_Herik.pdf}, 
 year = {2009}
 }
 @article{10.1109/msp.2008.923513, 
@@ -218,13 +200,11 @@ pages = {37--48},
 number = {4}, 
 volume = {25}, 
 journal = {IEEE Signal Processing Magazine}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2008_Image%20processing%20for%20artist%20identification_Johnson_Wang.pdf}, 
 year = {2008}
 }
 @article{undefined, 
 author = {Texler, O. and Fišer, J. and Luká, M. and Lu, J. and Shechtman, E. and Sýkora, D.}, 
 title = {{Enhancing Neural Style Transfer using Patch-Based Synthesis}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/043-050.pdf}
 }
 @article{10.1109/act.2010.9, 
 author = {Antaresti, R P Tieta and Arymurthy, Aniati Murni}, 
@@ -233,7 +213,6 @@ doi = {10.1109/act.2010.9},
 abstract = {{This paper chooses and evaluates three feature vectors and their augmented feature vector for recognizing the styles of Indonesian paintings. The three feature extraction methods include the Gabor wavelet, histogram analysis, and number-of-edge analysis. The recognition purpose is to discriminate between the abstractionism and the realism styles of Indonesian paintings. The experimental results using 115 painting images show that the use of number-of-edge features has given the best result with 66.23\% accuracy.}}, 
 pages = {149--152}, 
 journal = {2010 Second International Conference on Advances in Computing, Control, and Telecommunication Technologies}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2010_Image%20Feature%20Extraction%20and%20Recognition%20of%20Abstractionism%20and%20Realism%20Style%20of%20Indonesian%20Paintings_Antaresti_Arymurthy.pdf}, 
 year = {2010}
 }
 @article{hertzmannreview, 
@@ -246,7 +225,6 @@ pages = {70--81},
 number = {4}, 
 volume = {23}, 
 journal = {IEEE Computer Graphics and Applications}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2003_A%20survey%20of%20stroke-based%20rendering_Hertzmann_Hertzmann.pdf}, 
 year = {2003}
 }
 @article{undefined, 
@@ -254,7 +232,6 @@ author = {Shen, Xi and Efros, Alexei A and Aubry, Mathieu},
 title = {{Discovering Visual Patterns in Art Collections with Spatially-consistent Feature Learning}}, 
 eprint = {1903.02678}, 
 abstract = {{Our goal in this paper is to discover near duplicate patterns in large collections of artworks. This is harder than standard instance mining due to differences in the artistic media (oil, pastel, drawing, etc), and imperfections inherent in the copying process. The key technical insight is to adapt a standard deep feature to this task by fine-tuning it on the specific art collection using self-supervised learning. More specifically, spatial consistency between neighbouring feature matches is used as supervisory fine-tuning signal. The adapted feature leads to more accurate style-invariant matching, and can be used with a standard discovery approach, based on geometric verification, to identify duplicate patterns in the dataset. The approach is evaluated on several different datasets and shows surprisingly good qualitative discovery results. For quantitative evaluation of the method, we annotated 273 near duplicate details in a dataset of 1587 artworks attributed to Jan Brueghel and his workshop. Beyond artwork, we also demonstrate improvement on localization on the Oxford5K photo dataset as well as on historical photograph localization on the Large Time Lags Location (LTLL) dataset.}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2019_Discovering%20Visual%20Patterns%20in%20Art%20Collections%20with%20Spatially-consistent%20Feature%20Learning_Shen_Aubry.pdf}, 
 year = {2019}
 }
 @article{10.1016/j.sigpro.2012.01.016, 
@@ -267,7 +244,6 @@ pages = {554--572},
 number = {3}, 
 volume = {93}, 
 journal = {Signal Processing}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2013_When%20Van%20Gogh%20meets%20Mandelbrot-%20Multifractal%20classification%20of%20painting's%20texture_Abry_Jaffard.pdf}, 
 year = {2013}
 }
 @article{10.1109/ivmspw.2016.7528187, 
@@ -277,7 +253,6 @@ doi = {10.1109/ivmspw.2016.7528187},
 abstract = {{The present contribution aims at segmenting a scale-free texture into different regions, characterized by an a priori (unknown) multifractal spectrum. The multifractal properties are quantified using multiscale quantities C 1,jand C2,j that quantify the evolution along the analysis scales 2jof the empirical mean and variance of a nonlinear transform of wavelet coefficients. The segmentation is performed jointly across all the scales j on the concatenation of both C 1,jand C2,jby an efficient vectorial extension of a convex relaxation of the piecewise constant Potts segmentation problem. We provide comparisons with the scalar segmentation of the Hölder exponent as well as independent vectorial segmentations over C1 and C 2.}}, 
 pages = {1--5}, 
 journal = {2016 IEEE 12th Image, Video, and Multidimensional Signal Processing Workshop (IVMSP)}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2016_Multifractal-Based%20Texture%20Segmentation%20Using%20Variational%20Procedure_Frecon_Abry.pdf}, 
 year = {2016}
 }
 @article{texton, 
@@ -286,16 +261,14 @@ title = {{Texton-based analysis of paintings}},
 issn = {0277-786X}, 
 doi = {10.1117/12.863082}, 
 pages = {77980H--77980H-14}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2010_Texton-based%20analysis%20of%20paintings_Maaten_Postma.pdf}, 
 year = {2010}
 }
 @article{textons, 
 author = {Maaten, Laurens van der and Postma, Eric}, 
 title = {{Identifying the Real Van Gogh with Brushstroke Textons}}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2009_Identifying%20the%20Real%20Van%20Gogh%20with%20Brushstroke%20Textons_Maaten_Postma.pdf}, 
 year = {2009}
 }
-@article{rhythmic, 
+@inproceedings{rhythmic, 
 author = {Li, Jia and Yao, Lei and Hendriks, E. and Wang, J. Z.}, 
 title = {{Rhythmic Brushstrokes Distinguish van Gogh from His Contemporaries: Findings via Automated Brushstroke Extraction}}, 
 issn = {0162-8828}, 
@@ -305,7 +278,6 @@ abstract = {{Art historians have long observed the highly characteristic brushst
 pages = {1159--1176}, 
 number = {6}, 
 volume = {34}, 
-journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
-local-url = {file://localhost/Users/arthur/Documents/Papers%20Library/2012_Rhythmic%20Brushstrokes%20Distinguish%20van%20Gogh%20from%20His%20Contemporaries-%20Findings%20via%20Automated%20Brushstroke%20Extraction_Li_Wang.pdf}, 
+journal = {{IEEE Transactions on}{ Pattern Analysis and Machine Intelligence}}, 
 year = {2012}
 }

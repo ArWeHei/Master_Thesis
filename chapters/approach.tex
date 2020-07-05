@@ -30,11 +30,10 @@ The way these brushstrokes have to fit together creates dependencies between the
 It is important where brushstrokes intersect or whether they run in parallel.
 Therefore, a brushstroke can not be placed without considering other brushstrokes in the same region.
 
-\todo{argue that placing one piece in tangram includes planning ahead. -> problem with sequential approaches.}
 A simple yet similar example is the game of Tangram.
 \begin{marginfigure}
     \includegraphics{tangram}
-    \caption[]{An Example of Tangram.}
+    \caption{An Example of Tangram.}
     \labfig{tangram}
 \end{marginfigure}
 Tangram is a Chinese puzzle game that has the objective of replicating a given silhouette with a set of 7 unique shapes.
@@ -68,7 +67,7 @@ They would formulate an energy function to describe how well the parameters desc
 Finding a minimum for these energy functions requires advanced searching algorithms like evolutionary algorithms~\cite{genetic_algo}.
 \begin{marginfigure}
     \includegraphics{genetic_starry_night}
-    \caption[]{'The Starry Night' approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
+    \caption{'The Starry Night' approximated by a genetic algorithm using only circles. \url{https://effyfan.com/2018/03/02/w6-van-gogh-flowfield/}}
     \labfig{genetic}
 \end{marginfigure}
 Albeit being capable of reconstructing images using pretty much any shape (also called unit), they have a major draw-back.
@@ -107,7 +106,7 @@ Previous works have shown that neural networks are capable of conditionally gene
 Therefore, it requires only data of brushstrokes and their parameters to train the network.\\
 As previously stated, many already did so.
 However, these approaches do not focus on the quality of the renderer.
-Thus, they use simple painting applications like \citetitle{libmypaint} to generate the training data.
+Thus, they use simple painting applications like ``libmypaint'' to generate the training data.
 In this approach there shall be more emphasis on the render quality.
 
 \subsection{Data Set}
@@ -140,15 +139,15 @@ This kind of data would allow to train a renderer, though it would likely cause 
 \subsubsection{Fluid Simulations}
 Fluid simulations like those by \citeauthor*{wetbrush} give a better render quality compared to painting libraries. 
 Unfortunately, only few implementations are openly available and if so are not as advanced.\\
-\citeauthor*{SPIRAL} provide a fluid simulation package based on \citetitle{fluidpaint}~\cite{fluidpaint}.
+\citeauthor*{SPIRAL} provide a fluid simulation package based on fluidpaint~\cite{fluidpaint}.
 It uses simple fluid dynamics to give artificial brushstrokes a more plastic look.
 One problem, that comes with all simulations is that the brushstroke path not controlled directly, but by moving a virtual paintbrush.
 Nevertheless, it is possible to partly account for this when creating the data set.\\
 Another problem is the simulation time.
 State-of-the-art approaches are just capable of rendering in real-time which is too slow for an entire data set.
-Luckily, \citetitle{fluidpaint} is not as computationally expensive and can be parallelized to generate $100,000$ samples in about two hours.
+Luckily, fluidpaint is not as computationally expensive and can be parallelized to generate $100,000$ samples in about two hours.
 
-All in all, \citetitle{fluidpaint} has been chosen as the tool to generate the data set.
+All in all, fluidpaint has been chosen as the tool to generate the data set.
 The superior render quality justifies the additional work required to generate the data set.\\
 There are other applications which are capable of simulating brushstrokes reasonably well like \citetitle{artrage}~\cite{artrage} and \citetitle{krita}~\cite{krita}.
 Unfortunately, these application do not provide an interface to efficiently generate a data set.
@@ -169,7 +168,7 @@ Unfortunately, these application do not provide an interface to efficiently gene
         \includegraphics[width=.8\textwidth]{images/fluidpaint_red_stroke}%
         \labfig{strokes:fluidpaint}%
     }
-    \caption[]{Comparison of similar brushstrokes in each data set}
+    \caption{Comparison of similar brushstrokes in each data set}
     \labfig{strokes}
 \end{marginfigure}
 
@@ -183,24 +182,23 @@ These parameters must quantify the following three properties of brushstrokes:
 \end{itemize}
 
 Naturally, color is approximated by three 8-bit numbers in the RGB format.\\
-Path and thickness depend on the given coordinate scaling which is $[0, 1]$ in \citetitle{fluidpaint}.
+Path and thickness depend on the given coordinate scaling which is $[0, 1]$ in fluidpaint.
 Valid brush sizes are any value in $[0, 1]$ from an infinitely small brushstroke ($0$) to one as wide as the canvas ($1$).
 Both these edge cases do not make sense in this approach, thus the range is constrained to $[0.03, 0.2]$.
 This range includes only brushstrokes that are visible but do not cover the whole canvas.\\
 
 Quantifying the path is a little more tricky.
-\citetitle{fluidpaint} is internally only able to move the brush in a straight line between $a$ and $b$ for a single time step $t \rightarrow t+1$.
+fluidpaint is internally only able to move the brush in a straight line between $a$ and $b$ for a single time step $t \rightarrow t+1$.
 Subsequently, any curved paths must be split into linear/straight segments that together approximate a curved line.
 As more time steps mean longer simulation times and fewer steps mean edgy curves, a value of 20 time-steps per stroke emerged as a good compromise.\\
-There are additional issues which stem from the fact that \citetitle{fluidpaint} gives only control over the brush's path.
+There are additional issues which stem from the fact that fluidpaint gives only control over the brush's path.
 Due to the length of the bristles an offset is introduced.
 Also, the bristles need to be aligned such that a ``clean'' brushstroke is drawn.
 Further information on how this has been implemented can be found in the appendix (see \refsec{fluidpaint}).
 \begin{marginfigure}
     \includegraphics{bristles}
-    \caption[]{Virtual bristles in \citetitle{fluidpaint} as they are initialized.}
+    \caption{Virtual bristles in fluidpaint as they are initialized.}
 \end{marginfigure}
-\todo{add figure of bristles/fluidpaint bristles}
 
 Another question is how to express a curved path in numbers for the neural renderer.
 A straightforward representation would be a sequence of points that make up the curved path.
@@ -212,8 +210,7 @@ Such an approach allows for the highest versatility.
     \subfloat[Sample Brushstroke]{%
         \includegraphics{zolee}
     }\qquad
-    \caption[]{(a) typical paths of a brushstroke in a painting. (b) a rarely observed path. Sources:\url{https://www.vangoghmuseum.nl/en/collection/s0164V1962}~\cite{zolee}.}
-    \labfig{genetic}
+    \caption{(a) typical paths of a brushstroke in a painting. (b) a rarely observed path. Sources:\url{https://www.vangoghmuseum.nl/en/collection/s0164V1962}~\cite{zolee}.}
 \end{marginfigure}
 At the same time it introduces a noticeable amount of parameters as each point consists of 2 coordinates, totaling 40 additional dimensions.
 Also, each point is not independent of the other points but should lie withing a certain range and follow a reasonable path. 
@@ -237,13 +234,12 @@ Thus a virtual point will always start at the start point $t=0$ and end at the e
 Drawing networks often face the same issue and many rely on Bézier curves as a parametrization~\cite{SPIRAL, neuralpainters, learning2paint}.\\
 A quadratic Bézier curve will only bend into one direction or follow a straight path.\\
 As brushstrokes usually follow a rather simple path and fewer parameters are preferred, quadratic Bézier curves are used as parametrization.
+\marginnote{For higher orders, the displayed process can be applied iteratively and allows for more complex curves.}
 This is also the case in many drawing networks~\cite{SPIRAL, neuralpainters, learning2paint}.
 \begin{marginfigure}
     \includegraphics{bezier_sample}
-    \caption[]{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm, \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
-    \labfig{genetic}
+    \caption{Sample of a 3rd degree Bezier curve, using the De-Casteljau-algorithm, \url{https:\/\/de.wikipedia.org\/wiki\/Bézierkurve\#\/media\/Datei:Bezier-cast-3.svg}}
 \end{marginfigure}
-\marginnote{For higher orders, the displayed process can be applied iteratively and allows for more complex curves.}
 
 Ultimately, there will be ten values that are sufficient to parametrize brushstrokes with certain constraints:
 \begin{itemize}
@@ -268,7 +264,7 @@ Brushstrokes should be at least two times as long as they are wide.
 \begin{align}
     \norm{\vec{s} - \vec{e}} \overset{!}{\leq}  2 \times (\text{brush size}) \labeq{bs}
 \end{align}
-Due to the simulation in \citetitle{fluidpaint}, shorter brushstrokes will show artifacts caused by the bristles' length.
+Due to the simulation in fluidpaint, shorter brushstrokes will show artifacts caused by the bristles' length.
 The length of these bristles directly correlates to the brush size/width.\\
 Another motivation is the intended use-case, which will focus on van Gogh paintings.
 As van Gogh did not practice pointillism, most of his strokes have a length to them, which brings such a constraint in line with some characteristics of van Gogh's style.\\
@@ -285,7 +281,7 @@ Most brushstrokes (especially those by van Gogh) have a certain ``flow'' or ``sm
 ``Smooth'' brushstrokes do not follow a kinky path but feature curvatures with large radii.\\
 \begin{marginfigure}
     \includegraphics{starry_strokes}
-    \caption[]{Brushstrokes by van Gogh in a painting (The Starry Night).}
+    \caption{Brushstrokes by van Gogh in a painting (The Starry Night).}
 \end{marginfigure}
 Thus, the data set will be restricted to brushstrokes that follow these descriptions.
 To achieve this with random sampling in place, a multivariate Gaussian distribution is placed between start ($\vec{s}$) and end point ($\vec{e}$).
@@ -317,7 +313,7 @@ Thus, the eigendecomposition of $\mat{\Sigma}$ is known and $\mat{\Sigma}$ can b
     \resizebox{\textwidth}{!}{
         \input{images/scatter.pgf}
     }
-    \caption[]{Exemplary scatter plot for given start and end point to visualize the covariance matrix}
+    \caption{Exemplary scatter plot for given start and end point to visualize the covariance matrix}
     \labfig{scatter}
 \end{marginfigure}
 
@@ -380,17 +376,16 @@ The last FC layer consists of only eight unit, which act are predictors.
 
 \reffig{architecture} shows a visual depiction of the architectures.
 
-\todo{reinsert these figures}
-%\begin{figure*}
-%    \resizebox{1.5\textwidth}{!}{
-%        \input{images/generator.tex}
-%    }
-%    \resizebox{1.5\textwidth}{!}{
-%        \input{images/discriminator.tex}
-%    }
-%        \caption{Visualization of the generator and discriminator architectures}\labfig{genarch}
-%        \labfig{architecture}
-%\end{figure*}
+\begin{figure*}
+    \resizebox{1.5\textwidth}{!}{
+        \input{images/generator.tex}
+    }
+    \resizebox{1.5\textwidth}{!}{
+        \input{images/discriminator.tex}
+    }
+        \caption{Visualization of the generator and discriminator architectures. This schematic does not include stylemod, noise or multi-scale inputs to allow for a better overview.}\labfig{genarch}
+        \labfig{architecture}
+\end{figure*}
 
 \subsection{Training}
 \marginnote{The Frechet inception distance (FID) is calculated by comparing the statistics of InceptionNet~\cite{inception}-activations for two batches of samples from the dataset and generated samples~\cite{FID}.
@@ -412,15 +407,15 @@ If, for instance, the discriminator becomes too strong and the generator's loss 
 \reffig{singlestrokes} shows a generated sample compared to a rendered sample with the same parameters.
 The images are split into their RGB channels and the alpha channel to allow evaluating the two independently.
 \reffig{singlestroke_rgba} shows all four channels merged for a generated brushstroke.
-It becomes immediately clear that the neural renderer is capable of imitating \citetitle{fluidpaint}.
+It becomes immediately clear that the neural renderer is capable of imitating fluidpaint.
 \begin{marginfigure}
     \includegraphics{singlestroke}
-    \caption[]{Generated sample and the corresponding data set sample compared.}
+    \caption{Generated sample and the corresponding data set sample compared.}
     \labfig{singlestrokes}
 \end{marginfigure}
 \begin{marginfigure}
     \includegraphics{singlestroke_rgba}
-    \caption[]{Generated brushstroke.}
+    \caption{Generated brushstroke.}
     \labfig{singlestroke_rgba}
 \end{marginfigure}
 
@@ -553,7 +548,7 @@ The core of this problem is the imposed lattice structure that could propagate l
 
 One possible solution is getting rid of the lattice structure and replacing it with a non-symmetric structure.
 Superpixels are an easy way of evenly spacing brushstrokes without a regular structure.
-\marginnote{Superpixels were popular in the 'pre-neural network era' of computer vision and were used in image segmentation tasks \cite{superpixel}.
+\marginnote{Superpixels were popular in the 'pre-neural network era' of computer vision and were used in image segmentation tasks \cite{superpixel_segmentation}.
 Each superpixel defines a groupd of pixels that is pairwise disjoint to all other superpixel \ie they do not overlap.
 Superpixels-like algorithms are also a valid starting point for brushstroke extraction algorithms \cite{lamberti}.}
 
@@ -804,7 +799,7 @@ A number of $100 \si{\pixel}/\text{brushstroke}$ has produced the best results d
 
 Another important choice that goes along the choice of how dense the brushstrokes should be distributed is that of how many optimization steps each brushstroke will be object to.
 As for too few steps, the training will not have converged, and for too many, optimization will take an unnecessary amount of time.\\
-This number can vary between images, since some images require more time to converge, about $500 - 1000 \text{steps}/\text{brushstroke}$ have given constantly good results.\\
+This number can vary between images, since some images require more time to converge, about $500 - 1000 \text{ steps}/\text{brushstroke}$ have given constantly good results.\\
 Albeit there is no direct enforcement that each brushstroke is updated exactly this often, it can be expected that due to the uniform sampling of the patch window position, brushstrokes are updated roughly equally often.
 Since 256 brushstrokes will be optimized in every step, the total number of optimization steps can be calculated together with the brushstroke density and the image's size.
 

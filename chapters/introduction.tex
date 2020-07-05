@@ -6,25 +6,22 @@
 % shortcoming of computers to visualize this -> will draw enormous resources
 % paintings are most often displayed though images -> no texture
 
-\todo{this need at least some pictures in it}
-
 The American Cambridge dictionary defines the word "picture" as
     
 \dictcite{CAD}{picture}
-\todo{add phonetic signs}
  
 which right away separates between different media that can make up a picture.
-If one were to look up the definitions of "drawing", "painting", and "photograph" as well, it becomes clear what distinguishes these three words:
+If one looks up the definitions of "drawing", "painting", and "photograph" as well, it becomes clear what distinguishes these three words:
 \begin{itemize}
 \item Paintings are only pictures that are made with paint.
-\item A drawing is confined to pictures drawn with a pencil or pen.
-\item Finally, a photograph is a picture taken with a camera.
+\item Drawings are confined to pictures drawn with a pencil or pen.
+\item And photographs are a pictures taken with a camera.
 \end{itemize}
 
 All of these three methods could be used to picture the same image.
 Yet, they will always give different results, as each medium comes with its limitations.\\
 The painting will almost always deviate in its details from the original image, as paint tends to mix and flow.\\
-The drawing will focus on edges and contours such that large colored regions have a somewhat smooth texture.\\
+The drawing will focus on edges and contours such that large colored regions have a smooth texture.\\
 The photograph will limit an artist in showing anything more than the actual visual input.\\
 
 Still, all of these techniques also have their characteristics that other techniques do not possess. \\
@@ -35,12 +32,12 @@ This can not only be confirmed by art historians or the like but can be seen whe
 Artists meticulously imitate every brushstroke of masterpieces such as The Starry Night by van Gogh or, most famously, the Mona Lisa by DaVinci.
 There can only be a market for such replicas if actual painting and photos of paintings show enough of a difference.\\
 Drawings suffer a different fate as they feature a rather two-dimensional structure and thus can be more easily copied and printed.
-Subsequently, there are drawing applications on computers and tablets that have been useful tools for digital artists for over two decades now.
+Subsequently, there are drawing applications on computers and tablets that have been useful tools for digital artists for over two decades.
 Due to technological advancement, it has become a feasible challenge to mimic the feel of pen on paper with styluses on glass tablets.\\
 All of this makes it clear that the art of drawing has been subject to the digital revolution as much as the art of taking photographs.
 \begin{marginfigure}
     \includegraphics{oil_painting_tools}
-    \caption[]{A typical set of brushes and spatulas used for oil paintings. Source:\url{https://www.shutterstock.com/image-photo/professional-brushes-palette-knife- tubes-paint-96120704}}
+    \caption{A typical set of brushes and spatulas used for oil paintings. Source:\url{https://www.shutterstock.com/image-photo/professional-brushes-palette -knife-tubes-paint-96120704}}
     \labfig{painting_tools}
 \end{marginfigure}
 
@@ -51,7 +48,7 @@ Even then, most digital content is consumed through 2D screens, which are not ca
 \begin{marginfigure}
     \includegraphics{images/cutout_orig}%
     \caption{Detailed brushstrokes in van Goghs painting 'The Little Arlesienne'. Source:~\cite{rhythmic}}
-    \labfig{cutout_orig}%
+    \labfig{cutout_orig0}%
 \end{marginfigure}
 
 So why even bother then, if all of these limitations are in place?\\
@@ -59,14 +56,14 @@ The development of technology in recent years suggests that the sky is the limit
 Coming up with ways of digitalizing paintings now will benefit development in the future.
 
 Thus, the question arises how paintings could be digitalized.\\
-One way to achieve this is 3D scans~\cite{3Dscan_art, 3Dscan_thesis} or gigapixel photographs of paintings~\cite{googleartproject}.
+One way to achieve this are 3D scans~\cite{3Dscan_art, 3Dscan_thesis} or gigapixel photographs of paintings~\cite{googleartproject}.
 Both of these methods require much technological effort and money for each painting to be digitalized.\\
-Another way imaginable would be to hire artists that already replicate paintings to do so in software.
+Another imaginable way would be to hire artists that already replicate paintings to do so in software.
 Such an approach would also be combined with huge costs and take lots of time if it were to be realized for many paintings.
 
 An interesting idea would be to combine the approach of re-drawing paintings with the latest technology in artificial intelligence and machine learning.
 Such an approach would ideally not cost much (but the time and effort to develop the algorithm once).
-At the same time, it would be able to approximate many images of paintings relatively fast automatically.
+At the same time, it would be able to automatically approximate many images of paintings relatively fast.
 
 If it were possible to imitate many paintings this way easily, there would be benefits for other fields as well.
 Conservation and restoration of paintings could be assisted digitally.
@@ -90,7 +87,8 @@ First, a differentiable renderer is trained from a neural network.
 The differentiable renderer generates images of single brushstrokes from parameters in a differentiable way.\\
 This renderer should then be used to train a feed-forward prediction network.
 A prediction network generates a set of parameters for a given input image which is meant to recreate the input.\\
-If a feed-forward approach does not work, a backpropagation-based optimization procedure will be tested.
+Unfortunately, early experiments showed that a feed-forward approach is not feasible.
+Thus the approach was modified to use a backpropagation-based optimization procedure.
 Such a procedure optimizes a set of brushstroke parameters directly such that they recreate the image together.\\
 The resulting rendered paintings will be evaluated against other methods that claim to reconstruct images from brushstrokes.
 

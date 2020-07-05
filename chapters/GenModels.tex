@@ -32,12 +32,13 @@ After every two or three blocks (convolutional layer + activation layer) there i
 Every time the resolution is reduced by $\frac{1}{4}$ the number of kernels for the following convolutions is doubled.
 In the end there are a couple fully connected layers which interpret the final features and generate a prediction.
 \reffig{VGG} shows the networks architecture.
-\todo{reinsert this figure}
-%\begin{figure}
-%    \input{images/vgg16.tex}
-%    \caption[]{Architecture of a VGG16 network.}
-%    \labfig{VGG}
-%\end{figure}
+\begin{figure}
+    \resizebox{1.5\textwidth}{!}{
+        \input{images/vgg16.tex}
+    }
+    \caption{Architecture of a VGG16 network. Source:\url{https://github.com/HarisIqbal88/PlotNeuralNet}}
+    \labfig{VGG}
+\end{figure}
 
 \marginnote{Interestingly, modern classification networks are able of super-human classification performance~\cite{superhuman}.}
 
@@ -46,7 +47,7 @@ Presented only a year after VGG16, ResNet features many more by using residual c
 
 \begin{marginfigure}
     \includegraphics{resnet}
-    \caption[]{Comparison of VGG19 architecture and ResNet architecture.}
+    \caption{Comparison of VGG19 architecture and ResNet architecture.}
     \labfig{resnet}
 \end{marginfigure}
 
@@ -78,7 +79,7 @@ A very common use-case for auto-encoders are images of faces.
 Usually these faces are pre-processed such that they are always aligned similarly in every image.
 Then a lower dimensional representation only needs to represent \eg the eye-color since the position of the eyes should be the same in all images.\\
 This example also points out another goal of auto-encoders, which is to make the compressed representation interpretable and/or controllable.
-This would mean, changing one parameter in the \textbf{feature space} \ie the lower dimensional representation will equate to changing the color of the hair.
+This would mean, changing one parameter in the \textbf{feature space} (the lower dimensional representation) will equate to changing the color of the hair.
 
 The now introduced features space allows for lots of research such as metric learning.
 
@@ -107,8 +108,6 @@ The resulting network then allows to generate samples with the decoder and explo
 Generative adversarial networks (GAN) were presented by \citeauthor*{GAN} in \citeyear{GAN}~\cite{GAN}.
 Nowadays, GANs are widely acclaimed and build the foundations for many approached in computer vision and machine learning.
 The researches behind GANs were even lauded with the prestigious Turing Award~\cite{turingaward}.
-\marginnote{Other researchers claim to have come up with the idea of GANs earlier, which is kind of a hot topic in the machine learning community.
-For safety measures the supposedly previous claim shall be cited as well~\cite{schmidhuber}.}
 
 The basic idea behind GANs is to combine a generator with a discriminator.
 The generator's job is to generate data from noise.
@@ -139,7 +138,7 @@ Again, other approaches improve the quality for high-resolution images by genera
 One particular approach to improving the loss function finds use in this thesis and thus shall be presented.
 
 Relativistic Standard GAN (RSGAN) and Relativistic average standard GAN (RaSGAN) are two implementations presented by \citeauthor*{RGAN}.
-\marginnote{Standard GAN means the GAN as presented in \refeq{GAN_G, GAN_D}.}
+\marginnote{Standard GAN means the GAN as presented in \refeq{GAN_G} and \refeq{GAN_D}.}
 They claim that by modifying the loss function the stability of training as well as the quality of generated samples can be improved~\cite{RGAN}.
 
 The main idea behind this approach is, that in a standard GAN approach the discriminator is more focussed on classifying real samples correctly.
@@ -159,10 +158,12 @@ Instead, the mean of real samples and generated samples is calculated across the
 \begin{align}
     \labeq{RAGAN_G}
     G & = \argmin_G - \E_Z[\log(\sigma(D(G(z)) - \E_X[D(x)])] \\
+    \nonumber
     & - \E_X[\log(1 - \sigma(D(x) - \E_Z[D(G(z))])]\\
     \labeq{RAGAN_D}
-    D & = \argmin_D - \E_Z[\log(1 - \sigma(D(G(z)) - \E_X[D(x)])]
-    & - \E_X[\log(\sigma(D(x) - \E_Z[D(G(z))])]\\
+    D & = \argmin_D - \E_Z[\log(1 - \sigma(D(G(z)) - \E_X[D(x)])] \\
+    \nonumber
+    & - \E_X[\log(\sigma(D(x) - \E_Z[D(G(z))])]
 \end{align}
 This further improves the quality of generated samples in adversarial training.
 

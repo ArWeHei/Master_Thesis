@@ -5,7 +5,7 @@
 \chapter{Appendix}
 \section{FluidPaint}
 \labsec{fluidpaint}
-This section shall explain some of the tricks that were employed to generate a nice-looking data set with \citetitle{fluidpaint}.
+This section shall explain some of the tricks that were employed to generate a nice-looking data set with fluidpaint.
 
 The main issue when dealing with this simulation environment is the fact, that control is given over a virtual brush.
 This brush has virtual bristles which are necessary to for the simulation.
@@ -19,8 +19,8 @@ Additionally, the brush is reinitialized for every data sample.
 Each time the brush is initialized, the bristles can point in random directions which is why the bristles have to be aligned beforehand as well.
 \begin{marginfigure}
     \includegraphics{bristles}
-    \caption[]{Image which shows the bristles in \citetitle{fluidpaint}~\cite{fluidpaint}}
-    \labfig{linear_class}
+    \caption{Image which shows the bristles in fluidpaint~\cite{fluidpaint}}
+    \labfig{bristles2}
 \end{marginfigure}
 
 In order to cope with these issues a special ``routine'' is performed with the brush beforehand.
@@ -41,7 +41,7 @@ Additionally, it helps later on to draw the brushstrokes with other visualizatio
 \section{Vecotrizing Alpha Blending}
 \labsec{alphablend}
 
-The easiest way to accomplish this, is to first find the maximum blending-depth over all pixels, where the blending-depth $k$ is the number of layers where the alpha value is not zero.
+The easiest way to accomplish efficient alpha bledning, is to first find the maximum blending-depth over all pixels, where the blending-depth $k$ is the number of layers where the alpha value is not zero.
 \begin{align}
     k = \argmax_{p \in \text{pixels}} \sum_{i \in \# \text{layers}} \mathds{1}(\alpha_i > 0)
 \end{align}
@@ -163,7 +163,7 @@ By multiplying the elements along each row in $\delta^{hw}$ one gets:
     \end{pmatrix}
 \end{align}
 
-This vectorized version of alpha blending will introduce a new possible bottleneck as it is, since $\beta^{hw}$ will be a tensor of shape $(N, N, H, W)$, which will equate to
+This vectorized version of alpha blending will introduce a new possible bottleneck, since $\beta^{hw}$ will be a tensor of shape $(N, N, H, W)$, which will equate to
 $$
 256 \times 256 \times 256 \times 256 \times 4 \si{\byte} = 2^{36}\si{\byte} = 64\si{\gibi\byte}
 $$
@@ -176,6 +176,6 @@ k \times k \times 256 \times 256 \times 4 \si{\byte} = k^2 2^{22}\si{\byte} = k^
 $$
 as the shape is reduced to $(k, k, H, W)$.
 
-Ultimately, this accelerates optimization by a factor of $2-3$, as it will be shown in \ref{sec:exp:vectorization}.
+Ultimately, this accelerates optimization by a factor of $2-3$.
 
 It must be mentioned that the upper boundary for computational complexity in using this kind of alpha-blending is $\mathcal{O}(N \log k)$, since the top $k$ search is bound by this complexity.
